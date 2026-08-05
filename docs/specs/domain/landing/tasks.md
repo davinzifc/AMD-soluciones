@@ -171,11 +171,11 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - **Recommended skills:** `angular-developer`
 - **Design refs:** §6 Routes · fragment contract · DD-014
 - **Requirements:** REQ-001 · REQ-002 (no sidenav on deep — shell flag) · REQ-014 · REQ-005/004 navigation targets prepared
-- **Verification:** `cd client && npm run test:agent` — **router smoke**: `/`, `/quienes-somos`, `/servicios`, `/privacidad`, `/terminos`, unknown → 404 component; fragment navigation to `/servicios#contabilidad` and `/#contacto` configured
-- **Evidence disqualifier:** Test only checks `Routes` array length; 404 is redirect-to-home without page; `/servicios/:group` child route invented instead of fragment
+- **Verification:** `cd client && npm run test:agent` — **router smoke**: `/`, `/about-us`, `/services`, `/privacy`, `/terms`, unknown → 404 component; fragment navigation to `/services#contabilidad` and `/#contacto` configured
+- **Evidence disqualifier:** Test only checks `Routes` array length; 404 is redirect-to-home without page; `/services/:group` child route invented instead of fragment
 
 ### Scope
-- Declare routes per design (Spanish paths)
+- Declare routes per design (English paths — DD-014 pivot)
 - `withInMemoryScrolling` anchor + restoration
 - Legal stub pages; minimal 404 with “Volver al inicio”
 - Lazy-load deep features when folders exist (stubs OK until T011/T012)
@@ -184,7 +184,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 ### Done when
 - [ ] Multi-page navigation works without Nest
 - [ ] Fragments use scroll API, not fake params
-- [ ] BUT it must NOT list `/servicios#:group` as a path segment
+- [ ] BUT it must NOT list `/services#:group` as a path segment
 
 ---
 
@@ -215,14 +215,14 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T007 — Home Services road (5 groups)
 
-- **Status:** [ ]
+- **Status:** [~]
 - **Size:** L
 - **Depends on:** T005, T003
 - **Directory boundary:** `client/src/app/features/home/services-road/`
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Design refs:** §6 ServicesRoadSection · DD-006
 - **Requirements:** REQ-004 · REQ-012 (no hover-only expand)
-- **Verification:** `cd client && npm run test:agent` — expand/collapse; keyboard Enter/Space on card/node; “Más info” navigates to `/servicios` + correct fragment for all 5 ids
+- **Verification:** `cd client && npm run test:agent` — expand/collapse; keyboard Enter/Space on card/node; “Más info” navigates to `/services` + correct fragment for all 5 ids
 - **Evidence disqualifier:** Only mouse click tested; hover-only expand on desktop CSS without keyboard path; missing any of 5 group ids
 
 ### Scope
@@ -247,7 +247,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Design refs:** §6 AboutTeaserSection
 - **Requirements:** REQ-006 (teaser half)
-- **Verification:** `cd client && npm run test:agent` — “Ver más” → `/quienes-somos`
+- **Verification:** `cd client && npm run test:agent` — “Ver más” → `/about-us`
 - **Evidence disqualifier:** Link goes to `#sobre-amd` only; full misión/visión duplicated on Home as if deep page done
 
 ### Scope

@@ -147,19 +147,19 @@ Derived from mockup v0.1 + `docs/ux-ui/design.md` tokens.
 | Route | Feature | Notes |
 |-------|---------|-------|
 | `/` | Home (composed sections) | Enables left sidenav |
-| `/quienes-somos` | About deep | No sidenav |
-| `/servicios` | Services deep | In-page anchors `#contabilidad`… via **fragment**, not child routes |
-| `/privacidad`, `/terminos` | Legal stub | Placeholder copy |
+| `/about-us` | About deep | No sidenav |
+| `/services` | Services deep | In-page anchors `#contabilidad`… via **fragment**, not child routes |
+| `/privacy`, `/terms` | Legal stub | Placeholder copy |
 | `/**` | Minimal **404 page** with “Volver al inicio” CTA | Not a silent redirect; UX §4 |
 
 **Fragment / scroll contract (REQ-004/005/009):**
 
 - Enable Angular `withInMemoryScrolling` (`anchorScrolling: 'enabled'`, `scrollPositionRestoration: 'enabled'`).
-- Home “Más info” → navigate to `/servicios` with fragment = group id (e.g. `contabilidad`).
+- Home “Más info” → navigate to `/services` with fragment = group id (e.g. `contabilidad`).
 - Deep-page Contactar CTA → navigate to `/` with fragment `contacto` (single mechanism; no alternate undecided path).
 - Locale switch updates copy in place — **must not** drop the current route or URL fragment.
 
-**URL localization (DD-014):** path segments stay Spanish (`/quienes-somos`, `/servicios`, …) in both locales — matches mockup filenames; only UI strings flip.
+**URL localization (DD-014 — superseded 2026-08-05):** path segments are **English** (`/about-us`, `/services`, `/privacy`, `/terms`) in both locales — single route tree; only UI strings flip. Home **section** fragments on `/` (`#inicio`, `#servicios`, `#sobre-amd`, `#confianza`, `#contacto`) and Servicios **group** fragments (`#contabilidad`…) stay as approved IA/content ids (not localized path prefixes).
 
 ### Shell & chrome
 
@@ -180,8 +180,8 @@ Derived from mockup v0.1 + `docs/ux-ui/design.md` tokens.
 | Section | Composition | Interaction |
 |---------|-------------|-------------|
 | `HeroSection` | Full-bleed bg + brand H1 + legal line + promise + CTA pair | Optional storytelling parallax; no cards |
-| `ServicesRoadSection` | Axis + 5 alternating nodes/cards | Expand via click/tap **and** keyboard on node/card (Enter/Space); not hover-only; “Más info” → `/servicios` + fragment |
-| `AboutTeaserSection` | Visual + short copy | “Ver más” → `/quienes-somos` |
+| `ServicesRoadSection` | Axis + 5 alternating nodes/cards | Expand via click/tap **and** keyboard on node/card (Enter/Space); not hover-only; “Más info” → `/services` + fragment |
+| `AboutTeaserSection` | Visual + short copy | “Ver más” → `/about-us` |
 | `TrustSection` | Metrics · logo marquee viewport · testimonial crossfade + dots | Marquee mask on viewport only; ~9s pause |
 | `ContactSection` | Meta (Cali, WA) + form | Validate → toast + handoff; emit `contact_submit` |
 
@@ -287,7 +287,7 @@ None across packages. Configurables in environment or `app.config`:
 | DD-011 | Forms API | **Reactive Forms** for contact v1 | Signal Forms gated on CLI version sniff | Stable test surface for REQ-008/013 |
 | DD-012 | Scaffold | Latest stable Angular CLI → `client/`; Vitest **or** Jest = **whatever `ng new` defaults**; define `npm start`, `npm run lint`, `npm run test:agent` (lean reporter); fonts via preconnect + `font-display: swap` (Google or self-host) | Ad-hoc scripts; undefined runner | Closes A1; NFR-006; TRD §12 placeholders become real |
 | DD-013 | Folder map vs TRD | `features/home/{…}` + deep features | Literal `landing/hero` paths from TRD §4 | Multi-page IA needs shared Home composition |
-| DD-014 | URL locale | Spanish path segments for all locales | Localized path prefixes | Mockup parity; avoids duplicate route trees |
+| DD-014 | URL locale | **English** path segments for all locales (`/about-us`, `/services`, `/privacy`, `/terms`) — HITL pivot 2026-08-05 | Spanish paths (mockup filenames); per-locale path prefixes | Single English tree; UI copy still ES/EN; avoids duplicate localized route trees |
 | DD-015 | Parallax ranges | Hero/story **0.15–0.35** (UX); road deco **0.08–0.14** (mockup) | Single blended 0.08–0.35 range | Resolves A2/B3 without inventing a hybrid |
 
 ## 9. NFR scenarios (this spec)

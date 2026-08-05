@@ -21,12 +21,12 @@ function setup(titleKey?: string) {
 }
 
 describe('LegalStubPage', () => {
-  it('renders the ftTerms title when route data supplies it (/terminos)', () => {
+  it('renders the ftTerms title when route data supplies it (/terms)', () => {
     const fixture = setup('ftTerms');
     expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('ftTerms');
   });
 
-  it('renders the ftPrivacy title when route data supplies it (/privacidad)', () => {
+  it('renders the ftPrivacy title when route data supplies it (/privacy)', () => {
     const fixture = setup('ftPrivacy');
     expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('ftPrivacy');
   });

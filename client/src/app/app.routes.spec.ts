@@ -31,7 +31,7 @@ function stubFetch(): void {
  * config with the SAME `withInMemoryScrolling` wiring as `app.config.ts`, so
  * this proves navigation resolves actual components — not just an
  * `Routes.length` assertion — and that the fragment/scroll contract is
- * configured for `/servicios#<group>` and `/#contacto`.
+ * configured for `/services#<group>` and `/#contacto`.
  */
 describe('app.routes — router smoke', () => {
   let harness: RouterTestingHarness;
@@ -60,24 +60,24 @@ describe('app.routes — router smoke', () => {
     expect(home).toBeInstanceOf(HomePage);
   });
 
-  it('resolves AboutPage at "/quienes-somos"', async () => {
-    const about = await harness.navigateByUrl('/quienes-somos', AboutPage);
+  it('resolves AboutPage at "/about-us"', async () => {
+    const about = await harness.navigateByUrl('/about-us', AboutPage);
     expect(about).toBeInstanceOf(AboutPage);
   });
 
-  it('resolves ServicesPage at "/servicios"', async () => {
-    const services = await harness.navigateByUrl('/servicios', ServicesPage);
+  it('resolves ServicesPage at "/services"', async () => {
+    const services = await harness.navigateByUrl('/services', ServicesPage);
     expect(services).toBeInstanceOf(ServicesPage);
   });
 
-  it('resolves the legal stub at "/privacidad" titled via ftPrivacy', async () => {
-    const legal = await harness.navigateByUrl('/privacidad', LegalStubPage);
+  it('resolves the legal stub at "/privacy" titled via ftPrivacy', async () => {
+    const legal = await harness.navigateByUrl('/privacy', LegalStubPage);
     expect(legal).toBeInstanceOf(LegalStubPage);
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('ftPrivacy');
   });
 
-  it('resolves the legal stub at "/terminos" titled via ftTerms', async () => {
-    const legal = await harness.navigateByUrl('/terminos', LegalStubPage);
+  it('resolves the legal stub at "/terms" titled via ftTerms', async () => {
+    const legal = await harness.navigateByUrl('/terms', LegalStubPage);
     expect(legal).toBeInstanceOf(LegalStubPage);
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('ftTerms');
   });
@@ -90,12 +90,12 @@ describe('app.routes — router smoke', () => {
     expect(router.url).toBe('/this-route-does-not-exist');
   });
 
-  it('navigates to "/servicios#contabilidad" (fragment) and the anchor target exists in the DOM', async () => {
-    const services = await harness.navigateByUrl('/servicios#contabilidad', ServicesPage);
+  it('navigates to "/services#contabilidad" (fragment) and the anchor target exists in the DOM', async () => {
+    const services = await harness.navigateByUrl('/services#contabilidad', ServicesPage);
     expect(services).toBeInstanceOf(ServicesPage);
 
     const router = TestBed.inject(Router);
-    expect(router.url).toBe('/servicios#contabilidad');
+    expect(router.url).toBe('/services#contabilidad');
     expect(harness.routeNativeElement?.querySelector('#contabilidad')).toBeTruthy();
   });
 
@@ -108,10 +108,10 @@ describe('app.routes — router smoke', () => {
     expect(harness.routeNativeElement?.querySelector('#contacto')).toBeTruthy();
   });
 
-  it('does NOT declare a "/servicios/:group" (or any) child route — group anchors are fragments only', () => {
-    const serviciosRoute = routes.find((route) => route.path === 'servicios');
-    expect(serviciosRoute?.children ?? []).toEqual([]);
-    expect(routes.some((route) => route.path?.startsWith('servicios/'))).toBe(false);
+  it('does NOT declare a "/services/:group" (or any) child route — group anchors are fragments only', () => {
+    const servicesRoute = routes.find((route) => route.path === 'services');
+    expect(servicesRoute?.children ?? []).toEqual([]);
+    expect(routes.some((route) => route.path?.startsWith('services/'))).toBe(false);
   });
 
   it('places the wildcard "**" route last (first-match-wins ordering)', () => {

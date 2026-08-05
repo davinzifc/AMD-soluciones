@@ -73,7 +73,7 @@ describe('App', () => {
       fixture.detectChanges();
 
       const router = TestBed.inject(Router);
-      await router.navigateByUrl('/quienes-somos');
+      await router.navigateByUrl('/about-us');
       fixture.detectChanges();
 
       expect(fixture.nativeElement.querySelector('.sidenav-host')).toBeNull();

@@ -5,7 +5,7 @@ import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 
 /**
  * Servicios group anchor ids (design §3 `ServiceGroupId`). Home's road
- * "Más info" links (T007) deep-link here as `/servicios#<id>` — a fragment,
+ * "Más info" links (T007) deep-link here as `/services#<id>` — a fragment,
  * never a child route. Order matches REQ-004 (Contabilidad, Gestión
  * Administrativa, Sistemas de Riesgo, Asesoría, Marca).
  */
@@ -26,7 +26,7 @@ const GROUPS: readonly ServiceGroupStub[] = [
 ];
 
 /**
- * Servicios route (`/servicios`) stub (T005). Full sub-service catalog and
+ * Servicios route (`/services`) stub (T005). Full sub-service catalog and
  * TOC land in T012; this stub guarantees the five `ServiceGroupId` anchors
  * exist as scroll targets for the fragment contract (`withInMemoryScrolling`)
  * and for Home's future road deep-links.

@@ -16,8 +16,8 @@
   <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" (click)="close()">{{
     'navHome' | localize
   }}</a>
-  <a routerLink="/quienes-somos" routerLinkActive="is-active" (click)="close()">{{ 'navAboutPage' | localize }}</a>
-  <a routerLink="/servicios" routerLinkActive="is-active" (click)="close()">{{ 'navServicesPage' | localize }}</a>
+  <a routerLink="/about-us" routerLinkActive="is-active" (click)="close()">{{ 'navAboutPage' | localize }}</a>
+  <a routerLink="/services" routerLinkActive="is-active" (click)="close()">{{ 'navServicesPage' | localize }}</a>
 
   @if (isHomeRoute()) {
     <a routerLink="/" fragment="servicios" (click)="close()">{{ 'navServices' | localize }}</a>

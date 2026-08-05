@@ -40,8 +40,8 @@ describe('MobileDrawer', () => {
     const anchors = Array.from(fixture.nativeElement.querySelectorAll('#drawer a')) as HTMLAnchorElement[];
     const pageHrefs = anchors.map((a) => a.getAttribute('ng-reflect-router-link') ?? a.pathname);
     expect(anchors.length).toBeGreaterThanOrEqual(3);
-    expect(pageHrefs.some((h) => h?.includes('quienes-somos'))).toBe(true);
-    expect(pageHrefs.some((h) => h?.includes('servicios'))).toBe(true);
+    expect(pageHrefs.some((h) => h?.includes('about-us'))).toBe(true);
+    expect(pageHrefs.some((h) => h?.includes('services'))).toBe(true);
   });
 
   it('shows Home section anchors (servicios/sobre-amd/confianza/contacto) while on "/"', () => {
@@ -52,7 +52,7 @@ describe('MobileDrawer', () => {
 
   it('hides Home section anchors once navigated away from "/"', async () => {
     const { fixture, router } = setup();
-    await router.navigateByUrl('/servicios');
+    await router.navigateByUrl('/services');
     fixture.detectChanges();
 
     const anchors = fixture.nativeElement.querySelectorAll('#drawer a');

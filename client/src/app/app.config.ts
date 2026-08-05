@@ -15,7 +15,7 @@ import { LocaleService } from './core/i18n/locale.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    // Fragment / scroll contract (design §6): Home "Más info" → /servicios#<group>,
+    // Fragment / scroll contract (design §6): Home "Más info" → /services#<group>,
     // deep-page Contactar → /#contacto (T005).
     provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' })),
     provideAnimationsAsync(),

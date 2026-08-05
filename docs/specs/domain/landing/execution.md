@@ -276,3 +276,16 @@ Build green; gold present; no forbidden purples in `client/src`.
 #### Final verification
 
 79 tests green including hero anti-pattern + CTA fragment asserts; lint/build green.
+
+## Pivot Record: DD-014 URL paths (user HITL 2026-08-05)
+
+| Field | Value |
+|-------|-------|
+| Trigger | User: routes must be English (`quienes-somos` → `about-us`, and likewise for all page routes) before continuing to T007 |
+| Supersedes | DD-014 Spanish path segments / mockup filename parity |
+| New decision | English path segments for all locales: `/`, `/about-us`, `/services`, `/privacy`, `/terms` |
+| Unchanged | Home section fragments (`#inicio`…`#contacto`); Servicios group fragments (`#contabilidad`…); ES/EN UI copy via LocaleService |
+| Spec sweep | `design.md` Routes table + DD-014 row; `tasks.md` T005/T007/T008 verification paths |
+| Code | Migrated in follow-up Implementer pass; router smoke + all `routerLink`s |
+
+Affected ADR: none in TRD (DD-014 is design-level). Mockup HTML filenames remain historical visual SoT; SPA routes no longer mirror those filenames.
