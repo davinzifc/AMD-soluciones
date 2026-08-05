@@ -34,7 +34,7 @@
       }
     </div>
 
-    <div class="testimonial-dots" aria-label="Testimonios">
+    <div class="testimonial-dots" [attr.aria-label]="'testimonialDotsAria' | localize">
       @for (quote of testimonials; track quote.textKey; let i = $index) {
         <button
           type="button"

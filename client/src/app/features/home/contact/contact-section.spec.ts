@@ -70,6 +70,16 @@ describe('ContactSection', () => {
       expect(fixture.nativeElement.querySelector('#fullName-error')).toBeTruthy();
     });
 
+    it('moves focus to the first invalid field (fullName) on invalid submit (REQ-013 keyboard path)', () => {
+      const { fixture } = setup();
+      const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      const nameInput = fixture.nativeElement.querySelector('#fullName') as HTMLInputElement;
+      expect(document.activeElement).toBe(nameInput);
+    });
+
     it('flags an invalid email format (errEmail) distinctly from a missing one (errRequired)', () => {
       const { fixture } = setup();
       const email = fixture.nativeElement.querySelector('#email') as HTMLInputElement;

@@ -89,6 +89,7 @@ export class ContactSection {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.toastVisibleSignal.set(false);
+      this.focusFirstInvalidField();
       return;
     }
 
@@ -100,6 +101,15 @@ export class ContactSection {
       locale: intent.locale,
       hasService: Boolean(intent.serviceInterest),
     });
+  }
+
+  /** REQ-013 keyboard path: an invalid submit must not just paint inline errors — it moves focus to the first offending field, mirroring native form validation UX. */
+  private focusFirstInvalidField(): void {
+    const order: readonly RequiredFieldName[] = ['fullName', 'email', 'message'];
+    const firstInvalid = order.find((name) => this.form.controls[name].invalid);
+    if (firstInvalid) {
+      document.getElementById(firstInvalid)?.focus();
+    }
   }
 
   private buildIntent(): ContactIntent {

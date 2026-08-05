@@ -62,7 +62,7 @@
                 <h3>{{ group.titleKey | localize }}</h3>
                 <p class="road__summary">{{ group.summaryKey | localize }}</p>
 
-                <div class="road__detail" [id]="detailId(group.id)">
+                <div class="road__detail" [id]="detailId(group.id)" [inert]="!isOpen(group.id)">
                   <div>
                     <p>{{ group.bodyKey | localize }}</p>
                     <a class="btn btn--ink btn--sm" routerLink="/services" [fragment]="group.id">{{ 'moreInfo' | localize }}</a>

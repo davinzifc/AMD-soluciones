@@ -385,7 +385,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T014 — UX IA doc sync + a11y/responsive polish
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** M
 - **Depends on:** T011, T012, T013
 - **Directory boundary:** `docs/ux-ui/design.md` (IA sections only) + `client/` polish only as needed
@@ -402,10 +402,10 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - Record visual HITL vs mockup for closure
 
 ### Done when
-- [ ] REQ-015 satisfied in constitution UX IA
-- [ ] Critical keyboard path works end-to-end
-- [ ] BUT it must NOT expand scope into Nest, admin, or PROD deploy
-- [ ] HITL checklist attached to execution log
+- [x] REQ-015 satisfied in constitution UX IA
+- [x] Critical keyboard path works end-to-end
+- [x] BUT it must NOT expand scope into Nest, admin, or PROD deploy
+- [x] HITL checklist attached to execution log
 
 ---
 

@@ -5,6 +5,7 @@
   "navCta": "Contact",
   "menuAria": "Menu",
   "langAria": "Language",
+  "navSiteAria": "Site",
   "brandSub": "Integrales S.A.S.",
   "ftPrivacy": "Privacy",
   "ftTerms": "Terms",
@@ -20,6 +21,7 @@
   "heroPromise": "Formalize and professionalize your operations with trusted accounting, admin, and advisory — from Cali to your business.",
   "heroCtaPrimary": "Talk to an advisor",
   "heroCtaSecondary": "View services",
+  "heroScroll": "Scroll",
 
   "servicesTitle": "Our services",
   "servicesLead": "Five service lines. The landing shows a summary; full detail lives on the Services page.",
@@ -53,6 +55,7 @@
   "m3": "bilingual service",
   "m4": "regional base",
   "logosLabel": "Some clients / sectors",
+  "testimonialDotsAria": "Testimonials",
   "q1": "“We finally understood what to formalize and in what order. Contact was direct and clear.”",
   "q1By": "Founder, retail",
   "q2": "“Needed bilingual support for our ops setup in Colombia. Smooth and professional.”",

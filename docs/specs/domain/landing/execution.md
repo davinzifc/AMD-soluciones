@@ -618,3 +618,64 @@ User: on Quiénes somos / Servicios the glass looks right, but a light/white ban
 - Cause: `html`/`body` kept the browser default white canvas; translucent topnav (`rgba(13,20,26,0.78)` + blur) composited over that white. Mockup already sets `body { background: var(--amd-ink) }`.
 - Change: `client/src/styles.css` — `html, body { background: var(--amd-ink); color: #f5f6f8; min-height: 100%; }` (parity with mockup).
 - Note: mist/light *sections* scrolling under the glass will still tint it slightly — that is intentional glass, not the canvas bug.
+
+### T014 — UX IA doc sync + a11y/responsive polish
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-015 · REQ-012/013 residuals · residual REQ-002 touch notes via prior coverage |
+| Design refs | DD-010 |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`) — [T014 Impl](51580e01-ba3b-4826-bdea-8a588dbdd275)
+
+- Skills: `cognitive-doc-design`, `ui-ux-pro-max`, `angular-developer`
+- Effort: medium
+- Docs: `docs/ux-ui/design.md` §2/§5 (+ §4 route-mapping line) — multi-page + dual-nav; §1/§7 untouched
+- Client: road collapsed `[inert]`; contact focus-first-invalid; i18n `navSiteAria` / `testimonialDotsAria` / `heroScroll`; `scroll-behavior: smooth` + reduce → `auto`
+- Verification: lint quiet; `test:agent` 25 files / 176 tests
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`) — [T014 Review](937ef785-49f7-45b7-8b8b-7a9f3b4c7de5)
+
+- Verdict: **STATUS: PASS**
+- Summary: REQ-015 verified (no surviving scroll-only current IA); breakpoints match code; a11y tests real; no Nest/PROD; no fake Lighthouse/375 claims; HITL honesty OK.
+
+**ADVISORY** (4R, non-gating):
+
+1. Untokenized `#8a7630` / error hexes — token hygiene at archive (T014 correctly avoided rewriting §7).
+2. Drawer modal containment (topnav/FAB above backdrop) still open.
+3. Hardcoded Spanish route `title`s — cosmetic.
+4. `es.json` `q2` still English copy — pre-existing.
+5. Smooth scroll also affects router restoration — verify in HITL.
+
+#### HITL checklist (attached — Done when)
+
+| Check | Width/condition | Status |
+|-------|-----------------|--------|
+| Layout/usability | 375px | **Owed** |
+| Layout/usability | 768px | **Owed** |
+| Layout/usability | 1024px | **Owed** |
+| Layout/usability | 1440px | **Owed** |
+| Home sidenav visible, no dark bar | ≥1100px | Partially verified by unit |
+| Road detail unreachable by Tab when collapsed | keyboard | Partially verified by unit (`inert`) |
+| `prefers-reduced-motion` OS toggle | Home motion | Partially verified by unit |
+| Contact: fail submit → focus first invalid + AT | keyboard | Partially verified by unit |
+| Mobile drawer trap / Escape / restore | <900px | Partially verified by unit |
+| Visual vs mockup v0.1 | all widths | **Owed** |
+| EN aria-labels via screen reader | EN locale | Partially verified by unit |
+
+**NFR-001 Lighthouse:** **Accepted deferral** — no Lighthouse ≥85 claim in this task; optional smoke deferred to archive / deploy prep. Do not treat unit-green as Performance ≥85.
+
+**Open HITL (carry to archive / `/akili-validate`):** verification-width visual pass; prior Hero/Trust/Contact/About/Services/sidenav items; confirm mailto + WA with AMD; optional Lighthouse run.
+
+#### Final verification
+
+176 tests green; lint green; UX IA synced; no Nest.
+
+## Summary — Landing v1 Phase 1 tasks
+
+All **14/14** tasks **PASS** (T001–T014). Spec ready for `/akili-test` and/or `/akili-validate` once HITL visual checklist is human-signed; `/akili-archive` after validation.

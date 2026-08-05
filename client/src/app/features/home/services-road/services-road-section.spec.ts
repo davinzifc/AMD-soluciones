@@ -250,6 +250,28 @@ describe('ServicesRoadSection', () => {
     });
   });
 
+  describe('collapsed detail is inert (REQ-013: no keyboard-focusable "Más info" hidden under a collapsed card)', () => {
+    it('marks .road__detail inert while collapsed and clears it once expanded', () => {
+      const fixture = setup();
+      const root = fixture.nativeElement as HTMLElement;
+      const item = itemFor(root, 'contabilidad');
+      const detail = item.querySelector('.road__detail') as HTMLElement;
+      const card = item.querySelector('.road__card') as HTMLElement;
+
+      expect((detail as HTMLElement & { inert: boolean }).inert).toBe(true);
+
+      card.click();
+      fixture.detectChanges();
+
+      expect((detail as HTMLElement & { inert: boolean }).inert).toBe(false);
+
+      card.click();
+      fixture.detectChanges();
+
+      expect((detail as HTMLElement & { inert: boolean }).inert).toBe(true);
+    });
+  });
+
   describe('road progress + deco parallax (T013 · design.md Motion plan · DD-005 — no GSAP)', () => {
     afterEach(() => {
       setInnerHeight(768);
