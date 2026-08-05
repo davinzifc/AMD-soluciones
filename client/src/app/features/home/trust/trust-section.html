@@ -1,0 +1,52 @@
+<section id="confianza" class="trust-section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>{{ 'trustTitle' | localize }}</h2>
+      <p>{{ 'trustLead' | localize }}</p>
+    </div>
+
+    <div class="metrics">
+      @for (metric of metrics; track metric.labelKey) {
+        <div class="metric">
+          <strong>{{ metric.value }}</strong>
+          <span>{{ metric.labelKey | localize }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="logos">
+      <p class="logos__label">{{ 'logosLabel' | localize }}</p>
+      <div class="logos__viewport" [class.is-reduced-motion]="reducedMotion">
+        <div class="logo-track" aria-hidden="true">
+          @for (sector of logoTrack; track $index) {
+            <div class="logo-pill">{{ sector }}</div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonials" aria-live="polite">
+      @for (quote of testimonials; track quote.textKey; let i = $index) {
+        <blockquote class="quote" [class.is-active]="isActive(i)">
+          <p>{{ quote.textKey | localize }}</p>
+          <footer>— <span>{{ quote.byKey | localize }}</span></footer>
+        </blockquote>
+      }
+    </div>
+
+    <div class="testimonial-dots" aria-label="Testimonios">
+      @for (quote of testimonials; track quote.textKey; let i = $index) {
+        <button
+          type="button"
+          [attr.aria-label]="testimonialLabel(i)"
+          [attr.aria-current]="isActive(i)"
+          (click)="selectTestimonial(i)"
+        ></button>
+      }
+    </div>
+
+    <div class="trust-cta">
+      <a class="btn btn--ink" routerLink="/" fragment="contacto">{{ 'trustCta' | localize }}</a>
+    </div>
+  </div>
+</section>

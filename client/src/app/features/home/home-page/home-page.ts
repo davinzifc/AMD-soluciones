@@ -4,6 +4,7 @@ import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { AboutTeaserSection } from '../about-teaser/about-teaser-section';
 import { HeroSection } from '../hero/hero-section';
 import { ServicesRoadSection } from '../services-road/services-road-section';
+import { TrustSection } from '../trust/trust-section';
 
 /**
  * Home route (`/`) composition root. Section ids match the Home dual-nav
@@ -13,13 +14,12 @@ import { ServicesRoadSection } from '../services-road/services-road-section';
  *
  * `#inicio` is the brand-first `HeroSection` (T006); `#servicios` is the
  * five-group `ServicesRoadSection` (T007); `#sobre-amd` is the short
- * `AboutTeaserSection` (T008) — the full misión/visión/leaders content lives
- * only on the Quiénes somos deep page (T011). The remaining two sections
- * stay stubs until T009–T010 land.
+ * `AboutTeaserSection` (T008); `#confianza` is metrics/marquee/testimonials
+ * `TrustSection` (T009). The remaining stub stays until T010 lands.
  */
 @Component({
   selector: 'app-home-page',
-  imports: [LocalizePipe, HeroSection, ServicesRoadSection, AboutTeaserSection],
+  imports: [LocalizePipe, HeroSection, ServicesRoadSection, AboutTeaserSection, TrustSection],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })

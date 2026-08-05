@@ -359,3 +359,41 @@ Affected ADR: none in TRD (DD-014 is design-level). Mockup HTML filenames remain
 #### Final verification
 
 104 tests green including `/about-us` href assert; lint green.
+
+### T009 — Home Trust (metrics, marquee, testimonials)
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-007 (fade scope, ~9s testimonials, reduced-motion) · DD-008 |
+| Design refs | §6 TrustSection · Motion plan stub |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`
+- Effort: medium
+- Files: `features/home/trust/*` (`TrustMotionQuery`, `TrustSection`); wired into `home-page` replacing `#confianza`; `#contacto` stub left for T010
+- Verification: lint quiet; `test:agent` 117/117 — `TESTIMONIAL_PAUSE_MS=9000` with fake timers (no shortened prod interval); reduce skips auto-advance; fade structural test
+- HITL: no browser — structural/CSS fade scope only; **visual sign-off still owed**
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Separate marquee vs crossfade models; mask only on `.logos__viewport`; title sibling proven; reduced-motion double-gated; timer honesty OK; HITL deferred honestly.
+
+**ADVISORY** (4R, non-gating):
+
+1. Visual HITL fade/contrast at verification widths — carry forward (with T006).
+2. Testimonial dots 44×44 hit areas overlap — T014.
+3. Untokenized `#8a7630` metric gold — consider `--amd-gold-deep` at T014.
+4. `aria-live` / opacity-0 quotes a11y — T014; unused `protected activeIndex`.
+
+**Open HITL (carry forward):** Trust logo fade + metrics contrast visual check still owed before archive.
+
+#### Final verification
+
+117 tests green including 9s timer + reduced-motion paths; lint green.

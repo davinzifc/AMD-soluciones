@@ -262,7 +262,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T009 — Home Trust (metrics, marquee, testimonials)
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** M
 - **Depends on:** T005, T003
 - **Directory boundary:** `client/src/app/features/home/trust/`
