@@ -215,7 +215,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T007 — Home Services road (5 groups)
 
-- **Status:** [~]
+- **Status:** [x]
 - **Size:** L
 - **Depends on:** T005, T003
 - **Directory boundary:** `client/src/app/features/home/services-road/`

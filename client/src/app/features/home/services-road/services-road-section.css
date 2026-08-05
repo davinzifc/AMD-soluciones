@@ -1,0 +1,300 @@
+/* Home services road (REQ-004 · design.md §6 · DD-006). Mirrors mockup
+   `landing.css` `.road*` rules on AMD tokens (no template purple, REQ-011). */
+
+:host {
+  display: block;
+}
+
+.road-section {
+  padding: 5.5rem 0;
+  background: var(--amd-mist);
+  color: var(--amd-ink);
+}
+
+.wrap {
+  width: min(100% - 2.5rem, 1160px);
+  margin-inline: auto;
+}
+
+.section-head {
+  max-width: 36rem;
+  margin-bottom: 2.75rem;
+}
+
+.section-head h2 {
+  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  margin: 0 0 0.6rem;
+}
+
+.section-head p,
+.road__hint,
+.road__summary,
+.road__detail p {
+  margin: 0;
+  color: var(--amd-slate);
+}
+
+.road__hint {
+  margin: 0 0 1.5rem;
+  font-size: 0.88rem;
+}
+
+.road {
+  position: relative;
+  padding: 0.5rem 0 1rem;
+}
+
+.road__axis {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1.15rem;
+  width: 2px;
+  background: rgba(13, 20, 26, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Static hook until T013 wires the scroll-driven fill (design.md Motion plan). */
+.road__progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(180deg, var(--amd-gold), var(--amd-gold-soft));
+}
+
+.road__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.road__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.3rem 1fr;
+  gap: 0.85rem 1rem;
+  align-items: start;
+}
+
+.road__spacer {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .road__axis {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .road__spacer {
+    display: block;
+    min-height: 1px;
+  }
+
+  .road__item {
+    grid-template-columns: 1fr 2.5rem 1fr;
+    gap: 0 1.5rem;
+    align-items: center;
+  }
+
+  .road__item--left .road__main {
+    grid-column: 1;
+    justify-self: end;
+    text-align: right;
+  }
+
+  .road__item--left .road__node-wrap {
+    grid-column: 2;
+  }
+
+  .road__item--left .road__spacer {
+    grid-column: 3;
+  }
+
+  .road__item--right .road__spacer {
+    grid-column: 1;
+  }
+
+  .road__item--right .road__node-wrap {
+    grid-column: 2;
+  }
+
+  .road__item--right .road__main {
+    grid-column: 3;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .road__item--left .road__card {
+    margin-left: auto;
+  }
+}
+
+.road__node-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.35rem;
+}
+
+/* Visual dot stays 22px (mockup parity); button hit area grows to 44×44
+   (REQ-002/012 touch target) via a centered pseudo-element bulb. */
+.road__node {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.road__node::after {
+  content: '';
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--amd-gold);
+  background: var(--amd-surface);
+  box-shadow: 0 0 0 4px rgba(207, 187, 102, 0.18);
+  transition: background 240ms var(--amd-ease), transform 240ms var(--amd-ease), box-shadow 240ms var(--amd-ease);
+}
+
+.road__node:hover::after,
+.road__item.is-open .road__node::after {
+  background: var(--amd-gold);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 6px rgba(207, 187, 102, 0.22);
+}
+
+.road__main {
+  max-width: 28rem;
+  width: 100%;
+}
+
+.road__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.4rem 0.95rem;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--amd-ink);
+  background: linear-gradient(115deg, var(--amd-gold), var(--amd-gold-soft));
+  box-shadow: 0 6px 16px rgba(13, 20, 26, 0.1);
+}
+
+.road__node:focus-visible,
+.road__pill:focus-visible {
+  outline: 2px solid var(--amd-ink);
+  outline-offset: 3px;
+}
+
+.road__card {
+  margin-top: 0.75rem;
+  background: var(--amd-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: 1.15rem 1.25rem 1.05rem;
+  text-align: left;
+  border: 1px solid var(--amd-border);
+  cursor: pointer;
+}
+
+.road__card:hover {
+  border-color: rgba(207, 187, 102, 0.45);
+}
+
+.road__card:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 2px;
+}
+
+.road__card h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.35rem;
+  color: var(--amd-ink);
+}
+
+.road__detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 380ms var(--amd-ease), opacity 320ms var(--amd-ease), margin 320ms var(--amd-ease);
+  margin-top: 0;
+}
+
+.road__detail > div {
+  overflow: hidden;
+}
+
+.road__item.is-open .road__detail {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 0.85rem;
+}
+
+.road__detail p {
+  margin: 0 0 0.85rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform var(--amd-motion-fast) var(--amd-ease), background var(--amd-motion-fast) var(--amd-ease);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 3px;
+}
+
+.btn--ink {
+  background: var(--amd-ink);
+  color: #f5f6f8;
+}
+
+.btn--sm {
+  min-height: 40px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .road__detail,
+  .road__node::after,
+  .btn {
+    transition: none;
+  }
+}

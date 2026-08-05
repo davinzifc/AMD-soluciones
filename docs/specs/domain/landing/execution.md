@@ -289,3 +289,39 @@ Build green; gold present; no forbidden purples in `client/src`.
 | Code | Migrated in follow-up Implementer pass; router smoke + all `routerLink`s |
 
 Affected ADR: none in TRD (DD-014 is design-level). Mockup HTML filenames remain historical visual SoT; SPA routes no longer mirror those filenames.
+
+### T007 — Home Services road (5 groups)
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-004 · REQ-012 (keyboard expand, not hover-only) |
+| Design refs | §6 ServicesRoadSection · DD-006 · DD-014 English `/services` |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`
+- Effort: medium
+- Files: `features/home/services-road/*`; wired into `home-page` replacing `#servicios` stub
+- Verification: `test:agent` 17 files / 98 tests; lint quiet; build OK (soft style budget warn)
+- Más info → `/services#contabilidad|administrativa|riesgo|asesoria|marca` via shared `SERVICE_GROUP_IDS`
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Five groups; signal-driven expand with click+Enter/Space on node/pill/card; English `/services#` deep-links; teaser only; static `#road-progress` for T013.
+
+**ADVISORY** (4R, non-gating):
+
+1. Collapsed detail leaves Más info in tab order (invisible focus) — T014 a11y (`inert`/`hidden`).
+2. `role="button"` card with nested `<a>`; pill name is bare number — T014.
+3. `.btn` duplicated across components — hoist to global styles.
+4. Test count bookkeeping 21 vs 19 — coverage adequate.
+
+#### Final verification
+
+98 tests green including keyboard expand + all five `/services#` hrefs; lint/build green.
