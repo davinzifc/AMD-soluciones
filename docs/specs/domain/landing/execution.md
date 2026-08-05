@@ -459,3 +459,80 @@ User: still a huge empty band under the nav; ask to center the copy more.
 #### Final verification
 
 137 tests green (invalid blocks handoff; valid wa.me + mailto + named events; FAB/form `whatsapp_click`); lint green; no Nest.
+
+### T011 — Quiénes somos deep page
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-006 (deep half: misión, visión, 3 leaders + roles) |
+| Design refs | §6 Deep pages · DD-014 `/about-us` |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`) — [T011 About](705539ac-1bbb-41d6-a456-1971c16fbf7a)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`
+- Effort: medium
+- Files: `features/about/about-page/*` — page hero, mv-cards, leaders grid (names literal in component), closing, CTAs; i18n keys already present (no dictionary edits)
+- Verification: lint quiet; `test:agent` 22 files / 151 tests — leader names in DOM; CTAs `/#contacto`, `/services`, `/`; no `.sidenav-host` on route
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`) — [T011 Review](d85e4ed1-8527-4f3c-b913-224fb14fc875)
+
+- Verdict: **STATUS: PASS**
+- Summary: REQ-006 blocks present and mockup-faithful; both evidence disqualifiers closed (names in DOM; sidenav absence proven at App shell); independent lint + 151/151 re-run green.
+
+**ADVISORY** (4R, non-gating):
+
+1. Untokenized `#8a7630` on `.mv-card h3` (~4.45:1) — same T009 precedent; `--amd-gold-deep` at T014.
+2. Duplicated `.btn`/`.wrap` across deep pages — shared partial candidate at T014.
+3. Hardcoded on-dark rgba — optional `--amd-on-dark` at T014.
+4. HITL visual vs `quienes-somos.html` still owed (coverage matrix: not unit-green alone).
+
+**Open HITL (carry forward):** Quiénes somos visual at verification widths before archive.
+
+#### Final verification
+
+151 tests green; lint green; leaders + misión/visión asserted; no Nest.
+
+### T012 — Servicios deep page
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-005 · REQ-004 group id alignment |
+| Design refs | §6 Deep pages · ServiceGroupId · fragment contract · DD-014 |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`) — [T012 Services](bac8d185-09b5-4f28-9bf1-98262890295f)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`
+- Effort: medium
+- Files: `features/services/services-page/*` — hero + TOC + 5 `article[id]` groups; Contabilidad 16 / Admin 4 / Asesoría 4 real subs; Riesgo/Marca placeholder notes; `SERVICE_GROUP_IDS` export unchanged
+- Verification: lint quiet; `test:agent` 22 files / 151 tests — TOC + article ids for all 5 groups; CTA `/#contacto`
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`) — [T012 Review](c967abe8-6e3d-4d9a-b7bc-fa4cb463cbfa)
+
+- Verdict: **STATUS: PASS**
+- Summary: Five groups share one `SERVICE_GROUP_IDS` constant with Home road; disqualifiers closed; i18n keys independently verified in both locales; independent 151/151 + lint re-run green.
+
+**ADVISORY** (4R, non-gating):
+
+1. `.svc-note` ~3.6:1 contrast — raise alpha at T014 a11y.
+2. `:host` restates app-shell ink — about-page inherits instead; align later.
+3. Duplicated deep-page chrome CSS with About — T014 shared partial candidate.
+4. Dead `stubPending` key after stub removal — sweep later.
+5. HITL visual vs `servicios.html` still owed.
+
+**Open HITL (carry forward):** Servicios visual + fragment landings (`/services#riesgo` etc.) at verification widths before archive.
+
+#### Final verification
+
+151 tests green; lint green; 5 anchors + catalogs; no Nest.
+
+*Parallel wave:* T011 + T012 executed concurrently (disjoint dirs `features/about/` · `features/services/`).

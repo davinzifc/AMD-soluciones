@@ -313,7 +313,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T011 — Quiénes somos deep page
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** M
 - **Depends on:** T005, T003
 - **Directory boundary:** `client/src/app/features/about/`
@@ -328,14 +328,14 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - Shared chrome; Contactar → `/#contacto`
 
 ### Done when
-- [ ] Content matches mockup structure
-- [ ] BUT it must NOT show Home section sidenav
+- [x] Content matches mockup structure
+- [x] BUT it must NOT show Home section sidenav
 
 ---
 
 ## T012 — Servicios deep page
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** L
 - **Depends on:** T005, T003
 - **Directory boundary:** `client/src/app/features/services/`
@@ -351,8 +351,8 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - Contactar → `/#contacto`
 
 ### Done when
-- [ ] Anchors align with REQ-004/005 ids
-- [ ] BUT it must NOT omit a group Home can deep-link to
+- [x] Anchors align with REQ-004/005 ids
+- [x] BUT it must NOT omit a group Home can deep-link to
 
 ---
 

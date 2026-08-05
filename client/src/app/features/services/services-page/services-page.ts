@@ -11,25 +11,52 @@ import { LocalizePipe } from '../../../core/i18n/localize.pipe';
  */
 export const SERVICE_GROUP_IDS = ['contabilidad', 'administrativa', 'riesgo', 'asesoria', 'marca'] as const;
 
-interface ServiceGroupStub {
-  readonly id: (typeof SERVICE_GROUP_IDS)[number];
+interface ServiceSub {
   readonly titleKey: string;
-  readonly summaryKey: string;
+  readonly descKey: string;
 }
 
-const GROUPS: readonly ServiceGroupStub[] = [
-  { id: 'contabilidad', titleKey: 'g1Title', summaryKey: 'g1Sum' },
-  { id: 'administrativa', titleKey: 'g2Title', summaryKey: 'g2Sum' },
-  { id: 'riesgo', titleKey: 'g3Title', summaryKey: 'g3Sum' },
-  { id: 'asesoria', titleKey: 'g4Title', summaryKey: 'g4Sum' },
-  { id: 'marca', titleKey: 'g5Title', summaryKey: 'g5Sum' },
+interface ServiceGroup {
+  readonly id: (typeof SERVICE_GROUP_IDS)[number];
+  readonly titleKey: string;
+  readonly leadKey: string;
+  readonly subs: readonly ServiceSub[];
+  /** Riesgo/Marca carry a placeholder note (REQ-005: MAY use validated placeholders). */
+  readonly noteKey?: string;
+}
+
+/**
+ * Builds the `subXX(t|d)` key pairs seeded from mockup `i18n.js` (already
+ * mirrored into `assets/i18n/{es,en}.json` by T003) for a given sub-service
+ * prefix, e.g. `subKeys('C', 16)` → `subC01t`/`subC01d` … `subC16t`/`subC16d`.
+ */
+function subKeys(prefix: string, count: number): ServiceSub[] {
+  return Array.from({ length: count }, (_, index) => {
+    const n = String(index + 1).padStart(2, '0');
+    return { titleKey: `sub${prefix}${n}t`, descKey: `sub${prefix}${n}d` };
+  });
+}
+
+const GROUPS: readonly ServiceGroup[] = [
+  { id: 'contabilidad', titleKey: 'g1Title', leadKey: 'g1Lead', subs: subKeys('C', 16) },
+  { id: 'administrativa', titleKey: 'g2Title', leadKey: 'g2Lead', subs: subKeys('A', 4) },
+  { id: 'riesgo', titleKey: 'g3Title', leadKey: 'g3Lead', subs: subKeys('R', 4), noteKey: 'g3Note' },
+  { id: 'asesoria', titleKey: 'g4Title', leadKey: 'g4Lead', subs: subKeys('As', 4) },
+  { id: 'marca', titleKey: 'g5Title', leadKey: 'g5Lead', subs: subKeys('M', 3), noteKey: 'g5Note' },
 ];
 
 /**
- * Servicios route (`/services`) stub (T005). Full sub-service catalog and
- * TOC land in T012; this stub guarantees the five `ServiceGroupId` anchors
- * exist as scroll targets for the fragment contract (`withInMemoryScrolling`)
- * and for Home's future road deep-links.
+ * Servicios deep page (T012 · REQ-005 · design.md §6 Deep pages). Page hero +
+ * in-page TOC + the five `ServiceGroup` articles with sub-service catalogs,
+ * seeded from mockup `servicios.html` / `i18n.js`. Every `article[id]` uses
+ * the exact `SERVICE_GROUP_IDS` string so Home's road "Más info" fragment
+ * links (`/services#<id>`, T007) always resolve to a real scroll target —
+ * the two features share this same constant to prevent id drift.
+ *
+ * Riesgo and Marca sub-service copy is flagged with a visible placeholder
+ * note (`g3Note`/`g5Note`) per REQ-005 ("MAY use validated placeholders
+ * until AMD finalizes copy") — the anchors and structure are still real,
+ * only the copy is provisional.
  */
 @Component({
   selector: 'app-services-page',

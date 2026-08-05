@@ -1,6 +1,46 @@
-<section class="page-stub">
-  <h1>{{ 'aboutPageTitle' | localize }}</h1>
-  <p>{{ 'aboutPageLead' | localize }}</p>
-  <p class="stub-note">{{ 'stubPending' | localize }}</p>
-  <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'aboutCta' | localize }}</a>
+<header class="page-hero">
+  <div class="wrap">
+    <h1>{{ 'aboutPageTitle' | localize }}</h1>
+    <p>{{ 'aboutPageLead' | localize }}</p>
+  </div>
+</header>
+
+<section class="section--light">
+  <div class="wrap mv-grid">
+    <article class="mv-card">
+      <h3>{{ 'missionLabel' | localize }}</h3>
+      <p>{{ 'missionBody' | localize }}</p>
+    </article>
+    <article class="mv-card">
+      <h3>{{ 'visionLabel' | localize }}</h3>
+      <p>{{ 'visionBody' | localize }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="leaders-section">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>{{ 'leadersTitle' | localize }}</h2>
+      <p>{{ 'leadersLead' | localize }}</p>
+    </div>
+
+    <div class="leaders">
+      @for (leader of leaders; track leader.name) {
+        <article class="leader">
+          <div class="leader__avatar" aria-hidden="true"></div>
+          <h3>{{ leader.name }}</h3>
+          <p>{{ leader.roleKey | localize }}</p>
+        </article>
+      }
+    </div>
+
+    <p class="about-closing">{{ 'aboutClosing' | localize }}</p>
+
+    <div class="about-actions">
+      <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'aboutCta' | localize }}</a>
+      <a class="btn btn--ghost" routerLink="/services">{{ 'viewServices' | localize }}</a>
+      <a class="btn btn--ghost" routerLink="/">{{ 'backHome' | localize }}</a>
+    </div>
+  </div>
 </section>

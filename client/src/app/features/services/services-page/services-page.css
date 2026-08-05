@@ -1,24 +1,195 @@
+/* Servicios deep page (REQ-005 · design.md §6 Deep pages). Mirrors mockup
+   `servicios.html` + `landing.css` `.page-hero/.toc/.svc-*` rules — the
+   mockup page body itself is dark ink (`styles.css` body { background:
+   var(--amd-ink) }), so this page owns its own full ink surface instead of
+   the light `--amd-mist` used by Home's alternating sections. Reimplemented
+   on AMD tokens (no template purple, REQ-011). */
+
 :host {
   display: block;
+  background: var(--amd-ink);
+  color: #f5f6f8;
 }
 
-.page-stub {
+.wrap {
   width: min(100% - 2.5rem, 1160px);
   margin-inline: auto;
-  padding: 4rem 0 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: flex-start;
 }
 
-.stub-section {
-  width: min(100% - 2.5rem, 1160px);
-  margin-inline: auto;
-  padding: 2.5rem 0;
+.page-hero {
+  padding: 4.5rem 0 3rem;
   border-bottom: 1px solid var(--amd-glass-border);
 }
 
-.stub-note {
-  color: var(--amd-slate);
+.page-hero h1 {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  margin: 0 0 0.75rem;
+}
+
+.page-hero p {
+  max-width: 38rem;
+  margin: 0;
+  color: rgba(245, 246, 248, 0.72);
+}
+
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid var(--amd-glass-border);
+  font-size: 0.85rem;
+  color: rgba(245, 246, 248, 0.78);
+  text-decoration: none;
+  transition:
+    border-color var(--amd-motion-fast) var(--amd-ease),
+    color var(--amd-motion-fast) var(--amd-ease);
+}
+
+.toc a:hover,
+.toc a:focus-visible {
+  border-color: var(--amd-gold);
+  color: var(--amd-gold-soft);
+}
+
+.toc a:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 2px;
+}
+
+.svc-groups {
+  padding: 3rem 0 4.5rem;
+}
+
+.svc-group {
+  scroll-margin-top: 5.5rem;
+  margin-bottom: 2.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--amd-glass-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.svc-group h2 {
+  font-size: 1.45rem;
+  margin: 0 0 0.5rem;
+}
+
+.svc-lead {
+  margin: 0 0 1.25rem;
+  color: rgba(245, 246, 248, 0.68);
+}
+
+.svc-subs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .svc-subs {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.svc-subs li {
+  background: rgba(13, 20, 26, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+}
+
+.svc-subs strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  margin: 0 0 0.25rem;
+  color: #f5f6f8;
+}
+
+.svc-subs span {
+  font-size: 0.85rem;
+  color: rgba(245, 246, 248, 0.6);
+}
+
+.svc-note {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: rgba(245, 246, 248, 0.45);
+}
+
+.svc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--amd-motion-fast) var(--amd-ease),
+    background var(--amd-motion-fast) var(--amd-ease),
+    border-color var(--amd-motion-fast) var(--amd-ease),
+    color var(--amd-motion-fast) var(--amd-ease);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 3px;
+}
+
+.btn--gold {
+  background: var(--amd-gold);
+  color: var(--amd-ink);
+}
+
+.btn--gold:hover {
+  background: var(--amd-gold-soft);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--amd-glass-border);
+  color: #f5f6f8;
+}
+
+.btn--ghost:hover {
+  border-color: var(--amd-gold);
+  color: var(--amd-gold-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toc a,
+  .btn {
+    transition: none;
+  }
 }
