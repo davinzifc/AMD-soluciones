@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "node .cursor/hooks/akili-tasks-gate.js",
+        "matcher": "Write|StrReplace",
+        "failClosed": true
+      }
+    ]
+  }
+}
