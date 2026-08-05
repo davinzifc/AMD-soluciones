@@ -235,3 +235,44 @@ Build green; gold present; no forbidden purples in `client/src`.
 #### Final verification
 
 72 tests green including router smoke + fragment DOM anchors; lint/build green.
+
+### T006 — Home Hero (brand-first)
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-003 · REQ-011 (tokens) |
+| Design refs | §6 HeroSection · DD-015 parallax deferred to T013 |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`, `frontend-design`
+- Effort: medium
+- Files: `features/home/hero/*`; wired into `home-page` replacing `#inicio` stub only
+- Verification: `test:agent` 16 files / 79 tests; lint quiet; build OK (`-- hero` filter unsupported by ng wrapper — full suite used)
+- HITL: no browser in Implementer sandbox — structural/CSS parity vs mockup only; **human/T6 visual sign-off still owed** (not claimed done)
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Markup/CSS faithful to mockup `#inicio`; brand-first with `Integrales S.A.S.` via `brandSub`; CTAs `/#contacto` + `/#servicios`; no cards/stats/badges; HITL recorded-as-deferred (disqualifier does not fire).
+
+**ADVISORY** (4R, non-gating):
+
+1. Missing mockup `.hero__bg::after` grid texture — check in real HITL.
+2. `z-index: -1` vs mockup `-2` — restore layering when T013 adds parallax.
+3. `.wrap`/`.btn` re-declared; hardcoded 1160px — shared primitive at T014.
+4. Hardcoded English "Scroll" cue — T014 i18n sweep.
+5. Above-fold CTAs at 375/768 — confirm in T014 HITL (REQ-012).
+6. Anti-pattern test is class-substring heuristic only.
+7. Motion duration token 200ms vs mockup 220ms — token preferred.
+
+**Open HITL (carry forward):** First-viewport visual brand-first check at 375/768/1024/1440 still owed before T014 closure / archive — do not treat unit green as visual sign-off.
+
+#### Final verification
+
+79 tests green including hero anti-pattern + CTA fragment asserts; lint/build green.

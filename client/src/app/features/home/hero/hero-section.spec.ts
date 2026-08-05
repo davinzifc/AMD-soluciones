@@ -1,0 +1,67 @@
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+
+import { LocaleService } from '../../../core/i18n/locale.service';
+import { HeroSection } from './hero-section';
+
+function setup() {
+  TestBed.configureTestingModule({
+    providers: [provideRouter([]), { provide: LocaleService, useValue: { translate: (key: string) => key } }],
+  });
+  const fixture = TestBed.createComponent(HeroSection);
+  fixture.detectChanges();
+  return fixture;
+}
+
+describe('HeroSection', () => {
+  it('renders the #inicio fragment scroll target', () => {
+    const fixture = setup();
+    expect(fixture.nativeElement.querySelector('#inicio')).toBeTruthy();
+  });
+
+  it('brand reads AMD Soluciones with the legal line Integrales S.A.S. (REQ-003)', () => {
+    const fixture = setup();
+    const brand = fixture.nativeElement.querySelector('.hero__brand') as HTMLElement;
+    expect(brand.textContent?.replace(/\s+/g, ' ').trim()).toBe('AMD Soluciones');
+    // "Soluciones" carries the gold-emphasis hook (mockup `em` parity).
+    expect(brand.querySelector('em')?.textContent).toBe('Soluciones');
+
+    const legal = fixture.nativeElement.querySelector('.hero__legal') as HTMLElement;
+    expect(legal.textContent).toContain('brandSub');
+  });
+
+  it('renders one promise sentence bound to heroPromise', () => {
+    const fixture = setup();
+    const promise = fixture.nativeElement.querySelector('.hero__promise') as HTMLElement;
+    expect(promise.textContent).toContain('heroPromise');
+  });
+
+  it('primary CTA routes to Home fragment #contacto (heroCtaPrimary)', () => {
+    const fixture = setup();
+    const primary = fixture.nativeElement.querySelector('a.btn--gold') as HTMLAnchorElement;
+    expect(primary.getAttribute('href')).toBe('/#contacto');
+    expect(primary.textContent).toContain('heroCtaPrimary');
+  });
+
+  it('secondary CTA routes to Home fragment #servicios (heroCtaSecondary)', () => {
+    const fixture = setup();
+    const secondary = fixture.nativeElement.querySelector('a.btn--ghost') as HTMLAnchorElement;
+    expect(secondary.getAttribute('href')).toBe('/#servicios');
+    expect(secondary.textContent).toContain('heroCtaSecondary');
+  });
+
+  it('contains no cards, stat strips, or floating badges (REQ-003 anti-pattern)', () => {
+    const fixture = setup();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelectorAll('[class*="card"]').length).toBe(0);
+    expect(root.querySelectorAll('[class*="stat"]').length).toBe(0);
+    expect(root.querySelectorAll('[class*="badge"]').length).toBe(0);
+    expect(root.querySelectorAll('[class*="metric"]').length).toBe(0);
+  });
+
+  it('exposes exactly one primary+secondary CTA pair (no extra hero clutter)', () => {
+    const fixture = setup();
+    const ctas = fixture.nativeElement.querySelectorAll('.hero__cta a');
+    expect(ctas.length).toBe(2);
+  });
+});

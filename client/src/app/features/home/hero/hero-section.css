@@ -1,0 +1,182 @@
+/**
+ * Full-bleed brand-first hero (REQ-003 · design.md §6 HeroSection).
+ * Mirrors `docs/specs/domain/landing/mockup/landing.css` `.hero*` rules —
+ * visual SoT — reimplemented as scoped component styles (tokens only, no
+ * hardcoded template purple per REQ-011).
+ */
+
+:host {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(115deg, rgba(13, 20, 26, 0.55) 0%, rgba(13, 20, 26, 0.82) 48%, rgba(13, 20, 26, 0.92) 100%),
+    radial-gradient(ellipse 80% 60% at 70% 40%, rgba(207, 187, 102, 0.18), transparent 55%),
+    linear-gradient(160deg, #1a242c 0%, var(--amd-ink) 55%, #0a1015 100%);
+}
+
+.wrap {
+  width: min(100% - 2.5rem, 1160px);
+  margin-inline: auto;
+}
+
+.hero__content {
+  padding: 7rem 0 5.5rem;
+  max-width: 38rem;
+  animation: hero-rise 900ms var(--amd-ease) both;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero__brand {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 7vw, 4.25rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  margin: 0 0 0.35rem;
+  color: #fff;
+}
+
+/* `em` here is a structural style hook (mockup parity), not textual emphasis. */
+.hero__brand em {
+  font-style: normal;
+  color: var(--amd-gold);
+}
+
+.hero__legal {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amd-gold-soft);
+  margin: 0 0 1.25rem;
+  opacity: 0.92;
+}
+
+.hero__promise {
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  color: rgba(245, 246, 248, 0.78);
+  margin: 0 0 2rem;
+  max-width: 32rem;
+}
+
+.hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.7rem 1.25rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform var(--amd-motion-fast) var(--amd-ease),
+    background var(--amd-motion-fast) var(--amd-ease),
+    border-color var(--amd-motion-fast) var(--amd-ease),
+    color var(--amd-motion-fast) var(--amd-ease);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 3px;
+}
+
+.btn--gold {
+  background: var(--amd-gold);
+  color: var(--amd-ink);
+}
+
+.btn--gold:hover {
+  background: var(--amd-gold-soft);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--amd-glass-border);
+  color: #f5f6f8;
+}
+
+.btn--ghost:hover {
+  border-color: var(--amd-gold);
+  color: var(--amd-gold-soft);
+}
+
+.hero__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245, 246, 248, 0.4);
+  animation: hero-scroll-bob 2.4s var(--amd-ease) infinite;
+}
+
+@keyframes hero-scroll-bob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(-50%, 6px);
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__content {
+    animation: none;
+  }
+
+  .hero__scroll {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero__content {
+    padding: 6rem 0 4rem;
+  }
+}

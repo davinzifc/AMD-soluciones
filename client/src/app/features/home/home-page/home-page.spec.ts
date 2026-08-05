@@ -1,11 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { HomePage } from './home-page';
 
 function setup() {
   TestBed.configureTestingModule({
-    providers: [{ provide: LocaleService, useValue: { translate: (key: string) => key } }],
+    providers: [provideRouter([]), { provide: LocaleService, useValue: { translate: (key: string) => key } }],
   });
   const fixture = TestBed.createComponent(HomePage);
   fixture.detectChanges();
