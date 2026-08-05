@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AMD Soluciones — Home (mockup)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body class="has-side-nav">
+  <div class="mockup-banner" data-i18n="bannerHome">Mockup multi-página · Home = landing · Top nav = páginas · Izquierda = anclas del landing</div>
+
+  <header class="topnav">
+    <div class="wrap topnav__inner">
+      <a class="brand" href="index.html" aria-label="AMD Soluciones Integrales">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">AMD Soluciones<span data-i18n="brandSub">Integrales S.A.S.</span></span>
+      </a>
+      <nav aria-label="Sitio">
+        <ul class="topnav__links">
+          <li><a href="index.html" aria-current="page" data-i18n="navHome">Home</a></li>
+          <li><a href="quienes-somos.html" data-i18n="navAboutPage">Quiénes somos</a></li>
+          <li><a href="servicios.html" data-i18n="navServicesPage">Servicios</a></li>
+        </ul>
+      </nav>
+      <div class="topnav__actions">
+        <div class="lang" role="group" data-i18n-aria="langAria" aria-label="Idioma">
+          <button type="button" data-lang="es" aria-pressed="true">ES</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="btn btn--gold" href="#contacto" data-i18n="navCta">Contactar</a>
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="drawer" data-i18n-aria="menuAria" aria-label="Menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" hidden>
+    <a href="index.html" aria-current="page" data-i18n="navHome">Home</a>
+    <a href="quienes-somos.html" data-i18n="navAboutPage">Quiénes somos</a>
+    <a href="servicios.html" data-i18n="navServicesPage">Servicios</a>
+    <a href="#servicios" data-i18n="navServices">Servicios</a>
+    <a href="#sobre-amd" data-i18n="navAbout">Sobre AMD</a>
+    <a href="#confianza" data-i18n="navTrust">Confianza</a>
+    <a href="#contacto" data-i18n="navContact">Contacto</a>
+  </div>
+
+  <nav class="sidenav" aria-label="Secciones del landing">
+    <a href="#inicio" aria-current="true" title="Inicio"><span data-i18n="sideHome">Inicio</span></a>
+    <a href="#servicios" title="Servicios"><span data-i18n="navServices">Servicios</span></a>
+    <a href="#sobre-amd" title="Sobre AMD"><span data-i18n="navAbout">Sobre AMD</span></a>
+    <a href="#confianza" title="Confianza"><span data-i18n="navTrust">Confianza</span></a>
+    <a href="#contacto" title="Contacto"><span data-i18n="navContact">Contacto</span></a>
+  </nav>
+
+  <div class="page-inner">
+    <main>
+      <section class="hero" id="inicio">
+        <div class="hero__bg" aria-hidden="true"></div>
+        <div class="parallax-layer" data-parallax aria-hidden="true"></div>
+        <div class="wrap hero__content">
+          <h1 class="hero__brand">AMD <em>Soluciones</em></h1>
+          <p class="hero__legal" data-i18n="brandSub">Integrales S.A.S.</p>
+          <p class="hero__promise" data-i18n="heroPromise">Formaliza y profesionaliza tu operación con contabilidad, gestión y asesoría de confianza — desde Cali, para tu negocio.</p>
+          <div class="hero__cta">
+            <a class="btn btn--gold" href="#contacto" data-i18n="heroCtaPrimary">Hablar con un asesor</a>
+            <a class="btn btn--ghost" href="#servicios" data-i18n="heroCtaSecondary">Ver servicios</a>
+          </div>
+        </div>
+        <div class="hero__scroll" aria-hidden="true">Scroll</div>
+      </section>
+
+      <section id="servicios" class="section--light">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <h2 data-i18n="servicesTitle">Nuestros servicios</h2>
+            <p data-i18n="servicesLead">Cinco líneas de servicio. En el landing ves el resumen; el detalle completo está en la página Servicios.</p>
+          </div>
+          <p class="road__hint reveal" data-i18n="roadHint">Clic en un nodo para expandir. “Más info” abre la página completa.</p>
+
+          <div class="road" id="services-road">
+            <span class="road__deco road__deco--1" data-road-parallax="0.08" aria-hidden="true"></span>
+            <span class="road__deco road__deco--2" data-road-parallax="0.14" aria-hidden="true"></span>
+            <span class="road__deco road__deco--3" data-road-parallax="0.1" aria-hidden="true"></span>
+            <div class="road__axis" aria-hidden="true"><div class="road__progress" id="road-progress"></div></div>
+
+            <ol class="road__list">
+              <li class="road__item road__item--right" data-service="contabilidad">
+                <div class="road__spacer" aria-hidden="true"></div>
+                <div class="road__node-wrap"><button type="button" class="road__node" aria-expanded="false" aria-controls="svc-d1" aria-label="Contabilidad"></button></div>
+                <div class="road__main">
+                  <button type="button" class="road__pill" aria-expanded="false" aria-controls="svc-d1">01</button>
+                  <div class="road__card" role="button" tabindex="0" aria-expanded="false" aria-controls="svc-d1">
+                    <h3 data-i18n="g1Title">Contabilidad</h3>
+                    <p class="road__summary" data-i18n="g1Sum">Estados financieros, sistema contable, declaraciones y más.</p>
+                    <div class="road__detail" id="svc-d1"><div>
+                      <p data-i18n="g1Body">Portafolio contable para persona natural y jurídica: EEFF, inventarios, costos, exógena, revisoría, facturación electrónica…</p>
+                      <a class="btn btn--ink btn--sm" href="servicios.html#contabilidad" data-i18n="moreInfo">Más info</a>
+                    </div></div>
+                  </div>
+                </div>
+              </li>
+              <li class="road__item road__item--left" data-service="administrativa">
+                <div class="road__spacer" aria-hidden="true"></div>
+                <div class="road__node-wrap"><button type="button" class="road__node" aria-expanded="false" aria-controls="svc-d2" aria-label="Gestión administrativa"></button></div>
+                <div class="road__main">
+                  <button type="button" class="road__pill" aria-expanded="false" aria-controls="svc-d2">02</button>
+                  <div class="road__card" role="button" tabindex="0" aria-expanded="false" aria-controls="svc-d2">
+                    <h3 data-i18n="g2Title">Gestión Administrativa</h3>
+                    <p class="road__summary" data-i18n="g2Sum">Nómina, seguridad social, cartera y proveedores.</p>
+                    <div class="road__detail" id="svc-d2"><div>
+                      <p data-i18n="g2Body">Operación administrativa con cumplimiento: afiliaciones, liquidación de nómina, seguimiento de clientes y proveedores.</p>
+                      <a class="btn btn--ink btn--sm" href="servicios.html#administrativa" data-i18n="moreInfo">Más info</a>
+                    </div></div>
+                  </div>
+                </div>
+              </li>
+              <li class="road__item road__item--right" data-service="riesgo">
+                <div class="road__spacer" aria-hidden="true"></div>
+                <div class="road__node-wrap"><button type="button" class="road__node" aria-expanded="false" aria-controls="svc-d3" aria-label="Sistemas de riesgo"></button></div>
+                <div class="road__main">
+                  <button type="button" class="road__pill" aria-expanded="false" aria-controls="svc-d3">03</button>
+                  <div class="road__card" role="button" tabindex="0" aria-expanded="false" aria-controls="svc-d3">
+                    <h3 data-i18n="g3Title">Sistemas de Riesgo</h3>
+                    <p class="road__summary" data-i18n="g3Sum">Cumplimiento, control y protección reputacional.</p>
+                    <div class="road__detail" id="svc-d3"><div>
+                      <p data-i18n="g3Body">Diseño y acompañamiento en sistemas de riesgo y cumplimiento normativo para operar con seguridad.</p>
+                      <a class="btn btn--ink btn--sm" href="servicios.html#riesgo" data-i18n="moreInfo">Más info</a>
+                    </div></div>
+                  </div>
+                </div>
+              </li>
+              <li class="road__item road__item--left" data-service="asesoria">
+                <div class="road__spacer" aria-hidden="true"></div>
+                <div class="road__node-wrap"><button type="button" class="road__node" aria-expanded="false" aria-controls="svc-d4" aria-label="Asesoría"></button></div>
+                <div class="road__main">
+                  <button type="button" class="road__pill" aria-expanded="false" aria-controls="svc-d4">04</button>
+                  <div class="road__card" role="button" tabindex="0" aria-expanded="false" aria-controls="svc-d4">
+                    <h3 data-i18n="g4Title">Asesoría</h3>
+                    <p class="road__summary" data-i18n="g4Sum">Legal, financiera y de formalización.</p>
+                    <div class="road__detail" id="svc-d4"><div>
+                      <p data-i18n="g4Body">Asesoría para constituir, formalizar y crecer con criterio legal y financiero.</p>
+                      <a class="btn btn--ink btn--sm" href="servicios.html#asesoria" data-i18n="moreInfo">Más info</a>
+                    </div></div>
+                  </div>
+                </div>
+              </li>
+              <li class="road__item road__item--right" data-service="marca">
+                <div class="road__spacer" aria-hidden="true"></div>
+                <div class="road__node-wrap"><button type="button" class="road__node" aria-expanded="false" aria-controls="svc-d5" aria-label="Marca"></button></div>
+                <div class="road__main">
+                  <button type="button" class="road__pill" aria-expanded="false" aria-controls="svc-d5">05</button>
+                  <div class="road__card" role="button" tabindex="0" aria-expanded="false" aria-controls="svc-d5">
+                    <h3 data-i18n="g5Title">Marca</h3>
+                    <p class="road__summary" data-i18n="g5Sum">Identidad y posicionamiento de tu negocio.</p>
+                    <div class="road__detail" id="svc-d5"><div>
+                      <p data-i18n="g5Body">Acompañamiento en marca e imagen para reforzar la propuesta de valor frente al mercado.</p>
+                      <a class="btn btn--ink btn--sm" href="servicios.html#marca" data-i18n="moreInfo">Más info</a>
+                    </div></div>
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="sobre-amd">
+        <div class="wrap about-grid">
+          <figure class="about-visual reveal"><figcaption>Cali · Colombia</figcaption></figure>
+          <div class="about-copy reveal">
+            <div class="section-head" style="margin-bottom:1.25rem"><h2 data-i18n="aboutTitle">Quiénes somos</h2></div>
+            <p data-i18n="aboutBody">PYME colombiana enfocada en finanzas, administración y cumplimiento. Equipo con más de una década acompañando empresas de distintas industrias.</p>
+            <div class="about-actions">
+              <a class="btn btn--gold" href="quienes-somos.html" data-i18n="seeMore">Ver más</a>
+              <a class="btn btn--ghost" href="#contacto" data-i18n="aboutCta">Contactar</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="confianza" class="section--light">
+        <div class="wrap">
+          <div class="section-head reveal">
+            <h2 data-i18n="trustTitle">Confianza que se nota</h2>
+            <p data-i18n="trustLead">Clientes en movimiento continuo; testimonios con pausa larga para leer.</p>
+          </div>
+
+          <div class="metrics reveal">
+            <div class="metric"><strong>10+</strong><span data-i18n="m1">años de acompañamiento</span></div>
+            <div class="metric"><strong>98%</strong><span data-i18n="m2">satisfacción</span></div>
+            <div class="metric"><strong>ES/EN</strong><span data-i18n="m3">atención bilingüe</span></div>
+            <div class="metric"><strong>Cali</strong><span data-i18n="m4">base regional</span></div>
+          </div>
+
+          <div class="logos reveal">
+            <p class="logos__label" data-i18n="logosLabel">Algunos clientes / sectores</p>
+            <div class="logos__viewport">
+            <div class="logo-track" aria-hidden="true">
+              <div class="logo-pill">Cripto</div>
+              <div class="logo-pill">Moda</div>
+              <div class="logo-pill">Oro</div>
+              <div class="logo-pill">Educación</div>
+              <div class="logo-pill">Fundaciones</div>
+              <div class="logo-pill">Minimarket</div>
+              <div class="logo-pill">Ploteo</div>
+              <div class="logo-pill">Turismo</div>
+              <!-- duplicate for seamless loop -->
+              <div class="logo-pill">Cripto</div>
+              <div class="logo-pill">Moda</div>
+              <div class="logo-pill">Oro</div>
+              <div class="logo-pill">Educación</div>
+              <div class="logo-pill">Fundaciones</div>
+              <div class="logo-pill">Minimarket</div>
+              <div class="logo-pill">Ploteo</div>
+              <div class="logo-pill">Turismo</div>
+            </div>
+            </div>
+          </div>
+
+          <div class="testimonials reveal" id="testimonials" aria-live="polite">
+            <blockquote class="quote is-active" data-quote="0">
+              <p data-i18n="q1">“Por fin entendimos qué debíamos formalizar y en qué orden. El contacto fue directo y claro.”</p>
+              <footer>— <span data-i18n="q1By">Emprendedora, comercio</span></footer>
+            </blockquote>
+            <blockquote class="quote" data-quote="1">
+              <p data-i18n="q2">“Needed bilingual support for our ops setup in Colombia. Smooth and professional.”</p>
+              <footer>— <span data-i18n="q2By">Ops lead, SaaS</span></footer>
+            </blockquote>
+            <blockquote class="quote" data-quote="2">
+              <p data-i18n="q3">“La nómina y la seguridad social dejaron de ser un dolor de cabeza mensual.”</p>
+              <footer>— <span data-i18n="q3By">Gerente, retail</span></footer>
+            </blockquote>
+            <blockquote class="quote" data-quote="3">
+              <p data-i18n="q4">“Claridad en declaraciones y acompañamiento real cuando hay cambios normativos.”</p>
+              <footer>— <span data-i18n="q4By">Director financiero</span></footer>
+            </blockquote>
+          </div>
+          <div class="testimonial-dots" id="testimonial-dots" aria-label="Testimonios"></div>
+
+          <div style="margin-top:2rem" class="reveal">
+            <a class="btn btn--ink" href="#contacto" data-i18n="trustCta">Contactar</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="contacto">
+        <div class="wrap contact-grid">
+          <div class="reveal">
+            <div class="section-head">
+              <h2 data-i18n="contactTitle">Hablemos</h2>
+              <p data-i18n="contactLead">Cuéntanos qué necesitas. Fase 1: WhatsApp o correo — sin backend.</p>
+            </div>
+            <dl class="contact-meta">
+              <dt data-i18n="locLabel">Ubicación</dt><dd>Cali, Colombia</dd>
+              <dt data-i18n="waLabel">WhatsApp</dt><dd>+57 324 880 5290</dd>
+            </dl>
+          </div>
+          <form class="form reveal" id="contact-form" novalidate>
+            <div class="field" data-field="fullName">
+              <label for="fullName" data-i18n="fName">Nombre completo</label>
+              <input id="fullName" name="fullName" autocomplete="name" required />
+              <div class="field-error" data-i18n="errRequired">Campo requerido</div>
+            </div>
+            <div class="field">
+              <label for="email" data-i18n="fEmail">Correo</label>
+              <input id="email" name="email" type="email" autocomplete="email" required />
+              <div class="field-error" data-i18n="errEmail">Correo inválido</div>
+            </div>
+            <div class="field">
+              <label for="service" data-i18n="fService">Línea de servicio</label>
+              <select id="service" name="service">
+                <option value="" data-i18n="fServiceOpt">Selecciona (opcional)</option>
+                <option value="contabilidad" data-i18n="g1Title">Contabilidad</option>
+                <option value="administrativa" data-i18n="g2Title">Gestión Administrativa</option>
+                <option value="riesgo" data-i18n="g3Title">Sistemas de Riesgo</option>
+                <option value="asesoria" data-i18n="g4Title">Asesoría</option>
+                <option value="marca" data-i18n="g5Title">Marca</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="message" data-i18n="fMessage">Mensaje</label>
+              <textarea id="message" name="message" required></textarea>
+              <div class="field-error" data-i18n="errRequired">Campo requerido</div>
+            </div>
+            <div class="form__actions">
+              <button class="btn btn--gold" type="submit" data-i18n="fSubmit">Enviar consulta</button>
+              <button class="btn btn--ghost" type="button" id="wa-btn" data-i18n="fWhatsapp">Abrir WhatsApp</button>
+            </div>
+            <p class="form-note" data-i18n="fNote">Mockup: validación client-side + handoff.</p>
+            <div class="toast" id="toast" role="status" data-i18n="fToast">Listo — abriendo canal de contacto.</div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer__inner">
+        <div>© <span id="year"></span> AMD Soluciones Integrales S.A.S.</div>
+        <div>
+          <a href="#" data-i18n="ftPrivacy">Privacidad</a> ·
+          <a href="#" data-i18n="ftTerms">Términos</a> ·
+          <a href="quienes-somos.html" data-i18n="navAboutPage">Quiénes somos</a> ·
+          <a href="servicios.html" data-i18n="navServicesPage">Servicios</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <a class="fab" id="fab" href="https://wa.me/573248805290?text=Hola%20AMD" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.15 6.43 2.15 11.89c0 1.96.52 3.81 1.43 5.41L2 22l4.85-1.54a9.84 9.84 0 0 0 5.19 1.43h.01c5.46 0 9.89-4.43 9.89-9.89C21.94 6.43 17.5 2 12.04 2zm5.77 14.05c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.19-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.45.27-.29.59-.36.79-.36h.57c.18 0 .42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.32.02.52-.1.2-.15.32-.29.5-.14.17-.3.39-.43.52-.14.14-.29.29-.12.56.16.27.73 1.2 1.56 1.95 1.08.96 1.98 1.26 2.26 1.4.28.14.44.12.6-.07.17-.2.7-.81.88-1.09.19-.28.37-.23.62-.14.26.1 1.63.77 1.91.91.28.14.47.21.54.32.07.12.07.68-.17 1.36z"/></svg>
+  </a>
+
+  <script src="i18n.js"></script>
+  <script src="landing.js"></script>
+</body>
+</html>
