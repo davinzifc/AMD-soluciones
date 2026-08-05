@@ -10,7 +10,7 @@ import { HomePage } from './features/home/home-page/home-page';
 import { NotFoundPage } from './features/not-found/not-found-page/not-found-page';
 import { ServicesPage } from './features/services/services-page/services-page';
 
-const fakeLocaleService = { translate: (key: string) => key };
+const fakeLocaleService = { translate: (key: string) => key, locale: () => 'es' as const };
 
 function stubFetch(): void {
   vi.stubGlobal(

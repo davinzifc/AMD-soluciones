@@ -286,7 +286,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T010 — Home Contact form + handoff + analytics stub
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** L
 - **Depends on:** T005, T003, T004
 - **Directory boundary:** `client/src/app/features/home/contact/`, `core/contact/`, `core/analytics/`
@@ -304,10 +304,10 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - Empty / invalid / success / WA-blocked states; no fake backend spinner
 
 ### Done when
-- [ ] Invalid path blocks handoff
-- [ ] Valid path handoff + named events
-- [ ] BUT it must NOT POST leads or add Nest
-- [ ] AND IT MUST keep mailto/number visible if popup blocked
+- [x] Invalid path blocks handoff
+- [x] Valid path handoff + named events
+- [x] BUT it must NOT POST leads or add Nest
+- [x] AND IT MUST keep mailto/number visible if popup blocked
 
 ---
 

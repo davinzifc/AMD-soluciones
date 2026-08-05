@@ -1,0 +1,84 @@
+<section id="contacto" class="contact-section">
+  <div class="wrap contact-grid">
+    <div class="contact-intro">
+      <div class="section-head">
+        <h2>{{ 'contactTitle' | localize }}</h2>
+        <p>{{ 'contactLead' | localize }}</p>
+      </div>
+
+      <dl class="contact-meta">
+        <dt>{{ 'locLabel' | localize }}</dt>
+        <dd>Cali, Colombia</dd>
+        <dt>{{ 'waLabel' | localize }}</dt>
+        <dd>+57 324 880 5290</dd>
+      </dl>
+
+      <a class="mailto-fallback" [href]="mailtoHref()">{{ inboxAddress }}</a>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field" [class.is-invalid]="fieldInvalid('fullName')">
+        <label for="fullName">{{ 'fName' | localize }}</label>
+        <input
+          id="fullName"
+          formControlName="fullName"
+          autocomplete="name"
+          [attr.aria-invalid]="fieldInvalid('fullName')"
+          [attr.aria-describedby]="fieldInvalid('fullName') ? 'fullName-error' : null"
+        />
+        @if (fieldInvalid('fullName')) {
+          <div class="field-error" id="fullName-error">{{ 'errRequired' | localize }}</div>
+        }
+      </div>
+
+      <div class="field" [class.is-invalid]="fieldInvalid('email')">
+        <label for="email">{{ 'fEmail' | localize }}</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [attr.aria-invalid]="fieldInvalid('email')"
+          [attr.aria-describedby]="fieldInvalid('email') ? 'email-error' : null"
+        />
+        @if (fieldInvalid('email')) {
+          <div class="field-error" id="email-error">{{ emailErrorKey() | localize }}</div>
+        }
+      </div>
+
+      <div class="field">
+        <label for="service">{{ 'fService' | localize }}</label>
+        <select id="service" formControlName="serviceInterest">
+          <option value="">{{ 'fServiceOpt' | localize }}</option>
+          @for (option of serviceOptions; track option.id) {
+            <option [value]="option.id">{{ option.labelKey | localize }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field" [class.is-invalid]="fieldInvalid('message')">
+        <label for="message">{{ 'fMessage' | localize }}</label>
+        <textarea
+          id="message"
+          formControlName="message"
+          [attr.aria-invalid]="fieldInvalid('message')"
+          [attr.aria-describedby]="fieldInvalid('message') ? 'message-error' : null"
+        ></textarea>
+        @if (fieldInvalid('message')) {
+          <div class="field-error" id="message-error">{{ 'errRequired' | localize }}</div>
+        }
+      </div>
+
+      <div class="form__actions">
+        <button class="btn btn--gold" type="submit">{{ 'fSubmit' | localize }}</button>
+        <button class="btn btn--ghost" type="button" (click)="openWhatsApp()">{{ 'fWhatsapp' | localize }}</button>
+      </div>
+
+      <p class="form-note">{{ 'fNote' | localize }}</p>
+
+      @if (toastVisible()) {
+        <div class="toast" role="status">{{ 'fToast' | localize }}</div>
+      }
+    </form>
+  </div>
+</section>

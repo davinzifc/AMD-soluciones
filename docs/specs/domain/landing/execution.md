@@ -417,3 +417,45 @@ User: still a huge empty band under the nav; ask to center the copy more.
 
 - Change: `.hero` `align-items: end` → `center`; tighten `.hero__content` padding (`1.5rem 0 3.5rem`, mobile `1rem 0 3.25rem`) so the brand/CTA block sits mid-viewport; left text alignment kept (brand-first).
 - File: `features/home/hero/hero-section.css`
+
+### T010 — Home Contact form + handoff + analytics stub
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-008 · NFR-004 · REQ-013 (labels/errors) |
+| Design refs | DD-003 · DD-009 · DD-011 · Form UX states · §3 ContactIntent |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer` (Reactive Forms override per DD-011), `error-handling-patterns`
+- Effort: medium
+- Files created: `core/contact/{contact.config,contact-intent.model,contact-handoff(+spec)}.ts`; `core/analytics/{analytics-port,console-analytics.service(+spec)}.ts`; `features/home/contact/contact-section.{ts,html,css,spec.ts}`
+- Files modified: `whatsapp-fab.{ts,html,spec.ts}` (locale `waPrefill` + `whatsapp_click`); `home-page.{ts,html,css,spec.ts}` (stub → ContactSection); `app.routes.spec.ts`
+- Verification: `test:agent` 22 files / 137 tests; lint quiet; build OK; `server/` untouched
+- Assumptions: `CONTACT_MAILTO_INBOX` default `contacto@amdsoluciones.com` (DI-swappable; AMD confirm before archive)
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Invalid path asserts no `window.open` + no `contact_submit`; valid path asserts full `wa.me` URL decode (name/email/service/message/locale) + toast; analytics DI port asserted by exact event names (`contact_submit`, `whatsapp_click` with `source: form|fab`); Reactive Forms; no spinner/Nest/HttpClient in contact path; `#contacto` preserved. Disqualifiers not triggered. Leader re-ran 137/137 + lint quiet.
+
+**ADVISORY** (non-gating → T014 / confirm):
+
+1. Visible WA number in template hardcoded — derive from `WHATSAPP_NUMBER` if token overridden.
+2. `SERVICE_GROUP_IDS` imported into `core/` from features — move tuple to `core/` later if value use risks chunk coupling.
+3. Invalid submit: aria association OK; no focus-to-first-error / error summary — T014 a11y.
+4. Toast `role="status"` mounted with `@if` — prefer persistent empty live region (T014).
+5. No form reset / toast auto-dismiss after success — behavior decision.
+6. Error colors off-token hex (`#f0a0a0` / `#e08080`) — `--amd-danger` at T014.
+7. No regression test pinning “no Nest POST” — optional guard later.
+
+**Open HITL (carry forward):** Contact section visual at 375/768/1024/1440; confirm real mailto inbox + WA number with AMD before archive.
+
+#### Final verification
+
+137 tests green (invalid blocks handoff; valid wa.me + mailto + named events; FAB/form `whatsapp_click`); lint green; no Nest.
