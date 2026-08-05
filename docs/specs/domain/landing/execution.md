@@ -159,3 +159,42 @@ Build green; gold present; no forbidden purples in `client/src`.
 #### Final verification
 
 `test:agent` 20/20 green including template reactivity guard; lint/build green.
+
+### T004 — App shell: TopNav, drawer, FAB, footer
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-002 (top nav, mobile drawer+Home anchors, touch, FAB) · REQ-013 (menu/FAB names, focus trap) |
+| Design refs | §6 Shell · breakpoints · DD-007 (FAB/chrome; sidenav deferred) |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`
+- Effort: medium
+- Files: `core/layout/` — `drawer-state.service`, `top-nav`, `mobile-drawer`, `whatsapp-fab`, `site-footer` (+ specs); `app.{ts,html,css,spec.ts}` shell composition
+- Verification: `test:agent` 9 files / 49 tests; lint quiet; build OK
+- HITL: FAB vs Contactar at 375 deferred (no Home contact section yet; Contactar in top bar, FAB bottom-right)
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Glass sticky top nav with `<900px` hamburger; drawer page links + Home anchors on `/` only; focus trap + restore; labeled FAB; footer; real 44×44 CSS; no sidenav; no Nest. Disqualifiers do not fire.
+
+**ADVISORY** (4R, non-gating — do not mint tasks):
+
+1. Modal containment incomplete — topnav/FAB above drawer backdrop; consider `inert` later (T014).
+2. Open drawer state survives ≥900px resize — matchMedia close candidate.
+3. Focus-on-open effect vs hidden node — keyboard HITL in T014.
+4. Duplicated `68px` topnav height / `.wrap` — prefer token (NFR-003).
+5. FAB media-query comment vs rule mismatch — fix before/with T010.
+6. `<nav aria-label="Sitio">` hardcoded ES — T014 i18n a11y sweep.
+7. Home-anchor test asserts count not fragments — strengthen later optional.
+
+#### Final verification
+
+49 tests green including drawer focus trap + FAB aria-label; lint/build green.

@@ -1,0 +1,28 @@
+@if (isOpen()) {
+  <button type="button" class="drawer-backdrop" tabindex="-1" aria-hidden="true" (click)="close()"></button>
+}
+<div
+  #drawerEl
+  id="drawer"
+  class="drawer"
+  [class.is-open]="isOpen()"
+  [hidden]="!isOpen()"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="'menuAria' | localize"
+  tabindex="-1"
+  (keydown)="onKeydown($event)"
+>
+  <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" (click)="close()">{{
+    'navHome' | localize
+  }}</a>
+  <a routerLink="/quienes-somos" routerLinkActive="is-active" (click)="close()">{{ 'navAboutPage' | localize }}</a>
+  <a routerLink="/servicios" routerLinkActive="is-active" (click)="close()">{{ 'navServicesPage' | localize }}</a>
+
+  @if (isHomeRoute()) {
+    <a routerLink="/" fragment="servicios" (click)="close()">{{ 'navServices' | localize }}</a>
+    <a routerLink="/" fragment="sobre-amd" (click)="close()">{{ 'navAbout' | localize }}</a>
+    <a routerLink="/" fragment="confianza" (click)="close()">{{ 'navTrust' | localize }}</a>
+    <a routerLink="/" fragment="contacto" (click)="close()">{{ 'navContact' | localize }}</a>
+  }
+</div>

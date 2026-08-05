@@ -137,7 +137,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T004 — App shell: TopNav, drawer, FAB, footer
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** L
 - **Depends on:** T002, T003
 - **Directory boundary:** `client/src/app/core/layout/`, `shared/ui/` as needed
