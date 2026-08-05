@@ -325,3 +325,37 @@ Affected ADR: none in TRD (DD-014 is design-level). Mockup HTML filenames remain
 #### Final verification
 
 98 tests green including keyboard expand + all five `/services#` hrefs; lint/build green.
+
+### T008 — Home About teaser
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-006 (teaser half) |
+| Design refs | §6 AboutTeaserSection · DD-014 `/about-us` |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer`, `ui-ux-pro-max`
+- Effort: medium
+- Files: `features/home/about-teaser/*`; wired into `home-page` replacing `#sobre-amd` stub
+- Verification: lint quiet; `test:agent` 18 files / 104 tests — Ver más → `/about-us`; Contactar → `/#contacto`; no mission/vision/leaders dump
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Teaser-only About section; Ver más is real `/about-us` link (not `#sobre-amd`); deep about page untouched for T011; tokens OK.
+
+**ADVISORY** (4R, non-gating):
+
+1. `aria-hidden` on figure also hides visible "Cali · Colombia" caption — T014 a11y.
+2. Visual fidelity vs mockup remains HITL.
+3. (resolved by this entry) execution.md needed T008 log.
+
+#### Final verification
+
+104 tests green including `/about-us` href assert; lint green.

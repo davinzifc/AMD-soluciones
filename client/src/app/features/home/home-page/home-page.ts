@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
+import { AboutTeaserSection } from '../about-teaser/about-teaser-section';
 import { HeroSection } from '../hero/hero-section';
 import { ServicesRoadSection } from '../services-road/services-road-section';
 
@@ -11,12 +12,14 @@ import { ServicesRoadSection } from '../services-road/services-road-section';
  * and reserved for the future `HomeSideNav` (T013).
  *
  * `#inicio` is the brand-first `HeroSection` (T006); `#servicios` is the
- * five-group `ServicesRoadSection` (T007). The remaining three sections stay
- * stubs until T008–T010 land.
+ * five-group `ServicesRoadSection` (T007); `#sobre-amd` is the short
+ * `AboutTeaserSection` (T008) — the full misión/visión/leaders content lives
+ * only on the Quiénes somos deep page (T011). The remaining two sections
+ * stay stubs until T009–T010 land.
  */
 @Component({
   selector: 'app-home-page',
-  imports: [LocalizePipe, HeroSection, ServicesRoadSection],
+  imports: [LocalizePipe, HeroSection, ServicesRoadSection, AboutTeaserSection],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })

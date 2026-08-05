@@ -240,7 +240,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T008 — Home About teaser
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** S
 - **Depends on:** T005, T003
 - **Directory boundary:** `client/src/app/features/home/about-teaser/`
