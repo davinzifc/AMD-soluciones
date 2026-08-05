@@ -60,7 +60,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T001 — Scaffold Angular `client/` + scripts + fonts
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** L
 - **Depends on:** none
 - **Directory boundary:** `client/` (create); never `server/`
