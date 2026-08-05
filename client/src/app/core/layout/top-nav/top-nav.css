@@ -1,11 +1,18 @@
+/*
+ * Sticky must live on `:host`, not on the inner `.topnav`. In Angular the
+ * host (`app-top-nav`) is only as tall as the bar; sticky on the child cannot
+ * outlive that short parent, so the whole chrome scrolled away (unlike the
+ * mockup, where `.topnav` is a direct child of `body`). Keep the same dark
+ * glass on every route — only the Home sidenav flips ink/gold via `is-on-light`.
+ */
 :host {
   display: block;
-}
-
-.topnav {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+.topnav {
   backdrop-filter: var(--amd-glass-blur);
   -webkit-backdrop-filter: var(--amd-glass-blur);
   background: rgba(13, 20, 26, 0.78);

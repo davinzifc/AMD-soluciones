@@ -24,7 +24,10 @@ const ANCHORS: readonly SideNavAnchor[] = [
 /**
  * Home-only floating section nav (T013 · REQ-002 · design.md §6
  * `HomeSideNav` · DD-007). Dots + labels, **no opaque bar** — CSS alone
- * gates visibility to `≥1100px` via the existing `body.has-side-nav` class
+ * gates visibility to `≥1100px` via a plain media query on `.sidenav`
+ * (Home-only mount in `app.html` already removes the component off `/`).
+ * Do not reintroduce `body.has-side-nav .sidenav` in component CSS —
+ * Angular encapsulation attributes `body` and the rule never matches.
  * (T005). Scroll-spy and light/dark contrast are computed here per the
  * mockup `landing.js` `updateSideNav()` algorithm:
  *

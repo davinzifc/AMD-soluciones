@@ -24,9 +24,15 @@
   -webkit-backdrop-filter: none;
 }
 
-/* Visible only ≥1100px, and only while `body.has-side-nav` (Home route, T005). */
+/*
+ * Visible ≥1100px. Do NOT use `body.has-side-nav .sidenav` here — Angular's
+ * emulated encapsulation rewrites that to `body.has-side-nav[_ngcontent] …`
+ * which never matches (body has no encapsulation attr), so the nav stays
+ * `display: none` forever. Home-only mounting is already gated in `app.html`;
+ * `body.has-side-nav` remains for layout/tests only.
+ */
 @media (min-width: 1100px) {
-  body.has-side-nav .sidenav {
+  .sidenav {
     display: flex;
   }
 }

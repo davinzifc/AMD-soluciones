@@ -596,3 +596,17 @@ User: still a huge empty band under the nav; ask to center the copy more.
 - Child `client/AGENTS.md` not required yet (conventions still match root)
 - Root `## Module Guides` unchanged
 - CodeGraph re-index pending at archive (graph not initialized)
+
+## HITL patch — sticky topnav + sidenav visibility (2026-08-05)
+
+User compared live Home vs mockup before T014: (1) topnav scrolled away; (2) left section sidenav invisible at desktop widths; (3) header appeared to change color across pages / sections.
+
+| Fix | Cause | Change |
+|-----|-------|--------|
+| Sticky topnav | `position: sticky` lived on inner `.topnav` inside a short `app-top-nav` host — sticky cannot outlive that parent, so the whole chrome scrolled away (mockup sticks because `.topnav` is a direct `body` child) | Move `position: sticky; top: 0; z-index: 50` to `:host`; keep dark glass on `.topnav` for every route |
+| Missing sidenav | Component CSS used `body.has-side-nav .sidenav`; Angular emulated encapsulation rewrites to `body.has-side-nav[_ngcontent] .sidenav[_ngcontent]`, which never matches → sidenav stuck at `display: none` | Show `.sidenav { display: flex }` under `@media (min-width: 1100px)` only; Home-only mount stays in `app.html` |
+| Header color | Not a separate palette bug — non-sticky nav + translucent glass over light sections made chrome look inconsistent; mockup keeps the same dark glass on all pages; only sidenav uses `is-on-light` ink/gold | No per-page topnav theme; sidenav contrast unchanged |
+
+- Files: `core/layout/top-nav/top-nav.css`, `core/layout/home-side-nav/{home-side-nav.css,home-side-nav.ts}`
+- Verification: lint quiet; `test:agent` (re-run after patch)
+- **Human re-check owed:** sticky topnav while scrolling Home + deep pages; sidenav visible ≥1100px on `/` with hover label reveal + ink on light sections (`#servicios` / `#confianza`); sidenav absent on `/about-us` and `/services`.
