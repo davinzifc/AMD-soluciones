@@ -610,3 +610,11 @@ User compared live Home vs mockup before T014: (1) topnav scrolled away; (2) lef
 - Files: `core/layout/top-nav/top-nav.css`, `core/layout/home-side-nav/{home-side-nav.css,home-side-nav.ts}`
 - Verification: lint quiet; `test:agent` (re-run after patch)
 - **Human re-check owed:** sticky topnav while scrolling Home + deep pages; sidenav visible ≥1100px on `/` with hover label reveal + ink on light sections (`#servicios` / `#confianza`); sidenav absent on `/about-us` and `/services`.
+
+### Follow-up (same day) — canvas ink behind glass topnav
+
+User: on Quiénes somos / Servicios the glass looks right, but a light/white band shows behind the sticky header.
+
+- Cause: `html`/`body` kept the browser default white canvas; translucent topnav (`rgba(13,20,26,0.78)` + blur) composited over that white. Mockup already sets `body { background: var(--amd-ink) }`.
+- Change: `client/src/styles.css` — `html, body { background: var(--amd-ink); color: #f5f6f8; min-height: 100%; }` (parity with mockup).
+- Note: mist/light *sections* scrolling under the glass will still tint it slightly — that is intentional glass, not the canvas bug.
