@@ -4,3 +4,7 @@
   color: #f5f6f8;
   font-family: var(--font-body);
 }
+
+.sidenav-host {
+  display: none;
+}

@@ -164,7 +164,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T005 — Routes, fragments, legal stubs, 404
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** M
 - **Depends on:** T004
 - **Directory boundary:** `client/src/app/` routes · `features/legal/` · placeholder page components as needed

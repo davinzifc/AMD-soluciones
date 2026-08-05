@@ -1,0 +1,16 @@
+<section class="page-stub">
+  <h1>{{ 'svcPageTitle' | localize }}</h1>
+  <p>{{ 'svcPageLead' | localize }}</p>
+</section>
+
+@for (group of groups; track group.id) {
+  <section [id]="group.id" class="stub-section">
+    <h2>{{ group.titleKey | localize }}</h2>
+    <p>{{ group.summaryKey | localize }}</p>
+    <p class="stub-note">{{ 'stubPending' | localize }}</p>
+  </section>
+}
+
+<div class="page-stub">
+  <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'talkAdvisor' | localize }}</a>
+</div>

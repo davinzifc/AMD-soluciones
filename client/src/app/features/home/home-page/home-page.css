@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.stub-section {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 3rem min(5vw, 2.5rem);
+  border-bottom: 1px solid var(--amd-glass-border);
+}
+
+.stub-note {
+  color: rgba(245, 246, 248, 0.6);
+}

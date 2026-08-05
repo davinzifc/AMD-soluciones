@@ -168,5 +168,11 @@
   "subM02t": "Positioning",
   "subM02d": "Message and presence aligned to the offer.",
   "subM03t": "Sales materials",
-  "subM03d": "Assets for client communication."
+  "subM03d": "Assets for client communication.",
+
+  "stubPending": "Section under construction — full content coming soon.",
+  "legalStubLead": "Content in preparation. We'll publish the final version soon.",
+  "backToHome": "Back to home",
+  "notFoundTitle": "Page not found",
+  "notFoundLead": "The page you're looking for doesn't exist or was moved."
 }

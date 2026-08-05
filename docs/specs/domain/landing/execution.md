@@ -198,3 +198,40 @@ Build green; gold present; no forbidden purples in `client/src`.
 #### Final verification
 
 49 tests green including drawer focus trap + FAB aria-label; lint/build green.
+
+### T005 — Routes, fragments, legal stubs, 404
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 1 |
+| Requirements covered | REQ-001 · REQ-002 (Home-vs-deep shell flag) · REQ-014 · fragment targets for REQ-004/005 |
+| Design refs | §6 Routes · fragment contract · DD-014 |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
+
+- Skills: `angular-developer`
+- Effort: medium
+- Files: `app.routes.ts` (lazy Spanish paths + wildcard 404); `app.config.ts` `withInMemoryScrolling`; Home/About/Services/Legal/NotFound stubs; `app.routes.spec.ts` router smoke; shell `isHomeRoute` + empty `.sidenav-host`; i18n stub/404 keys
+- Verification: `test:agent` 15 files / 72 tests; lint quiet; build OK with lazy chunks
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
+
+- Verdict: **STATUS: PASS**
+- Summary: Routes + scrolling contract match design; 404 is a real page not redirect; servicios has zero children; smoke tests resolve components and DOM anchors for `/servicios#contabilidad` and `/#contacto`; no Nest.
+
+**ADVISORY** (4R, non-gating):
+
+1. Hardcoded Spanish route `title`s — fold into T014 i18n.
+2. Stub CTAs use encapsulated `.btn` from top-nav — unstyled/undersized until T011–T014.
+3. `isHomeRoute` duplicated in App + MobileDrawer — extract in T013.
+4. Consider `pathMatch: 'full'` on `path: ''`.
+5. `angular.json` `analytics: false` CLI opt-out — harmless.
+6. Stub CSS hex not purple — REQ-011 OK.
+
+#### Final verification
+
+72 tests green including router smoke + fragment DOM anchors; lint/build green.

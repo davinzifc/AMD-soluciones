@@ -168,5 +168,11 @@
   "subM02t": "Posicionamiento",
   "subM02d": "Mensaje y presencia alineados a la oferta.",
   "subM03t": "Materiales comerciales",
-  "subM03d": "Soportes para comunicación con clientes."
+  "subM03d": "Soportes para comunicación con clientes.",
+
+  "stubPending": "Sección en construcción — contenido completo próximamente.",
+  "legalStubLead": "Contenido en preparación. Publicaremos la versión final próximamente.",
+  "backToHome": "Volver al inicio",
+  "notFoundTitle": "Página no encontrada",
+  "notFoundLead": "La página que buscas no existe o fue movida."
 }

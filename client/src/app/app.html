@@ -2,6 +2,10 @@
 <app-mobile-drawer />
 
 <main class="app-shell">
+  @if (isHomeRoute()) {
+    <!-- Reserved mount point for T013's HomeSideNav — empty until then. -->
+    <div class="sidenav-host" aria-hidden="true"></div>
+  }
   <router-outlet />
 </main>
 
