@@ -410,3 +410,10 @@ User compared live `#inicio` vs mockup before T010: hero copy too low / "Scroll"
 - Files: `features/home/hero/hero-section.css`, `features/home/trust/trust-section.css`
 - Verification: `test:agent` 117/117; lint quiet
 - **Human re-check owed:** first viewport (brand + CTAs + Scroll visible) + click each testimonial dot on the circle itself — then continue T010.
+
+### Follow-up (same day) — hero vertical centering
+
+User: still a huge empty band under the nav; ask to center the copy more.
+
+- Change: `.hero` `align-items: end` → `center`; tighten `.hero__content` padding (`1.5rem 0 3.5rem`, mobile `1rem 0 3.25rem`) so the brand/CTA block sits mid-viewport; left text alignment kept (brand-first).
+- File: `features/home/hero/hero-section.css`

@@ -19,7 +19,9 @@
   padding-top: var(--hero-topnav-offset);
   box-sizing: border-box;
   display: grid;
-  align-items: end;
+  /* HITL: end-align left a huge empty band under the nav; center the copy
+     in the viewport while Scroll stays absolute at the bottom. */
+  align-items: center;
   overflow: hidden;
   isolation: isolate;
 }
@@ -53,8 +55,8 @@
 }
 
 .hero__content {
-  /* Extra bottom room so CTAs clear the absolute "Scroll" cue (HITL 2026-08-05). */
-  padding: 7rem 0 4.25rem;
+  /* Balanced pad: clear Scroll below without recreating the empty upper band. */
+  padding: 1.5rem 0 3.5rem;
   max-width: 38rem;
   animation: hero-rise 900ms var(--amd-ease) both;
 }
@@ -199,6 +201,6 @@
 
 @media (max-width: 480px) {
   .hero__content {
-    padding: 6rem 0 4rem;
+    padding: 1rem 0 3.25rem;
   }
 }
