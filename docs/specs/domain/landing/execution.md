@@ -388,7 +388,7 @@ Affected ADR: none in TRD (DD-014 is design-level). Mockup HTML filenames remain
 **ADVISORY** (4R, non-gating):
 
 1. Visual HITL fade/contrast at verification widths — carry forward (with T006).
-2. Testimonial dots 44×44 hit areas overlap — T014.
+2. ~~Testimonial dots 44×44 hit areas overlap — T014.~~ **Fixed** in HITL patch 2026-08-05 (non-overlapping 44×44 buttons + 8px `::before` pip).
 3. Untokenized `#8a7630` metric gold — consider `--amd-gold-deep` at T014.
 4. `aria-live` / opacity-0 quotes a11y — T014; unused `protected activeIndex`.
 
@@ -397,3 +397,16 @@ Affected ADR: none in TRD (DD-014 is design-level). Mockup HTML filenames remain
 #### Final verification
 
 117 tests green including 9s timer + reduced-motion paths; lint green.
+
+## HITL patch — Hero first-viewport + testimonial dots (2026-08-05)
+
+User compared live `#inicio` vs mockup before T010: hero copy too low / "Scroll" below the fold; testimonial dots required clicking left of the visual circle (first pip).
+
+| Fix | Cause | Change |
+|-----|-------|--------|
+| Hero under sticky topnav | `100svh` hero sat *below* sticky nav → end-aligned content + Scroll past fold | `margin-top: -68px` + `padding-top: 68px` + `box-sizing: border-box`; content bottom pad `4.25rem`; Scroll `z-index: 1`, brighter, `bottom: 1.25rem`; mockup `.hero__bg::after` grid |
+| Dot hit targets | overlapping `::after { inset: -18px }` 44×44 bulbs (~15px centers) — later sibling stole clicks | transparent 44×44 buttons, 8px visual via `::before` (no overlap) |
+
+- Files: `features/home/hero/hero-section.css`, `features/home/trust/trust-section.css`
+- Verification: `test:agent` 117/117; lint quiet
+- **Human re-check owed:** first viewport (brand + CTAs + Scroll visible) + click each testimonial dot on the circle itself — then continue T010.

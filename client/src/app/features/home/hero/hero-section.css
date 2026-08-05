@@ -10,8 +10,14 @@
 }
 
 .hero {
+  /* Pull under sticky topnav (68px) so the first viewport matches mockup:
+     brand/CTAs/"Scroll" sit in the initial screen instead of below the fold. */
+  --hero-topnav-offset: 68px;
   position: relative;
   min-height: 100svh;
+  margin-top: calc(-1 * var(--hero-topnav-offset));
+  padding-top: var(--hero-topnav-offset);
+  box-sizing: border-box;
   display: grid;
   align-items: end;
   overflow: hidden;
@@ -28,13 +34,27 @@
     linear-gradient(160deg, #1a242c 0%, var(--amd-ink) 55%, #0a1015 100%);
 }
 
+.hero__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 70% 60% at 65% 45%, black, transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .wrap {
   width: min(100% - 2.5rem, 1160px);
   margin-inline: auto;
 }
 
 .hero__content {
-  padding: 7rem 0 5.5rem;
+  /* Extra bottom room so CTAs clear the absolute "Scroll" cue (HITL 2026-08-05). */
+  padding: 7rem 0 4.25rem;
   max-width: 38rem;
   animation: hero-rise 900ms var(--amd-ease) both;
 }
@@ -144,12 +164,14 @@
 .hero__scroll {
   position: absolute;
   left: 50%;
-  bottom: 1.5rem;
+  bottom: 1.25rem;
+  z-index: 1;
   transform: translateX(-50%);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(245, 246, 248, 0.4);
+  color: rgba(245, 246, 248, 0.55);
+  pointer-events: none;
   animation: hero-scroll-bob 2.4s var(--amd-ease) infinite;
 }
 
