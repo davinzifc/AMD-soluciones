@@ -2,16 +2,39 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { MotionService } from '../../../core/motion/motion.service';
 import { SERVICE_GROUP_IDS } from '../../services/services-page/services-page';
-import { ServicesRoadSection } from './services-road-section';
+import { ROAD_DECO_FACTORS, ServicesRoadSection } from './services-road-section';
 
-function setup() {
+function setup(reduce = false) {
   TestBed.configureTestingModule({
-    providers: [provideRouter([]), { provide: LocaleService, useValue: { translate: (key: string) => key } }],
+    providers: [
+      provideRouter([]),
+      { provide: LocaleService, useValue: { translate: (key: string) => key } },
+      { provide: MotionService, useValue: { reducedMotion: () => reduce } },
+    ],
   });
   const fixture = TestBed.createComponent(ServicesRoadSection);
   fixture.detectChanges();
   return fixture;
+}
+
+function mockRoadRect(el: HTMLElement, top: number, height: number): void {
+  vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
+    top,
+    height,
+    bottom: top + height,
+    left: 0,
+    right: 0,
+    width: 0,
+    x: 0,
+    y: top,
+    toJSON: () => ({}),
+  } as DOMRect);
+}
+
+function setInnerHeight(value: number): void {
+  Object.defineProperty(window, 'innerHeight', { value, configurable: true });
 }
 
 function itemFor(root: HTMLElement, id: string): HTMLElement {
@@ -224,6 +247,75 @@ describe('ServicesRoadSection', () => {
       fixture.detectChanges();
 
       expect(instance.isOpen('contabilidad')).toBe(true);
+    });
+  });
+
+  describe('road progress + deco parallax (T013 · design.md Motion plan · DD-005 — no GSAP)', () => {
+    afterEach(() => {
+      setInnerHeight(768);
+    });
+
+    it('renders the three ambient deco elements', () => {
+      const fixture = setup(false);
+      const decos = fixture.nativeElement.querySelectorAll('.road__deco');
+      expect(decos.length).toBe(3);
+    });
+
+    it('fills the progress bar based on scroll position when motion is allowed (mockup updateRoadScroll parity)', () => {
+      const fixture = setup(false);
+      const root = fixture.nativeElement as HTMLElement;
+      const road = root.querySelector('#services-road') as HTMLElement;
+      const progress = root.querySelector('#road-progress') as HTMLElement;
+
+      setInnerHeight(800);
+      // total = height(1000) + innerHeight*0.35(280) = 1280; traveled = clamp(280 - 400, 0, 1280) = 0.
+      mockRoadRect(road, 400, 1000);
+      window.dispatchEvent(new Event('scroll'));
+      expect(progress.style.height).toBe('0%');
+
+      // traveled = clamp(280 - (-200), 0, 1280) = 480; pct = 480/1280*100 = 37.5.
+      mockRoadRect(road, -200, 1000);
+      window.dispatchEvent(new Event('scroll'));
+      expect(progress.style.height).toBe('37.5%');
+    });
+
+    it('sets the progress bar to a static full state under prefers-reduced-motion instead of tracking scroll (REQ-004/010)', () => {
+      const fixture = setup(true);
+      const root = fixture.nativeElement as HTMLElement;
+      const road = root.querySelector('#services-road') as HTMLElement;
+      const progress = root.querySelector('#road-progress') as HTMLElement;
+
+      setInnerHeight(800);
+      mockRoadRect(road, -600, 1000);
+      window.dispatchEvent(new Event('scroll'));
+
+      expect(progress.style.height).toBe('100%');
+    });
+
+    it('applies deco parallax transforms proportional to each factor when motion is allowed', () => {
+      const fixture = setup(false);
+      const root = fixture.nativeElement as HTMLElement;
+      const road = root.querySelector('#services-road') as HTMLElement;
+      const decos = root.querySelectorAll<HTMLElement>('.road__deco');
+
+      mockRoadRect(road, 100, 1000);
+      window.dispatchEvent(new Event('scroll'));
+
+      ROAD_DECO_FACTORS.forEach((factor, index) => {
+        expect(decos[index].style.transform).toBe(`translate3d(0, ${100 * -factor}px, 0)`);
+      });
+    });
+
+    it('clears deco parallax transforms under prefers-reduced-motion (REQ-010: no motion-only content)', () => {
+      const fixture = setup(true);
+      const root = fixture.nativeElement as HTMLElement;
+      const road = root.querySelector('#services-road') as HTMLElement;
+      const decos = root.querySelectorAll<HTMLElement>('.road__deco');
+
+      mockRoadRect(road, 250, 1000);
+      window.dispatchEvent(new Event('scroll'));
+
+      decos.forEach((deco) => expect(deco.style.transform).toBe(''));
     });
   });
 });

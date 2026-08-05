@@ -536,3 +536,63 @@ User: still a huge empty band under the nav; ask to center the copy more.
 151 tests green; lint green; 5 anchors + catalogs; no Nest.
 
 *Parallel wave:* T011 + T012 executed concurrently (disjoint dirs `features/about/` · `features/services/`).
+
+### T013 — Home sidenav + motion gate (+ optional road progress)
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 2 |
+| Requirements covered | REQ-002 (sidenav) · REQ-004 progress · REQ-007 reduce · REQ-010 |
+| Design refs | DD-005 · DD-007 · DD-015 · HomeSideNav · Motion plan · scroll-spy |
+
+#### Attempt 1
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`) — [T013 Impl](a8d72f7a-7dc1-4b36-83ac-3b86f18e78ba)
+
+- Skills: `angular-developer`, `ui-ux-pro-max` (no `gsap-animation` — DD-005)
+- Effort: medium
+- Files: `core/motion/{motion.service,scroll-listener}`; `core/layout/home-side-nav/*`; app shell mount; hero parallax 0.22; road deco + progress; Trust → `MotionService` (deleted `TrustMotionQuery`); i18n `sideNavAria`
+- Verification: lint quiet; `test:agent` 25 files / 174 tests; build OK (CSS budget warn only)
+- HITL: deferred honestly (no dark bar; ≥1100; contrast; OS reduce; parallax feel)
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`) — [T013 Review FAIL](dcf099ae-3a19-4084-807a-a0ef85ab5f70)
+
+- Verdict: **STATUS: FAIL**
+- Issue: silent shrink of `.testimonial-dots button` 44×44 → 15×15 (reverts HITL 2026-08-05; violates REQ-002/013 touch ≥44; stale comment). Rest of T013 (no GSAP, behavioral scroll-spy tests, motion gate) audited clean.
+
+#### Attempt 2
+
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`) — [T013 Rework](f6f63d61-fc74-4278-aa7c-418136ae25d2)
+
+- Effort: **high** (bump after FAIL)
+- Fix: pure restore `width/height: 44px` on `.testimonial-dots button`; comment already accurate
+- Verification: lint quiet; 174/174
+
+**Reviewer** (T3 · `claude-opus-5-thinking-high`) — [T013 Review PASS](b9688330-d609-4eb9-917e-f684295849dd)
+
+- Verdict: **STATUS: PASS**
+- Summary: FAIL closed — dots 44×44 at HEAD/index/disk; net trust CSS staged diff is comment-only (no geometry regression); attempt-1 15px gone.
+
+**ADVISORY** (4R, non-gating — from attempts 1–2):
+
+1. `HomeSideNav` hand-rolls scroll vs `onPassiveScroll` helper — unify later.
+2. Three un-throttled scroll handlers — consider rAF coalesce (NFR-001).
+3. Road deco `[attr.class]` → prefer `[class]` idioms.
+4. Confirm `.parallax-layer` z-index vs hero bg during HITL.
+5. Duplicated `isHomeRoute` App/MobileDrawer — T014 candidate.
+6. Review scratch `.tmp-t013*.diff` must not be committed (deleted by Leader).
+
+**Open HITL (carry forward):** no dark sidenav bar · dots+label reveal · sidenav ≥1100px · gold/ink contrast · live OS reduce toggle · parallax/progress feel · prior About/Services/Contact/Hero visual items.
+
+#### Final verification
+
+174 tests green; lint green; no GSAP; scroll-spy behavior tested; dots 44×44 preserved; no Nest.
+
+## Constitution Impact: T013
+
+- New modules: `client/src/app/core/motion/`, `client/src/app/core/layout/home-side-nav/`
+- Child `client/AGENTS.md` not required yet (conventions still match root)
+- Root `## Module Guides` unchanged
+- CodeGraph re-index pending at archive (graph not initialized)

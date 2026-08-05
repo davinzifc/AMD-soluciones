@@ -44,6 +44,42 @@
   padding: 0.5rem 0 1rem;
 }
 
+/* Ambient deco parallax circles (T013 · design.md Motion plan, DD-015 ·
+   mockup `landing.css` `.road__deco*`). Transform is set imperatively by
+   `ServicesRoadSection` from a passive scroll listener (DD-005 — no GSAP);
+   hidden below 900px like the mockup (decorative only, never blocks content). */
+.road__deco {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 1px solid rgba(13, 20, 26, 0.06);
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .road__deco {
+    display: block;
+  }
+
+  .road__deco--1 {
+    top: 8%;
+    left: 4%;
+  }
+
+  .road__deco--2 {
+    top: 48%;
+    right: 6%;
+  }
+
+  .road__deco--3 {
+    bottom: 6%;
+    left: 10%;
+  }
+}
+
 .road__axis {
   position: absolute;
   top: 0;
@@ -296,5 +332,9 @@
   .road__node::after,
   .btn {
     transition: none;
+  }
+
+  .road__deco {
+    transform: none !important;
   }
 }

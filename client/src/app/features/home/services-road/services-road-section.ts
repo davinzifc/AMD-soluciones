@@ -1,7 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
+import { MotionService } from '../../../core/motion/motion.service';
+import { onPassiveScroll } from '../../../core/motion/scroll-listener';
 import { SERVICE_GROUP_IDS } from '../../services/services-page/services-page';
 
 type ServiceGroupId = (typeof SERVICE_GROUP_IDS)[number];
@@ -29,6 +31,9 @@ const GROUPS: readonly RoadGroup[] = [
   { id: 'marca', number: '05', titleKey: 'g5Title', summaryKey: 'g5Sum', bodyKey: 'g5Body' },
 ];
 
+/** Road ambient deco parallax factors, in DOM order (design.md Motion plan, DD-015: 0.08–0.14; mockup `data-road-parallax` parity). */
+export const ROAD_DECO_FACTORS = [0.08, 0.14, 0.1] as const;
+
 /**
  * Home services road (T007 · REQ-004 · design.md §6 `ServicesRoadSection` ·
  * DD-006). Renders the five groups as an accordion road: activating a
@@ -44,9 +49,14 @@ const GROUPS: readonly RoadGroup[] = [
  * native `<button>` node/pill, so activation fires exactly once regardless
  * of input method.
  *
- * The road progress fill (`#road-progress` element, mirroring mockup ids) is
- * intentionally static here — T013 owns wiring the scroll-driven fill per the
- * design.md Motion plan; this section only guarantees the DOM hook exists.
+ * The road progress fill (`#road-progress` element, mirroring mockup ids)
+ * and three ambient `.road__deco` circles are wired here (T013 · design.md
+ * Motion plan · DD-005 — passive scroll listener + CSS, no GSAP): scroll
+ * position drives both the fill height and the deco `translate3d` factors,
+ * mirroring mockup `landing.js` `updateRoadScroll()`. Under
+ * `prefers-reduced-motion: reduce` the fill goes static-full and the deco
+ * transforms are cleared instead of continuing to track scroll (REQ-004
+ * "Road progress" scenario / REQ-010).
  */
 @Component({
   selector: 'app-services-road-section',
@@ -54,11 +64,28 @@ const GROUPS: readonly RoadGroup[] = [
   templateUrl: './services-road-section.html',
   styleUrl: './services-road-section.css',
 })
-export class ServicesRoadSection {
+export class ServicesRoadSection implements AfterViewInit, OnDestroy {
   protected readonly groups = GROUPS;
+  /** Template-only index list to render one deco span per `ROAD_DECO_FACTORS` entry. */
+  protected readonly decoIndexes = ROAD_DECO_FACTORS.map((_, index) => index);
+
+  @ViewChild('roadEl') private readonly roadEl?: ElementRef<HTMLElement>;
+  @ViewChild('roadProgress') private readonly roadProgressEl?: ElementRef<HTMLElement>;
+  @ViewChildren('decoEl') private readonly decoEls?: QueryList<ElementRef<HTMLElement>>;
+
+  private readonly motion = inject(MotionService);
+  private cleanupScroll?: () => void;
 
   private readonly openIdSignal = signal<ServiceGroupId | null>(null);
   protected readonly openId = this.openIdSignal.asReadonly();
+
+  ngAfterViewInit(): void {
+    this.cleanupScroll = onPassiveScroll(() => this.updateRoadScroll());
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupScroll?.();
+  }
 
   protected detailId(id: ServiceGroupId): string {
     return `svc-detail-${id}`;
@@ -99,5 +126,34 @@ export class ServicesRoadSection {
     }
     event.preventDefault();
     this.toggle(id);
+  }
+
+  /** Mirrors mockup `landing.js` `updateRoadScroll()` — mockup-proven math (DD-005), no GSAP. */
+  private updateRoadScroll(): void {
+    const road = this.roadEl?.nativeElement;
+    const progress = this.roadProgressEl?.nativeElement;
+    if (!road || !progress) {
+      return;
+    }
+
+    if (this.motion.reducedMotion()) {
+      progress.style.height = '100%';
+      this.decoEls?.forEach((deco) => {
+        deco.nativeElement.style.transform = '';
+      });
+      return;
+    }
+
+    const rect = road.getBoundingClientRect();
+    const view = window.innerHeight || 1;
+    const total = rect.height + view * 0.35;
+    const traveled = Math.min(Math.max(view * 0.35 - rect.top, 0), total);
+    const percent = total > 0 ? Math.min(100, Math.max(0, (traveled / total) * 100)) : 0;
+    progress.style.height = `${percent}%`;
+
+    this.decoEls?.forEach((deco, index) => {
+      const factor = ROAD_DECO_FACTORS[index] ?? 0.1;
+      deco.nativeElement.style.transform = `translate3d(0, ${rect.top * -factor}px, 0)`;
+    });
   }
 }

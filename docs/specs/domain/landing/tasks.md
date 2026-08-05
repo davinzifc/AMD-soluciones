@@ -358,7 +358,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T013 — Home sidenav + motion gate (+ optional road progress)
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** L
 - **Depends on:** T006, T007, T008, T009, T010
 - **Directory boundary:** `client/src/app/core/motion/`, `core/layout/` sidenav
@@ -376,10 +376,10 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 - **Do not** add GSAP unless road progress fails HITL
 
 ### Done when
-- [ ] Dual-nav complete vs mockup
-- [ ] Reduced-motion path keeps content reachable without motion
-- [ ] BUT it must NOT ship GSAP by default
-- [ ] HITL sidenav + motion checks noted in execution
+- [x] Dual-nav complete vs mockup
+- [x] Reduced-motion path keeps content reachable without motion
+- [x] BUT it must NOT ship GSAP by default
+- [x] HITL sidenav + motion checks noted in execution
 
 ---
 

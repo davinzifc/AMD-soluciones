@@ -1,8 +1,8 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
-import { TrustMotionQuery } from './trust-motion-query';
+import { MotionService } from '../../../core/motion/motion.service';
 
 interface Metric {
   readonly value: string;
@@ -58,12 +58,14 @@ export const TESTIMONIAL_PAUSE_MS = 9000;
  * and stay sharp. Testimonials are a timed crossfade (`~9000ms` pause, dots
  * for manual selection), never a horizontal marquee of quotes.
  *
- * `TrustMotionQuery` (local stub, see that file's doc) gates both: under
- * `prefers-reduced-motion: reduce` the marquee loses its CSS animation
- * (`.is-reduced-motion` class + defense-in-depth `@media` rule in the
- * stylesheet) and the testimonial timer is never scheduled at all — content
- * still reaches every quote via the dots (REQ-010 "keep all content ...
- * reachable").
+ * `MotionService` (T013; replaces the T009-era `TrustMotionQuery` stub)
+ * gates both: under `prefers-reduced-motion: reduce` the marquee loses its
+ * CSS animation (`.is-reduced-motion` class + defense-in-depth `@media`
+ * rule in the stylesheet) and the testimonial timer is never scheduled at
+ * all — content still reaches every quote via the dots (REQ-010 "keep all
+ * content ... reachable"). Because `MotionService.reducedMotion` is a live
+ * signal (not a one-time read), an `effect()` re-evaluates the timer any
+ * time the OS preference changes mid-session, not just once at construction.
  */
 @Component({
   selector: 'app-trust-section',
@@ -71,18 +73,23 @@ export const TESTIMONIAL_PAUSE_MS = 9000;
   templateUrl: './trust-section.html',
   styleUrl: './trust-section.css',
 })
-export class TrustSection implements OnDestroy {
+export class TrustSection {
   protected readonly metrics = METRICS;
   protected readonly logoTrack = [...SECTORS, ...SECTORS];
   protected readonly testimonials = TESTIMONIALS;
 
-  private readonly motion = inject(TrustMotionQuery);
-  protected readonly reducedMotion = this.motion.reduce;
+  private readonly motion = inject(MotionService);
+  protected readonly reducedMotion = this.motion.reducedMotion;
 
   private readonly activeIndexSignal = signal(0);
   protected readonly activeIndex = this.activeIndexSignal.asReadonly();
 
-  private timer: ReturnType<typeof setInterval> | undefined = this.startTimer();
+  private timer: ReturnType<typeof setInterval> | undefined;
+
+  constructor() {
+    effect(() => this.restartTimer());
+    inject(DestroyRef).onDestroy(() => clearInterval(this.timer));
+  }
 
   protected isActive(index: number): boolean {
     return this.activeIndexSignal() === index;
@@ -95,20 +102,17 @@ export class TrustSection implements OnDestroy {
   /** Dot click mirrors mockup `showQuote(idx); restartTestimonials();` — manual pick resets the pause window. */
   protected selectTestimonial(index: number): void {
     this.activeIndexSignal.set(index);
-    clearInterval(this.timer);
-    this.timer = this.startTimer();
+    this.restartTimer();
   }
 
-  private startTimer(): ReturnType<typeof setInterval> | undefined {
-    if (this.reducedMotion || this.testimonials.length < 2) {
-      return undefined;
-    }
-    return setInterval(() => {
-      this.activeIndexSignal.update((current) => (current + 1) % this.testimonials.length);
-    }, TESTIMONIAL_PAUSE_MS);
-  }
-
-  ngOnDestroy(): void {
+  private restartTimer(): void {
     clearInterval(this.timer);
+    const reduce = this.reducedMotion();
+    this.timer =
+      reduce || this.testimonials.length < 2
+        ? undefined
+        : setInterval(() => {
+            this.activeIndexSignal.update((current) => (current + 1) % this.testimonials.length);
+          }, TESTIMONIAL_PAUSE_MS);
   }
 }

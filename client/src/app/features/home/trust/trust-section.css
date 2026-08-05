@@ -1,7 +1,9 @@
 /* Home Trust (REQ-007 · design.md §6 · DD-008). Mirrors mockup
    `landing.css` `.metrics/.logos/.testimonials` rules on AMD tokens (no
-   template purple, REQ-011). `section--light` mist background per mockup
-   `index.html#confianza`. */
+   template purple, REQ-011). Mist/light background per mockup
+   `index.html#confianza` `.section--light`; the same marker class is added
+   to the host `<section>` in the template so `HomeSideNav` (T013) can
+   detect it for the sidenav's light/dark contrast scroll-spy. */
 
 :host {
   display: block;
@@ -96,9 +98,9 @@
   animation: logo-marquee 42s linear infinite;
 }
 
-/* JS-driven gate (TrustMotionQuery, read once at construction) plus a
-   defense-in-depth `@media` rule below — either one alone is enough to stop
-   the loop under prefers-reduced-motion: reduce (REQ-007 / REQ-010). */
+/* JS-driven gate (MotionService, live-updating) plus a defense-in-depth
+   `@media` rule below — either one alone is enough to stop the loop under
+   prefers-reduced-motion: reduce (REQ-007 / REQ-010). */
 .logos__viewport.is-reduced-motion .logo-track {
   animation: none;
 }

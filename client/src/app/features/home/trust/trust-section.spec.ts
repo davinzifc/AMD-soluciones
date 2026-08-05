@@ -2,15 +2,15 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { MotionService } from '../../../core/motion/motion.service';
 import { TESTIMONIAL_PAUSE_MS, TrustSection } from './trust-section';
-import { TrustMotionQuery } from './trust-motion-query';
 
 function setup(reduce: boolean) {
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
       { provide: LocaleService, useValue: { translate: (key: string) => key } },
-      { provide: TrustMotionQuery, useValue: { reduce } },
+      { provide: MotionService, useValue: { reducedMotion: () => reduce } },
     ],
   });
   const fixture = TestBed.createComponent(TrustSection);

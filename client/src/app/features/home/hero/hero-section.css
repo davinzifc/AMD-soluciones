@@ -49,6 +49,21 @@
   pointer-events: none;
 }
 
+/* Storytelling parallax layer (T013 · design.md Motion plan, DD-015 · mockup
+   `landing.css` `.parallax-layer`). Transform is set imperatively by
+   `HeroSection` from a passive scroll listener (DD-005 — no GSAP); the
+   `@media` rule below is defense-in-depth in case that JS gate ever fails. */
+.parallax-layer {
+  position: absolute;
+  inset: -8% -4%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 72% 38%, rgba(207, 187, 102, 0.28), transparent 28%),
+    radial-gradient(circle at 58% 70%, rgba(45, 58, 70, 0.5), transparent 40%);
+  will-change: transform;
+  pointer-events: none;
+}
+
 .wrap {
   width: min(100% - 2.5rem, 1160px);
   margin-inline: auto;
@@ -196,6 +211,10 @@
 
   .hero__scroll {
     animation: none;
+  }
+
+  .parallax-layer {
+    transform: none !important;
   }
 }
 

@@ -1,4 +1,4 @@
-<section id="confianza" class="trust-section">
+<section id="confianza" class="trust-section section--light">
   <div class="wrap">
     <div class="section-head">
       <h2>{{ 'trustTitle' | localize }}</h2>
@@ -16,7 +16,7 @@
 
     <div class="logos">
       <p class="logos__label">{{ 'logosLabel' | localize }}</p>
-      <div class="logos__viewport" [class.is-reduced-motion]="reducedMotion">
+      <div class="logos__viewport" [class.is-reduced-motion]="reducedMotion()">
         <div class="logo-track" aria-hidden="true">
           @for (sector of logoTrack; track $index) {
             <div class="logo-pill">{{ sector }}</div>

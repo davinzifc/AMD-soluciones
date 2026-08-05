@@ -1,4 +1,4 @@
-<section id="servicios" class="road-section">
+<section id="servicios" class="road-section section--light">
   <div class="wrap">
     <div class="section-head">
       <h2>{{ 'servicesTitle' | localize }}</h2>
@@ -7,9 +7,12 @@
 
     <p class="road__hint">{{ 'roadHint' | localize }}</p>
 
-    <div class="road" id="services-road">
+    <div class="road" id="services-road" #roadEl>
+      @for (decoIndex of decoIndexes; track decoIndex) {
+        <span [attr.class]="'road__deco road__deco--' + (decoIndex + 1)" #decoEl aria-hidden="true"></span>
+      }
       <div class="road__axis" aria-hidden="true">
-        <div class="road__progress" id="road-progress"></div>
+        <div class="road__progress" id="road-progress" #roadProgress></div>
       </div>
 
       <ol class="road__list">

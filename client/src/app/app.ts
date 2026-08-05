@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 
+import { HomeSideNav } from './core/layout/home-side-nav/home-side-nav';
 import { MobileDrawer } from './core/layout/mobile-drawer/mobile-drawer';
 import { SiteFooter } from './core/layout/site-footer/site-footer';
 import { TopNav } from './core/layout/top-nav/top-nav';
@@ -13,14 +14,15 @@ import { WhatsappFab } from './core/layout/whatsapp-fab/whatsapp-fab';
  * wraps the routed page content.
  *
  * T005 Home-vs-deep shell flag: `isHomeRoute` (same URL check as
- * `MobileDrawer`) drives two things reserved for T013's `HomeSideNav`,
- * without implementing the sidenav itself here:
+ * `MobileDrawer`) drives two things:
  * - `body.has-side-nav` toggles on navigation (design §6 breakpoint table).
- * - an empty `.sidenav-host` slot renders inside `<main>` only on `/`.
+ * - the `.sidenav-host` slot — and the real `HomeSideNav` it mounts (T013)
+ *   — renders inside `<main>` only on `/` (REQ-002 "deep page has no
+ *   section sidenav").
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TopNav, MobileDrawer, WhatsappFab, SiteFooter],
+  imports: [RouterOutlet, TopNav, MobileDrawer, WhatsappFab, SiteFooter, HomeSideNav],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

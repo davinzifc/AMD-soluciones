@@ -3,8 +3,9 @@
 
 <main class="app-shell">
   @if (isHomeRoute()) {
-    <!-- Reserved mount point for T013's HomeSideNav — empty until then. -->
-    <div class="sidenav-host" aria-hidden="true"></div>
+    <div class="sidenav-host">
+      <app-home-side-nav />
+    </div>
   }
   <router-outlet />
 </main>

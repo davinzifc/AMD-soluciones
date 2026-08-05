@@ -2,15 +2,24 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
-import { HeroSection } from './hero-section';
+import { MotionService } from '../../../core/motion/motion.service';
+import { HERO_PARALLAX_FACTOR, HeroSection } from './hero-section';
 
-function setup() {
+function setup(reduce = false) {
   TestBed.configureTestingModule({
-    providers: [provideRouter([]), { provide: LocaleService, useValue: { translate: (key: string) => key } }],
+    providers: [
+      provideRouter([]),
+      { provide: LocaleService, useValue: { translate: (key: string) => key } },
+      { provide: MotionService, useValue: { reducedMotion: () => reduce } },
+    ],
   });
   const fixture = TestBed.createComponent(HeroSection);
   fixture.detectChanges();
   return fixture;
+}
+
+function setScrollY(value: number): void {
+  Object.defineProperty(window, 'scrollY', { value, configurable: true });
 }
 
 describe('HeroSection', () => {
@@ -63,5 +72,44 @@ describe('HeroSection', () => {
     const fixture = setup();
     const ctas = fixture.nativeElement.querySelectorAll('.hero__cta a');
     expect(ctas.length).toBe(2);
+  });
+
+  describe('storytelling parallax (T013 · design.md Motion plan · DD-015)', () => {
+    afterEach(() => {
+      setScrollY(0);
+    });
+
+    it('translates the parallax layer by scrollY * HERO_PARALLAX_FACTOR when motion is allowed', () => {
+      const fixture = setup(false);
+      const layer = fixture.nativeElement.querySelector('.parallax-layer') as HTMLElement;
+
+      setScrollY(200);
+      window.dispatchEvent(new Event('scroll'));
+
+      expect(layer.style.transform).toBe(`translate3d(0, ${200 * HERO_PARALLAX_FACTOR}px, 0)`);
+    });
+
+    it('recomputes the transform on further scroll (passive listener, DD-005 — no GSAP)', () => {
+      const fixture = setup(false);
+      const layer = fixture.nativeElement.querySelector('.parallax-layer') as HTMLElement;
+
+      setScrollY(50);
+      window.dispatchEvent(new Event('scroll'));
+      expect(layer.style.transform).toBe(`translate3d(0, ${50 * HERO_PARALLAX_FACTOR}px, 0)`);
+
+      setScrollY(400);
+      window.dispatchEvent(new Event('scroll'));
+      expect(layer.style.transform).toBe(`translate3d(0, ${400 * HERO_PARALLAX_FACTOR}px, 0)`);
+    });
+
+    it('never applies a transform under prefers-reduced-motion (REQ-010)', () => {
+      const fixture = setup(true);
+      const layer = fixture.nativeElement.querySelector('.parallax-layer') as HTMLElement;
+
+      setScrollY(500);
+      window.dispatchEvent(new Event('scroll'));
+
+      expect(layer.style.transform).toBe('');
+    });
   });
 });

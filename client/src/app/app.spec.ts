@@ -60,15 +60,18 @@ describe('App', () => {
   });
 
   describe('Home-vs-deep shell flag (T005)', () => {
-    it('renders the reserved .sidenav-host slot and adds body.has-side-nav on Home ("/")', () => {
+    it('renders the .sidenav-host slot with the real HomeSideNav mounted and adds body.has-side-nav on Home ("/")', () => {
       const fixture = TestBed.createComponent(App);
       fixture.detectChanges();
 
-      expect(fixture.nativeElement.querySelector('.sidenav-host')).toBeTruthy();
+      const host = fixture.nativeElement.querySelector('.sidenav-host');
+      expect(host).toBeTruthy();
+      expect(host.hasAttribute('aria-hidden')).toBe(false);
+      expect(fixture.nativeElement.querySelector('app-home-side-nav')).toBeTruthy();
       expect(document.body.classList.contains('has-side-nav')).toBe(true);
     });
 
-    it('removes the .sidenav-host slot and body.has-side-nav once navigated to a deep route', async () => {
+    it('removes the .sidenav-host slot (and HomeSideNav) and body.has-side-nav once navigated to a deep route (REQ-002)', async () => {
       const fixture = TestBed.createComponent(App);
       fixture.detectChanges();
 
@@ -77,6 +80,7 @@ describe('App', () => {
       fixture.detectChanges();
 
       expect(fixture.nativeElement.querySelector('.sidenav-host')).toBeNull();
+      expect(fixture.nativeElement.querySelector('app-home-side-nav')).toBeNull();
       expect(document.body.classList.contains('has-side-nav')).toBe(false);
     });
   });

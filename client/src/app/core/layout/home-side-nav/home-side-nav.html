@@ -1,0 +1,15 @@
+<nav class="sidenav" [attr.aria-label]="'sideNavAria' | localize">
+  @for (anchor of anchors; track anchor.id) {
+    <a
+      #anchorLink
+      [attr.data-anchor-id]="anchor.id"
+      routerLink="/"
+      [fragment]="anchor.id"
+      [attr.aria-current]="isActive(anchor.id)"
+      [class.is-on-light]="isOnLight(anchor.id)"
+      [attr.title]="anchor.labelKey | localize"
+    >
+      <span>{{ anchor.labelKey | localize }}</span>
+    </a>
+  }
+</nav>
