@@ -1,9 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-
-:root {
-  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-}
+@import './styles/tokens.css';
 
 body {
   margin: 0;
