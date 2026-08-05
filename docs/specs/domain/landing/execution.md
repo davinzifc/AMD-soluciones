@@ -114,10 +114,10 @@ Build green; gold present; no forbidden purples in `client/src`.
 
 | Field | Value |
 |-------|-------|
-| Final status | *(in progress — attempt 1 FAIL)* |
+| Final status | **PASS** |
 | Date | 2026-08-05 |
-| Attempts so far | 1 |
-| Requirements covered (partial) | REQ-009 foundation (persist/lang/key-parity OK; pipe reactivity FAIL) |
+| Attempts | 2 |
+| Requirements covered | REQ-009 (persist, lang, key-parity, bound-string updates via impure pipe + initializer) |
 | Design refs | DD-004 · DD-014 · §6 i18n |
 
 #### Attempt 1
@@ -132,78 +132,30 @@ Build green; gold present; no forbidden purples in `client/src`.
 
 **Reviewer** (T3 · `claude-opus-5-thinking-high`)
 
-- Verdict: **STATUS: FAIL**
+- Verdict: **STATUS: FAIL** — pure pipe memoizes constant-key bindings; no host reactivity test; no `whenReady` gate. Full FAIL text retained in session history / above block in prior draft; key findings: Done-when #1 broken; initial paint stuck on raw keys.
 
-```text
-STATUS: FAIL
+#### Attempt 2
 
-ISSUES:
+**Implementer** (T2 · `claude-sonnet-5-thinking-high`)
 
-1.  **Discovered Issue:** `LocalizePipe` is declared `pure: true` and takes only the key
-    as input, so Angular's pure-pipe memoization prevents `transform()` from ever
-    re-running after the first evaluation of a given binding. Verified against the
-    installed Angular 22 source, not from memory:
+- Skills: `angular-developer`
+- Effort: high (bumped)
+- Files: `localize.pipe.ts` → `pure: false`; `app.config.ts` → `provideAppInitializer(() => inject(LocaleService).whenReady())`; `localize.pipe.spec.ts` host-component ES→EN→ES DOM guard
+- Verification: lint pass; build pass; `test:agent` 4 files / 20 tests pass
 
-      `_debug_node-chunk.mjs:17669` - ??pipeBind1 → isPure(...) ? pureFunction1Internal(...) : transform(v1)
-      `_debug_node-chunk.mjs:17571` - pureFunction1Internal → bindingUpdated(lView, i, exp)
-                                    ? updateBinding(..., pureFn(exp))
-                                    : getPureFunctionReturnValue(lView, i + 1)
+**Reviewer** (T3 · `claude-opus-5-thinking-high`)
 
-    For `{{ 'heroCtaPrimary' | localize }}` the argument `exp` is a constant string
-    literal, so `bindingUpdated` returns false on every cycle after the first and the
-    cached slot value is returned. Reading `dictionarySignal()` inside `transform`
-    does register the signal on the LView reactive node during the single first
-    invocation, so the view is marked dirty on locale change - but change detection
-    then short-circuits at the memoized binding and the DOM keeps the stale string.
+- Verdict: **STATUS: PASS**
+- Summary: All three prior FAIL items closed — impure pipe updates bindings (verified vs Angular 22 source + zoneless reactive consumer); initializer gates empty dict; host test is a genuine attempt-1 regression guard. Persist/key-parity/no ngx-translate unchanged.
 
-    Two concrete failures follow:
+**ADVISORY** (4R, non-gating):
 
-    a) **Toggle ES↔EN does not update bound strings.** Directly contradicts the pipe's
-       own doc comment (`localize.pipe.ts:6-9`), which asserts the opposite.
+1. Fetch failure in initializer aborts bootstrap — soften later when T004 wires toggle.
+2. Dictionary fetch is render-blocking for LCP — T014 polish candidate.
+3. Host test uses manual `detectChanges`; `whenStable` could strengthen zoneless schedule proof later.
+4. `tsconfig.json` lacks `"strict": true` — Leader checked: HEAD scaffold never had it; only `resolveJsonModule` added. No silent drop.
+5. Impure pipe cost negligible at landing scale; revisit if binding count explodes.
 
-    b) **Initial render is permanently stuck on raw keys.** `LocaleService` starts with
-       `dictionarySignal = signal({})` and fetches asynchronously in the constructor
-       (`locale.service.ts:20,28`). The service is first instantiated when the pipe
-       injects it during the first template pass, so the dictionary is still empty:
-       `translate()` returns the key fallback, that fallback is memoized, and the
-       resolved dictionary never reaches the DOM. There is no `provideAppInitializer`
-       / `whenReady()` gate in `app.config.ts` to close this window.
+#### Final verification
 
-    *   **Violated Rule:** `docs/specs/domain/landing/tasks.md#T003` Done-when
-        "Toggle ES↔EN updates bound strings"; `docs/specs/domain/landing/requirements.md#REQ-009`
-        ("THEN visible UI copy and CTAs update to the selected locale",
-        "BUT it must NOT leave mixed-locale chrome").
-    *   **Remediation Suggestion:** Either (a) switch to `pure: false` - acceptable cost
-        for a landing, `transform` is a single Map lookup - or (b) drop the pipe in
-        favour of a signal-read template method (`{{ t('heroCtaPrimary') }}` where `t`
-        reads `dictionarySignal`), which stays OnPush/zoneless-correct without an
-        impure pipe. Passing the locale as a second pipe argument also works but
-        forces every consuming component to expose `locale()`, which will not age well
-        across T004-T012. Separately, gate the first paint with
-        `provideAppInitializer(() => inject(LocaleService).whenReady())` so the empty-
-        dictionary window cannot render.
-
-2.  **Discovered Issue:** No test exercises the pipe through a rendered template, so
-    the defect in (1) is invisible to the green suite. `localize.pipe.spec.ts:13,24`
-    calls `new LocalizePipe()` and invokes `transform()` imperatively, which bypasses
-    `??pipeBind1` and its memoization entirely - it proves delegation to
-    `LocaleService.translate`, not binding reactivity. Grep confirms `LocalizePipe` is
-    not imported by any template in `client/src`, so the "19 tests passed" evidence
-    carries zero signal on the Done-when clause. The Implementer's stated assumption
-    that "unit tests are sufficient" does not hold for this specific clause.
-
-    *   **Violated Rule:** `docs/specs/domain/landing/tasks.md#T003` Verification
-        ("tests for persist, `documentElement.lang`, key-parity") read together with
-        Done-when #1; `docs/specs/domain/landing/design.md#10` Test plan hooks -
-        "Presence of CSS classes alone ≠ proof"; the same principle applies to a pipe
-        instantiated outside a view.
-    *   **Remediation Suggestion:** Add a TestBed host-component test:
-        render `{{ 'greeting' | localize }}`, `detectChanges()`, assert `Hola`,
-        `await setLocale('en')`, `detectChanges()`, assert `Hello`. Written against the
-        current implementation this test fails, which is precisely the regression guard
-        T003 is missing.
-```
-
-What Reviewer confirmed OK (do not re-litigate): key-parity real; persist/reload; `amd.locale`; no ngx-translate; dictionaries seeded from mockup; angular.json/tsconfig wiring.
-
-Next: attempt 2 (effort high) — fix pipe reactivity + host-component test + initializer gate.
+`test:agent` 20/20 green including template reactivity guard; lint/build green.

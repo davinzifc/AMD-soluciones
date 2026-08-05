@@ -111,7 +111,7 @@ Soft ceiling: 2 concurrent workers; no heavy Lighthouse/E2E while a worker write
 
 ## T003 — i18n LocaleService + ES/EN dictionaries
 
-- **Status:** [~]
+- **Status:** [x]
 - **Size:** M
 - **Depends on:** T001
 - **Directory boundary:** `client/src/app/core/i18n/`, `client/src/assets/i18n/`
