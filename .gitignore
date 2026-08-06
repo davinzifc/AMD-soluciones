@@ -9,6 +9,8 @@ coverage/
 .env
 .env.*
 !.env.example
+# Optional local PrimeUI key override (if you create this file)
+client/src/environments/*
 
 # CodeGraph generated DB (config may be committed)
 .codegraph/

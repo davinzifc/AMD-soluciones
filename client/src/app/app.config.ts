@@ -11,6 +11,7 @@ import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
 import { AmdPreset } from '../styles/theme-primeng';
 import { LocaleService } from './core/i18n/locale.service';
+import { PRIME_UI_LICENSE } from '../environments/prime-ui-license';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +21,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' })),
     provideAnimationsAsync(),
     providePrimeNG({
+      // PrimeNG 22+ / PrimeUI — Community or commercial key (https://primeng.dev/configuration).
+      // Prefer `prime-ui-license.local.ts` (gitignored); see `.example` in environments/.
+      ...(PRIME_UI_LICENSE ? { license: PRIME_UI_LICENSE } : {}),
       theme: {
         preset: AmdPreset,
         options: {
