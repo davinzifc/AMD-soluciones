@@ -1,0 +1,11 @@
+---
+description: Git push requires explicit permission; commits and PRs OK
+alwaysApply: true
+---
+
+# Git publish permissions
+
+- **Commits:** allowed when the user asks to commit (or clearly requests a change that includes committing).
+- **Push (`git push`):** **never** without explicit user permission in that turn (e.g. “haz push”, “súbelo”, “push”). Do not push as a side effect of commit or PR prep unless they also authorized push.
+- **Pull requests:** allowed when the user asks for a PR. If the branch is not on the remote yet, **ask before pushing**, then create the PR after they approve (or after they push themselves).
+- Prefer: commit locally → tell the user the branch is ahead → wait for “push” / “crea el PR y pushea” before publishing.
