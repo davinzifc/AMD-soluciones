@@ -53,6 +53,10 @@ const GROUPS: readonly ServiceGroup[] = [
  * links (`/services#<id>`, T007) always resolve to a real scroll target —
  * the two features share this same constant to prevent id drift.
  *
+ * TOC chips use `routerLink="/services" [fragment]` (not bare `href="#id"`):
+ * with Angular `<base href="/">`, `#contabilidad` resolves to `/#contabilidad`
+ * and navigates Home — a HITL defect caught 2026-08-05.
+ *
  * Riesgo and Marca sub-service copy is flagged with a visible placeholder
  * note (`g3Note`/`g5Note`) per REQ-005 ("MAY use validated placeholders
  * until AMD finalizes copy") — the anchors and structure are still real,

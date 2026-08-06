@@ -72,19 +72,66 @@ export class ServicesRoadSection implements AfterViewInit, OnDestroy {
   @ViewChild('roadEl') private readonly roadEl?: ElementRef<HTMLElement>;
   @ViewChild('roadProgress') private readonly roadProgressEl?: ElementRef<HTMLElement>;
   @ViewChildren('decoEl') private readonly decoEls?: QueryList<ElementRef<HTMLElement>>;
+  @ViewChildren('roadItem') private readonly roadItems?: QueryList<ElementRef<HTMLElement>>;
 
   private readonly motion = inject(MotionService);
   private cleanupScroll?: () => void;
+  private revealObserver?: IntersectionObserver;
 
   private readonly openIdSignal = signal<ServiceGroupId | null>(null);
   protected readonly openId = this.openIdSignal.asReadonly();
 
   ngAfterViewInit(): void {
     this.cleanupScroll = onPassiveScroll(() => this.updateRoadScroll());
+    this.setupRevealObserver();
   }
 
   ngOnDestroy(): void {
     this.cleanupScroll?.();
+    this.revealObserver?.disconnect();
+  }
+
+  /**
+   * Mockup `landing.js` IntersectionObserver parity: road items start faded /
+   * offset and receive `.is-in` (plus `.is-active`) when they enter the
+   * viewport. Under reduced motion, mark all visible immediately (REQ-010).
+   */
+  private setupRevealObserver(): void {
+    const items = this.roadItems?.toArray().map((ref) => ref.nativeElement) ?? [];
+    if (items.length === 0) {
+      return;
+    }
+
+    if (this.motion.reducedMotion()) {
+      for (const el of items) {
+        el.classList.add('is-in', 'is-active');
+      }
+      return;
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      for (const el of items) {
+        el.classList.add('is-in', 'is-active');
+      }
+      return;
+    }
+
+    this.revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) {
+            continue;
+          }
+          entry.target.classList.add('is-in', 'is-active');
+          this.revealObserver?.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.18, rootMargin: '0px 0px -10% 0px' },
+    );
+
+    for (const el of items) {
+      this.revealObserver.observe(el);
+    }
   }
 
   protected detailId(id: ServiceGroupId): string {

@@ -28,14 +28,16 @@ describe('ServicesPage', () => {
     expect(fixture.nativeElement.querySelector('router-outlet')).toBeNull();
   });
 
-  it('renders an in-page TOC link for every ServiceGroupId, targeting the matching hash', () => {
+  it('renders an in-page TOC link for every ServiceGroupId on /services (not Home /#id)', () => {
     const fixture = setup();
     const root = fixture.nativeElement as HTMLElement;
     const tocLinks = Array.from(root.querySelectorAll('.toc a')) as HTMLAnchorElement[];
 
     expect(tocLinks.length).toBe(5);
     for (const id of SERVICE_GROUP_IDS) {
-      const match = tocLinks.find((a) => a.getAttribute('href') === `#${id}`);
+      // Plain href="#id" + <base href="/"> resolves to /#id (Home) — must use
+      // routerLink="/services" [fragment] so chips stay on the Servicios page.
+      const match = tocLinks.find((a) => a.getAttribute('href') === `/services#${id}`);
       expect(match).toBeTruthy();
     }
   });

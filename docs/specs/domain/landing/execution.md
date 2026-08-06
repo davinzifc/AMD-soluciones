@@ -676,6 +676,19 @@ User: on Quiénes somos / Servicios the glass looks right, but a light/white ban
 
 176 tests green; lint green; UX IA synced; no Nest.
 
+## HITL patch — Servicios TOC + road scroll reveal (2026-08-05)
+
+User after `/akili-test`: (1) Servicios TOC chips navigated to Home; (2) Home timeline lacked scroll-in / parallax feel vs mockup.
+
+| Fix | Cause | Change |
+|-----|-------|--------|
+| TOC → Home | Bare `href="#id"` + `<base href="/">` resolves to `/#id` | `routerLink="/services" [fragment]="id"`; spec asserts `/services#…` |
+| Road no scroll animation | Mockup `IntersectionObserver` → `.is-in` never ported; items always opaque | Reveal CSS + observer (threshold 0.18); reduce → instant `is-in`; progress axis `z-index` for gold fill visibility |
+
+- Files: `services-page.{html,ts,spec.ts}`; `services-road-section.{ts,html,css,spec.ts}`
+- Verification: lint quiet; `test:agent` 182/182
+- **Human re-check:** TOC chips stay on `/services` and scroll to group; road cards fade/slide in on scroll; gold progress fills; deco circles drift (≥900px).
+
 ## Summary — Landing v1 Phase 1 tasks
 
 All **14/14** tasks **PASS** (T001–T014). Spec ready for `/akili-test` and/or `/akili-validate` once HITL visual checklist is human-signed; `/akili-archive` after validation.

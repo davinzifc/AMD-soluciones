@@ -18,6 +18,7 @@
       <ol class="road__list">
         @for (group of groups; track group.id; let i = $index) {
           <li
+            #roadItem
             class="road__item"
             [class.road__item--right]="i % 2 === 0"
             [class.road__item--left]="i % 2 === 1"

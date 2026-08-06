@@ -5,7 +5,7 @@
 
     <nav class="toc" [attr.aria-label]="'tocAria' | localize">
       @for (group of groups; track group.id) {
-        <a [href]="'#' + group.id">{{ group.titleKey | localize }}</a>
+        <a routerLink="/services" [fragment]="group.id">{{ group.titleKey | localize }}</a>
       }
     </nav>
   </div>

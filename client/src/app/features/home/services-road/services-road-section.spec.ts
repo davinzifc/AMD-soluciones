@@ -340,4 +340,50 @@ describe('ServicesRoadSection', () => {
       decos.forEach((deco) => expect(deco.style.transform).toBe(''));
     });
   });
+
+  describe('scroll-in reveal (mockup IntersectionObserver is-in)', () => {
+    it('marks every road item is-in immediately under prefers-reduced-motion (REQ-010: content reachable)', () => {
+      const fixture = setup(true);
+      const items = fixture.nativeElement.querySelectorAll('.road__item');
+      expect(items.length).toBe(5);
+      items.forEach((item: HTMLElement) => {
+        expect(item.classList.contains('is-in')).toBe(true);
+      });
+    });
+
+    it('observes each road item when motion is allowed (IntersectionObserver owns the reveal)', () => {
+      const observed: Element[] = [];
+      class StubIO {
+        constructor(private readonly cb: IntersectionObserverCallback) {}
+        observe(el: Element): void {
+          observed.push(el);
+        }
+        unobserve(): void {
+          /* no-op */
+        }
+        disconnect(): void {
+          /* no-op */
+        }
+        takeRecords(): IntersectionObserverEntry[] {
+          return [];
+        }
+        readonly root = null;
+        readonly rootMargin = '';
+        readonly thresholds = [];
+      }
+      vi.stubGlobal('IntersectionObserver', StubIO);
+
+      const fixture = setup(false);
+      const items = Array.from(fixture.nativeElement.querySelectorAll('.road__item')) as HTMLElement[];
+
+      expect(items.length).toBe(5);
+      expect(observed.length).toBe(5);
+      items.forEach((item) => {
+        expect(item.classList.contains('is-in')).toBe(false);
+        expect(observed).toContain(item);
+      });
+
+      vi.unstubAllGlobals();
+    });
+  });
 });
