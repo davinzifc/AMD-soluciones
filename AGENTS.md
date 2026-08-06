@@ -20,7 +20,7 @@ Guía raíz para agentes. La **constitución AKILI-SPECS** de este repo es la fu
 
 ### CodeGraph
 
-CLI no instalado en el entorno de constitución. Opcional: `npm i -g @colbymchenry/codegraph` → `codegraph init -i` cuando exista código. No commitear DB generada.
+CLI no instalado. Código de fase 1 vive en `client/`. Opcional: `npm i -g @colbymchenry/codegraph` → `codegraph init -i` (o re-index) para reflejar el grafo. No commitear DB generada.
 
 ### Local stack
 
@@ -46,7 +46,10 @@ Tras scaffold, preferir:
 
 ## Module Guides
 
-*(Ningún child guide aún — el monorepo no tiene convenciones divergentes hasta scaffold. Cuando `client/` o `server/` necesiten reglas propias, añadir `client/AGENTS.md` / `server/AGENTS.md` y listarlos aquí.)*
+| Module | Guide | Notes |
+|--------|-------|-------|
+| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). Add `client/AGENTS.md` only when conventions diverge. |
+| `server/` | *(none — not scaffolded)* | NestJS = phase 2 (ADR-003). |
 
 ## Skill Map
 

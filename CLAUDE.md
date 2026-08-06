@@ -22,7 +22,7 @@ Estas piezas forman la baseline constitucional para `/akili-propose`, `/akili-sp
 
 ### CodeGraph
 
-CLI no instalado al crear la constitución. Opcional más adelante: `npm i -g @colbymchenry/codegraph` → `codegraph init -i`. No commitear la DB generada.
+CLI no instalado. Código de fase 1 vive en `client/`. Opcional: `npm i -g @colbymchenry/codegraph` → `codegraph init -i` (o re-index). No commitear la DB generada.
 
 ### Local stack
 
@@ -45,7 +45,10 @@ Una sesión AKILI por checkout; adicionales en `git worktree`. No medir (build/L
 
 ## Module Guides
 
-*(Vacío hasta que `client/` o `server/` diverjan del root.)*
+| Module | Guide | Notes |
+|--------|-------|-------|
+| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). Add `client/AGENTS.md` only when conventions diverge. |
+| `server/` | *(none — not scaffolded)* | NestJS = phase 2 (ADR-003). |
 
 ## Skill Map
 
