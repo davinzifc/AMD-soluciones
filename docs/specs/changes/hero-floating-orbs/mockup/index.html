@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AMD — Hero floating orbs (mockup v0.4)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="ambient-orbs.css" />
+  <link rel="stylesheet" href="hero-orbs.css" />
+</head>
+<body>
+  <div class="mockup-banner">
+    Mockup v0.4 · <code>AmbientOrbs.mount(host, opts)</code> reutilizable · HITL
+    <strong>8 · 300–560px · ~16s</strong>
+    <button type="button" id="toggle-motion" class="mockup-toggle" aria-pressed="false">
+      Simular reduced-motion
+    </button>
+  </div>
+
+  <aside class="speed-panel" aria-label="Controles HITL del mock">
+    <p class="speed-panel__title">Orbs · configuración</p>
+
+    <label class="speed-panel__field" for="count-slider">
+      <span>Cantidad <output id="count-readout">8</output></span>
+      <input type="range" id="count-slider" min="2" max="8" step="1" value="8" />
+    </label>
+
+    <label class="speed-panel__field" for="size-min-slider">
+      <span>Tamaño mín <output id="size-min-readout">300px</output></span>
+      <input type="range" id="size-min-slider" min="80" max="400" step="10" value="300" />
+    </label>
+
+    <label class="speed-panel__field" for="size-max-slider">
+      <span>Tamaño máx <output id="size-max-readout">560px</output></span>
+      <input type="range" id="size-max-slider" min="120" max="560" step="10" value="560" />
+    </label>
+
+    <label class="speed-panel__field" for="speed-slider">
+      <span>Velocidad (duración media) <output id="speed-readout">~16s</output></span>
+      <div class="speed-panel__row">
+        <span class="speed-panel__hint" aria-hidden="true">Rápido</span>
+        <input type="range" id="speed-slider" min="6" max="40" step="1" value="16" />
+        <span class="speed-panel__hint" aria-hidden="true">Lento</span>
+      </div>
+    </label>
+
+    <button type="button" id="reshuffle" class="mockup-toggle speed-panel__reshuffle">
+      Regenerar orbs
+    </button>
+
+    <p class="speed-panel__note">
+      API: <code>AmbientOrbs.mount(host, { count, sizeMin, sizeMax, baseDuration })</code>.
+      En Angular será <code>&lt;app-ambient-orbs&gt;</code> en cualquier section.
+    </p>
+  </aside>
+
+  <header class="topnav" aria-label="Chrome de referencia (no en scope)">
+    <div class="wrap topnav__inner">
+      <a class="brand" href="#">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">AMD Soluciones<span>Integrales S.A.S.</span></span>
+      </a>
+      <nav class="topnav__links" aria-label="Sitio">
+        <a href="#" aria-current="page">Home</a>
+        <a href="#">Quiénes somos</a>
+        <a href="#">Servicios</a>
+      </nav>
+      <div class="topnav__actions">
+        <span class="lang" aria-hidden="true"><b>ES</b> · EN</span>
+        <a class="btn btn--gold" href="#scroll-pad">Contactar</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero__bg" aria-hidden="true"></div>
+
+      <div class="parallax-layer" id="parallaxLayer" aria-hidden="true">
+        <!-- Reusable host: any positioned box that fills the section -->
+        <div id="orbHost" style="position: absolute; inset: 0"></div>
+      </div>
+
+      <div class="wrap hero__content">
+        <h1 class="hero__brand">AMD <em>Soluciones</em></h1>
+        <p class="hero__legal">Integrales S.A.S.</p>
+        <p class="hero__promise">
+          Formaliza y profesionaliza tu operación con contabilidad, gestión y asesoría de confianza — desde Cali, para tu negocio.
+        </p>
+        <div class="hero__cta">
+          <a class="btn btn--gold" href="#scroll-pad">Hablar con un asesor</a>
+          <a class="btn btn--ghost" href="#scroll-pad">Ver servicios</a>
+        </div>
+      </div>
+
+      <div class="hero__scroll" aria-hidden="true">Scroll</div>
+    </section>
+
+    <section id="scroll-pad" class="scroll-pad" aria-label="Pad de scroll para probar parallax">
+      <div class="wrap">
+        <h2>Pad de scroll + reutilización</h2>
+        <p>
+          El campo de orbs es un módulo reutilizable (<code>ambient-orbs.js/css</code>).
+          En producción: host con <code>position: relative|absolute</code> +
+          <code>&lt;app-ambient-orbs [count]="8" … /&gt;</code>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="ambient-orbs.js"></script>
+  <script src="hero-orbs.js"></script>
+</body>
+</html>

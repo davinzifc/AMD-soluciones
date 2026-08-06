@@ -1,0 +1,15 @@
+@for (orb of orbs(); track orb.id) {
+  <span
+    class="orb"
+    [style.width.px]="orb.sizePx"
+    [style.height.px]="orb.sizePx"
+    [style.top.%]="orb.topPct"
+    [style.left.%]="orb.leftPct"
+    [style.background]="orb.background"
+    [style.filter]="'blur(' + orb.blurPx + 'px)'"
+    [style.transformOrigin]="orb.transformOrigin"
+    [style.animationDuration.s]="orb.durationSec"
+    [style.animationDelay.s]="orb.delaySec"
+    [style.animationPlayState]="paused() ? 'paused' : 'running'"
+  ></span>
+}

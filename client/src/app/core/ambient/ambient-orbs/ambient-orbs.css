@@ -1,0 +1,43 @@
+/**
+ * AmbientOrbsComponent styles (T001 · design.md §5 Motion plan · DD-HFO-003).
+ * `:host` carries the field's own `position`/`pointer-events` so any
+ * positioned background host can absolutely-fill it without extra wrapper
+ * CSS — no `body`/`html` ancestor selectors (KZ-002).
+ */
+
+:host {
+  position: absolute;
+  inset: -15%;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  pointer-events: none;
+  will-change: transform, filter;
+  animation-name: ambient-orbit;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Class gate mirrors `MotionService.reducedMotion()` (see host binding in ambient-orbs.ts). */
+:host(.is-paused) .orb {
+  animation-play-state: paused;
+}
+
+@keyframes ambient-orbit {
+  100% {
+    transform: translate3d(0, 0, 1px) rotate(360deg);
+  }
+}
+
+/* Defense-in-depth (DD-HFO-004): OS-level preference wins even before MotionService settles. */
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none !important;
+  }
+}
