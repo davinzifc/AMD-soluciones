@@ -87,6 +87,13 @@ describe('HeroSection', () => {
     expect(ctas.length).toBe(2);
   });
 
+  it('mounts AmbientOrbsComponent inside the parallax layer, rendering live orbs (T002 · design.md §9)', () => {
+    const fixture = setup();
+    const ambientOrbs = fixture.nativeElement.querySelector('.parallax-layer app-ambient-orbs') as HTMLElement;
+    expect(ambientOrbs).toBeTruthy();
+    expect(ambientOrbs.querySelectorAll('span.orb').length).toBeGreaterThan(0);
+  });
+
   describe('storytelling parallax (T013 · design.md Motion plan · DD-015)', () => {
     afterEach(() => {
       setScrollY(0);

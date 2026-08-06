@@ -1,6 +1,8 @@
+// @akili-spec docs/specs/changes/hero-floating-orbs
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { AmbientOrbsComponent } from '../../../core/ambient/ambient-orbs/ambient-orbs';
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { MotionService } from '../../../core/motion/motion.service';
 import { onPassiveScroll } from '../../../core/motion/scroll-listener';
@@ -26,10 +28,15 @@ export const HERO_PARALLAX_FACTOR = 0.22;
  * via the shared passive scroll listener — no GSAP. `MotionService` gates it
  * off entirely (transform cleared, never recomputed) under
  * `prefers-reduced-motion: reduce` (REQ-010).
+ *
+ * T002 (design.md DD-HFO-005): the reusable `<app-ambient-orbs>` field
+ * (`core/ambient/ambient-orbs/`) rides inside `.parallax-layer` in place of
+ * the static dual-radial plate it replaces, so the orbs inherit the same
+ * scroll parallax translate without any extra wiring.
  */
 @Component({
   selector: 'app-hero-section',
-  imports: [RouterLink, LocalizePipe],
+  imports: [RouterLink, LocalizePipe, AmbientOrbsComponent],
   templateUrl: './hero-section.html',
   styleUrl: './hero-section.css',
 })

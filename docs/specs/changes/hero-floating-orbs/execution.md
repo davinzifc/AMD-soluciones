@@ -44,3 +44,40 @@
 - CodeGraph re-index: pending at archive
 
 ---
+
+### T002 — Hero mounts AmbientOrbs; remove dual-radial plate
+
+| Field | Value |
+|-------|-------|
+| Final status | **PASS** |
+| Date | 2026-08-05 |
+| Attempts | 2 |
+| Requirements | REQ-002 (primary), REQ-003 smoke via parallax tests |
+| Decisions | Default `<app-ambient-orbs />` inside `.parallax-layer`; dual-radial plate removed in same change (DD-HFO-005); KZ-001 clean |
+| Issues | Attempt 1 FAIL — missing mount test under `.parallax-layer` |
+
+#### Attempt 1
+
+| Role | Result |
+|------|--------|
+| Implementer | Wired AmbientOrbs into hero; removed dual-radial CSS. Tests/lint green but no new hero mount assertion |
+| Reviewer | **STATUS: FAIL** — Missing `hero-section.spec.ts` assertion that `app-ambient-orbs` is under `.parallax-layer` (tasks.md T002 Tests + design.md §9) |
+
+#### Attempt 2
+
+| Role | Result |
+|------|--------|
+| Implementer | Added scoped mount test (`.parallax-layer app-ambient-orbs` + live `span.orb`). Verification: `npm run test:agent` 193 passed; lint pass |
+| Reviewer | **STATUS: PASS** — Independently re-verified 193/193 tests + lint. Prior FAIL remediated; REQ-002 / DD-HFO-005 / KZ-001 hold |
+
+**ADVISORY (non-gating, recorded only — no new tasks minted):**
+1. HITL visual gate still open — confirm soft circular (not square) orbs + brand-first; watch clip at hero overflow edges (mock v0.3 failure mode)
+2. Bookkeeping: close T002 Done when / BUT checkboxes at sign-off
+
+#### Constitution Impact: T002
+
+- No new module; hero is first consumer of `core/ambient/`
+- No Module Guides / AGENTS.md change required
+- CodeGraph re-index: pending at archive
+
+---

@@ -81,7 +81,7 @@ T001 → T002
 
 ## T002 — Hero mounts AmbientOrbs; remove dual-radial plate
 
-- **Status:** [ ]
+- **Status:** [x]
 - **Size:** S (~60 LOC)
 - **Depends on:** T001
 - **Directory boundary:** `client/src/app/features/home/hero/` only (+ import from `core/ambient`) — never touch nav/FAB geometry
@@ -109,17 +109,17 @@ T001 → T002
 
 ### Done when
 
-- [ ] Hero tests + lint pass
-- [ ] Dual-radial plate removed from parallax-layer CSS
-- [ ] Diff contains no KZ-001 geometry changes
-- [ ] HITL note prepared: circular glow + brand not overpowered
+- [x] Hero tests + lint pass
+- [x] Dual-radial plate removed from parallax-layer CSS
+- [x] Diff contains no KZ-001 geometry changes
+- [x] HITL note prepared: circular glow + brand not overpowered
 
 ### BUT / AND IT MUST (from scenarios)
 
-- [ ] MUST keep brand/CTAs as only interactive first-viewport job
-- [ ] must NOT add cards/badges/chips/overlays
-- [ ] must NOT change nav/CTA/FAB control geometry (KZ-001)
-- [ ] Parallax contract preserved
+- [x] MUST keep brand/CTAs as only interactive first-viewport job
+- [x] must NOT add cards/badges/chips/overlays
+- [x] must NOT change nav/CTA/FAB control geometry (KZ-001)
+- [x] Parallax contract preserved
 
 ---
 
