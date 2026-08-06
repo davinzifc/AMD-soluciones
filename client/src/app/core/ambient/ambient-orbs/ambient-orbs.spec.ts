@@ -110,4 +110,16 @@ describe('AmbientOrbsComponent', () => {
     const orb = orbsOf(fixture)[0];
     expect(orb.style.background).toContain('rgba(1, 2, 3, 0.5)');
   });
+
+  it('honors durationSec override on each orb animationDuration (REQ-001 input contract)', () => {
+    const fixture = setup();
+    fixture.componentRef.setInput('durationSec', 4);
+    fixture.detectChanges();
+    for (const orb of orbsOf(fixture)) {
+      const seconds = parseFloat(orb.style.animationDuration);
+      // Formula: random(base*0.85, base*1.55) + base*0.35 → [4.8, 7.6] at base=4
+      expect(seconds).toBeGreaterThanOrEqual(4.8);
+      expect(seconds).toBeLessThanOrEqual(7.6);
+    }
+  });
 });

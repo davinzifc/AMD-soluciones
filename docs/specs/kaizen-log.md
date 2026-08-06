@@ -9,11 +9,34 @@ keep it at 10 rows or fewer.
 
 | ID | Lesson | Source Spec | Severity | Target | Standardized In | Status |
 |---|---|---|---|---|---|---|
+| KZ-004 | When replacing a decorative plate with a child component, the consumer task Tests/Done-when must require a DOM ancestry assertion (host contains child) — green suite without that assert is not enough | changes/hero-floating-orbs | Medium | Product | — (proposed `.agents/implementer.md` / tasks template) | Deferred |
 | KZ-001 | Do not change HITL-approved control geometry (e.g. ≥44px targets) unless the task Done-when names that control | domain/landing | Medium | Product | — (proposed `.agents/implementer.md`) | Deferred |
 | KZ-002 | Never use `body`/`html` ancestor selectors in Angular emulated component CSS for show/hide — prefer media queries + mount scope | domain/landing | Medium | Product | — (proposed `.agents/implementer.md`) | Deferred |
 | KZ-003 | i18n pipes that read locale service state must be impure (or signal-driven); `pure: true` memoizes constant keys and freezes UI | domain/landing | Medium | Product | — (proposed `.agents/implementer.md`) | Deferred |
 
 ## Entries
+
+### 2026-08-05 — changes/hero-floating-orbs
+
+**Metrics**
+
+| Signal | Value | Source |
+|---|---|---|
+| Tasks executed | 2 | tasks.md |
+| Reviewer FAIL rework attempts | 1 (T002 ×1) | execution.md |
+| HALTs / FATAL_FAILs | 0 | execution.md |
+| Pivots | 0 | execution.md |
+| PRODUCT_BUGs | 0 | test-report.md |
+| Judgment-day severe findings | 0 | — |
+| Validation FAIL / WARN | 0 / multiple (HITL, E2E, Module Guides hygiene) | validation-report.md |
+| `/akili-quick` escalation | informal (no `docs/specs/quick/` log) | conversation / proposal history |
+
+**Lessons**
+
+- **KZ-004 — Hero mount shipped green without asserting AmbientOrbs ancestry under `.parallax-layer`.** (Product, Medium)
+  - Root cause: T002 Implementer removed the dual-radial plate and mounted the child, but left the suite proving only pre-existing parallax/CTA behavior; Reviewer FAIL on design.md §9 / tasks.md Tests until a scoped `.parallax-layer app-ambient-orbs` + live `span.orb` assert landed on attempt 2.
+  - Evidence: `execution.md` — T002 Attempt 1 Reviewer FAIL; Attempt 2 PASS.
+  - Standardization: append to `.agents/implementer.md` (or consumer-task Tests bullet in general-setup): *When replacing decorative paint with a child host, add a DOM ancestry assertion in the same task — green unrelated tests do not prove the mount.* → **Deferred** (archive default; no High severity; user directed immediate archive)
 
 ### 2026-08-05 — domain/landing
 

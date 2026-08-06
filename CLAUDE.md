@@ -47,7 +47,7 @@ Una sesión AKILI por checkout; adicionales en `git worktree`. No medir (build/L
 
 | Module | Guide | Notes |
 |--------|-------|-------|
-| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). Add `client/AGENTS.md` only when conventions diverge. |
+| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). Shared ambient field at `core/ambient/` (archived `changes/hero-floating-orbs`). Add `client/AGENTS.md` only when conventions diverge. |
 | `server/` | *(none — not scaffolded)* | NestJS = phase 2 (ADR-003). |
 
 ## Skill Map
