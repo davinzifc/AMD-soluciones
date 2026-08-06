@@ -61,6 +61,9 @@ jobs:
           cache-dependency-path: client/package-lock.json
       - run: npm ci
       - name: Production build for project Pages
+        env:
+          # Optional: Settings → Secrets and variables → Actions → PRIME_UI_LICENSE
+          PRIME_UI_LICENSE: ${{ secrets.PRIME_UI_LICENSE }}
         run: npm run build:pages
       - name: SPA fallback for GitHub Pages (deep links)
         run: cp dist/client/browser/index.html dist/client/browser/404.html

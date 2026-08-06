@@ -22,7 +22,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       // PrimeNG 22+ / PrimeUI — Community or commercial key (https://primeng.dev/configuration).
-      // Prefer `prime-ui-license.local.ts` (gitignored); see `.example` in environments/.
+      // Committed `prime-ui-license.ts` is an empty stub (CI-safe). Local key lives in
+      // gitignored `prime-ui-license.local.ts` and is applied by `npm run license:apply`
+      // (also via prestart/prebuild). Pages CI can inject secret `PRIME_UI_LICENSE`.
       ...(PRIME_UI_LICENSE ? { license: PRIME_UI_LICENSE } : {}),
       theme: {
         preset: AmdPreset,
