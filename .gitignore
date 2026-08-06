@@ -9,8 +9,9 @@ coverage/
 .env
 .env.*
 !.env.example
-# Optional local PrimeUI key override (if you create this file)
-client/src/environments/*
+# PrimeUI: generated stub + local key (never commit real keys)
+client/src/environments/prime-ui-license.ts
+client/src/environments/*.local.ts
 
 # CodeGraph generated DB (config may be committed)
 .codegraph/

@@ -45,6 +45,7 @@ Cloud provider PROD: **no fijado** (local-first). Pages es solo vitrina de fase 
 | URL esperada | `https://davinzifc.github.io/AMD-soluciones/` |
 | Build | `cd client && npm run build:pages` (`base-href` `/AMD-soluciones/`) |
 | SPA deep links | el job copia `index.html` → `404.html` |
+| PrimeUI license | Stub generado en CI (`license:apply`); opcional secret `PRIME_UI_LICENSE`. Local: `prime-ui-license.local.ts` (gitignored) |
 
 **Qué no es:** no es `amdsoluciones.com`, no es staging con API, no sustituye la decisión de host PROD.
 
