@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { PlatformLocation } from '@angular/common';
 
 import {
   DEFAULT_LOCALE,
@@ -12,9 +13,14 @@ import {
  * Hand-rolled i18n service (DD-004) — no `@ngx-translate`.
  * Loads runtime JSON dictionaries from `assets/i18n/{locale}.json`,
  * persists the chosen locale, and keeps `documentElement.lang` in sync.
+ *
+ * Dictionary URLs are resolved against `<base href>` so GitHub Pages
+ * (`/AMD-soluciones/`) and local `/` both work — a leading `/assets/…`
+ * fetch would ignore the project base and 404 on project Pages.
  */
 @Injectable({ providedIn: 'root' })
 export class LocaleService {
+  private readonly platformLocation = inject(PlatformLocation);
   private readonly cache = new Map<LocaleId, LocaleDictionary>();
   private readonly localeSignal = signal<LocaleId>(this.readPersistedLocale());
   private readonly dictionarySignal = signal<LocaleDictionary>({});
@@ -61,7 +67,7 @@ export class LocaleService {
       return cached;
     }
 
-    const response = await fetch(`/assets/i18n/${locale}.json`);
+    const response = await fetch(this.dictionaryUrl(locale));
     if (!response.ok) {
       throw new Error(`LocaleService: unable to load dictionary for "${locale}" (${response.status})`);
     }
@@ -69,6 +75,13 @@ export class LocaleService {
     const dictionary = (await response.json()) as LocaleDictionary;
     this.cache.set(locale, dictionary);
     return dictionary;
+  }
+
+  /** Public for unit tests — joins `<base href>` with the dictionary path. */
+  dictionaryUrl(locale: LocaleId): string {
+    const base = this.platformLocation.getBaseHrefFromDOM() || '/';
+    const normalized = base.endsWith('/') ? base : `${base}/`;
+    return `${normalized}assets/i18n/${locale}.json`;
   }
 
   private applyDocumentLang(locale: LocaleId): void {

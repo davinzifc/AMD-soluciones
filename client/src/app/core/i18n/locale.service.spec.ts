@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { PlatformLocation } from '@angular/common';
 
 import { LOCALE_STORAGE_KEY } from './locale.model';
 import { LocaleService } from './locale.service';
@@ -83,6 +84,26 @@ describe('LocaleService', () => {
     const service = TestBed.inject(LocaleService);
     await service.whenReady();
     expect(service.translate('unknownKey')).toBe('unknownKey');
+  });
+
+  it('resolves dictionary URLs against document base href (GitHub Pages project path)', async () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        {
+          provide: PlatformLocation,
+          useValue: { getBaseHrefFromDOM: () => '/AMD-soluciones/' },
+        },
+      ],
+    });
+    stubFetch();
+
+    const service = TestBed.inject(LocaleService);
+    expect(service.dictionaryUrl('es')).toBe('/AMD-soluciones/assets/i18n/es.json');
+    expect(service.dictionaryUrl('en')).toBe('/AMD-soluciones/assets/i18n/en.json');
+
+    await service.whenReady();
+    expect(fetch).toHaveBeenCalledWith('/AMD-soluciones/assets/i18n/es.json');
   });
 
   it('keeps the reload-persisted locale (no fresh service instance loses it)', async () => {
