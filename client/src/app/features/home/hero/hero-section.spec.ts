@@ -45,6 +45,19 @@ describe('HeroSection', () => {
     expect(promise.textContent).toContain('heroPromise');
   });
 
+  it('keeps brand and legal identity before promise and CTAs in DOM order (REQ-003 brand-first structure)', () => {
+    const fixture = setup();
+    const content = fixture.nativeElement.querySelector('.hero__content') as HTMLElement;
+    const children = Array.from(content.children);
+
+    expect(children.map((child) => child.className)).toEqual([
+      'hero__brand',
+      'hero__legal',
+      'hero__promise',
+      'hero__cta',
+    ]);
+  });
+
   it('primary CTA routes to Home fragment #contacto (heroCtaPrimary)', () => {
     const fixture = setup();
     const primary = fixture.nativeElement.querySelector('a.btn--gold') as HTMLAnchorElement;

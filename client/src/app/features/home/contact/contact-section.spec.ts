@@ -35,6 +35,7 @@ function fillValidForm(fixture: ComponentFixture<ContactSection>): void {
 describe('ContactSection', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('renders the #contacto fragment scroll target', () => {
@@ -117,6 +118,22 @@ describe('ContactSection', () => {
 
       expect(track).toHaveBeenCalledWith('contact_submit', expect.objectContaining({ locale: 'es', hasService: true }));
       expect(fixture.nativeElement.querySelector('.toast')).toBeTruthy();
+    });
+
+    it('hands off client-side without issuing a fetch or XHR request to a Nest leads API (REQ-008 phase boundary)', () => {
+      const fetchSpy = vi.fn();
+      vi.stubGlobal('fetch', fetchSpy);
+      const xhrOpenSpy = vi.spyOn(XMLHttpRequest.prototype, 'open');
+      vi.spyOn(window, 'open').mockReturnValue(null);
+      const { fixture } = setup();
+      fillValidForm(fixture);
+
+      const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(xhrOpenSpy).not.toHaveBeenCalled();
     });
 
     it('clears the earlier inline errors once the form becomes valid', () => {
