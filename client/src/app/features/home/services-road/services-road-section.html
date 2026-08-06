@@ -1,0 +1,79 @@
+<section id="servicios" class="road-section section--light">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>{{ 'servicesTitle' | localize }}</h2>
+      <p>{{ 'servicesLead' | localize }}</p>
+    </div>
+
+    <p class="road__hint">{{ 'roadHint' | localize }}</p>
+
+    <div class="road" id="services-road" #roadEl>
+      @for (decoIndex of decoIndexes; track decoIndex) {
+        <span [attr.class]="'road__deco road__deco--' + (decoIndex + 1)" #decoEl aria-hidden="true"></span>
+      }
+      <div class="road__axis" aria-hidden="true">
+        <div class="road__progress" id="road-progress" #roadProgress></div>
+      </div>
+
+      <ol class="road__list">
+        @for (group of groups; track group.id; let i = $index) {
+          <li
+            #roadItem
+            class="road__item"
+            [class.road__item--right]="i % 2 === 0"
+            [class.road__item--left]="i % 2 === 1"
+            [class.is-open]="isOpen(group.id)"
+            [attr.data-service]="group.id"
+          >
+            <div class="road__spacer" aria-hidden="true"></div>
+
+            <div class="road__node-wrap">
+              <button
+                type="button"
+                class="road__node"
+                [attr.aria-expanded]="isOpen(group.id)"
+                [attr.aria-controls]="detailId(group.id)"
+                [attr.aria-label]="group.titleKey | localize"
+                (click)="onActivateClick($event, group.id)"
+                (keydown)="onActivateKeydown($event, group.id)"
+              ></button>
+            </div>
+
+            <div class="road__main">
+              <button
+                type="button"
+                class="road__pill"
+                [attr.aria-expanded]="isOpen(group.id)"
+                [attr.aria-controls]="detailId(group.id)"
+                (click)="onActivateClick($event, group.id)"
+                (keydown)="onActivateKeydown($event, group.id)"
+              >
+                {{ group.number }}
+              </button>
+
+              <div
+                class="road__card"
+                role="button"
+                tabindex="0"
+                [attr.aria-expanded]="isOpen(group.id)"
+                [attr.aria-controls]="detailId(group.id)"
+                (click)="onActivateClick($event, group.id)"
+                (keydown)="onActivateKeydown($event, group.id)"
+              >
+                <h3>{{ group.titleKey | localize }}</h3>
+                <p class="road__summary">{{ group.summaryKey | localize }}</p>
+
+                <div class="road__detail" [id]="detailId(group.id)" [inert]="!isOpen(group.id)">
+                  <div>
+                    <p>{{ group.bodyKey | localize }}</p>
+                    <a class="btn btn--ink btn--sm" routerLink="/services" [fragment]="group.id">{{ 'moreInfo' | localize }}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  </div>
+</section>

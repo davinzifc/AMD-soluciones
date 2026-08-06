@@ -1,0 +1,14 @@
+<app-top-nav />
+<app-mobile-drawer />
+
+<main class="app-shell">
+  @if (isHomeRoute()) {
+    <div class="sidenav-host">
+      <app-home-side-nav />
+    </div>
+  }
+  <router-outlet />
+</main>
+
+<app-site-footer />
+<app-whatsapp-fab />

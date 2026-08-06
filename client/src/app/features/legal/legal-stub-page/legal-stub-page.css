@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.page-stub {
+  width: min(100% - 2.5rem, 1160px);
+  margin-inline: auto;
+  padding: 4rem 0 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.stub-note {
+  color: var(--amd-slate);
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiénes somos — AMD Soluciones (mockup)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+  <div class="mockup-banner" data-i18n="bannerAbout">Mockup · Página profunda Quiénes somos (misión, visión, 3 líderes)</div>
+
+  <header class="topnav">
+    <div class="wrap topnav__inner">
+      <a class="brand" href="index.html">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__text">AMD Soluciones<span data-i18n="brandSub">Integrales S.A.S.</span></span>
+      </a>
+      <nav aria-label="Sitio">
+        <ul class="topnav__links">
+          <li><a href="index.html" data-i18n="navHome">Home</a></li>
+          <li><a href="quienes-somos.html" aria-current="page" data-i18n="navAboutPage">Quiénes somos</a></li>
+          <li><a href="servicios.html" data-i18n="navServicesPage">Servicios</a></li>
+        </ul>
+      </nav>
+      <div class="topnav__actions">
+        <div class="lang" role="group" data-i18n-aria="langAria" aria-label="Idioma">
+          <button type="button" data-lang="es" aria-pressed="true">ES</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+        <a class="btn btn--gold" href="index.html#contacto" data-i18n="navCta">Contactar</a>
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="drawer" data-i18n-aria="menuAria" aria-label="Menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer" id="drawer" hidden>
+    <a href="index.html" data-i18n="navHome">Home</a>
+    <a href="quienes-somos.html" aria-current="page" data-i18n="navAboutPage">Quiénes somos</a>
+    <a href="servicios.html" data-i18n="navServicesPage">Servicios</a>
+  </div>
+
+  <main>
+    <header class="page-hero">
+      <div class="wrap">
+        <h1 data-i18n="aboutPageTitle">¿Quiénes somos?</h1>
+        <p data-i18n="aboutPageLead">
+          AMD Soluciones Integrales es una PYME colombiana comprometida con ofrecer soluciones
+          integrales en finanzas, tecnología y cumplimiento normativo. Protegemos la reputación
+          de las empresas, optimizamos operaciones y garantizamos seguridad en un entorno competitivo.
+        </p>
+      </div>
+    </header>
+
+    <section class="section--light">
+      <div class="wrap">
+        <div class="mv-grid">
+          <article class="mv-card">
+            <h3 data-i18n="missionLabel">Misión</h3>
+            <p data-i18n="missionBody">
+              Proporcionar soluciones integrales innovadoras y confiables que impulsen el éxito
+              y la eficiencia de nuestros clientes, a través de servicios de alta calidad,
+              adaptados a sus necesidades específicas.
+            </p>
+          </article>
+          <article class="mv-card">
+            <h3 data-i18n="visionLabel">Visión</h3>
+            <p data-i18n="visionBody">
+              Convertirnos en el socio de confianza preferido por empresas y organizaciones,
+              destacando por nuestra excelencia en la entrega de soluciones integrales que
+              transformen y optimicen sus operaciones, contribuyendo al crecimiento sostenible
+              de clientes y comunidades.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <h2 data-i18n="leadersTitle">Nuestras líderes</h2>
+          <p data-i18n="leadersLead">Equipo con más de una década en el mercado, atendiendo clientes de diversas industrias.</p>
+        </div>
+        <div class="leaders">
+          <article class="leader">
+            <div class="leader__avatar" aria-hidden="true"></div>
+            <h3>Ana María Daza</h3>
+            <p data-i18n="roleGg">Gerente General</p>
+          </article>
+          <article class="leader">
+            <div class="leader__avatar" aria-hidden="true"></div>
+            <h3>María Camila Sanchez</h3>
+            <p data-i18n="roleGc">Gerente Comercial</p>
+          </article>
+          <article class="leader">
+            <div class="leader__avatar" aria-hidden="true"></div>
+            <h3>Leidy Yurani Villamil</h3>
+            <p data-i18n="roleGf">Gerente Financiero</p>
+          </article>
+        </div>
+        <p style="margin-top:2.5rem;color:rgba(245,246,248,0.65);max-width:40rem" data-i18n="aboutClosing">
+          Somos un equipo comprometido con la excelencia y la confiabilidad. Nuestra identidad
+          se cimienta en profesionales con décadas de experiencia y un profundo entendimiento
+          de las necesidades empresariales contemporáneas.
+        </p>
+        <div style="margin-top:1.5rem;display:flex;flex-wrap:wrap;gap:0.75rem">
+          <a class="btn btn--gold" href="index.html#contacto" data-i18n="navCta">Contactar</a>
+          <a class="btn btn--ghost" href="servicios.html" data-i18n="viewServices">Ver servicios</a>
+          <a class="btn btn--ghost" href="index.html" data-i18n="backHome">Volver al Home</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div>© <span id="year"></span> AMD Soluciones Integrales S.A.S.</div>
+      <div>
+        <a href="#" data-i18n="ftPrivacy">Privacidad</a> ·
+        <a href="#" data-i18n="ftTerms">Términos</a> ·
+        <a href="index.html" data-i18n="navHome">Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <a class="fab" id="fab" href="https://wa.me/573248805290?text=Hola%20AMD" target="_blank" rel="noopener noreferrer" data-i18n-aria="waAria" aria-label="WhatsApp">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.15 6.43 2.15 11.89c0 1.96.52 3.81 1.43 5.41L2 22l4.85-1.54a9.84 9.84 0 0 0 5.19 1.43h.01c5.46 0 9.89-4.43 9.89-9.89C21.94 6.43 17.5 2 12.04 2zm5.77 14.05c-.24.68-1.4 1.25-1.94 1.33-.5.07-1.13.1-1.82-.11-.42-.13-.96-.31-1.66-.61-2.92-1.26-4.82-4.2-4.97-4.39-.14-.19-1.2-1.6-1.2-3.05 0-1.45.76-2.16 1.03-2.45.27-.29.59-.36.79-.36h.57c.18 0 .42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.32.02.52-.1.2-.15.32-.29.5-.14.17-.3.39-.43.52-.14.14-.29.29-.12.56.16.27.73 1.2 1.56 1.95 1.08.96 1.98 1.26 2.26 1.4.28.14.44.12.6-.07.17-.2.7-.81.88-1.09.19-.28.37-.23.62-.14.26.1 1.63.77 1.91.91.28.14.47.21.54.32.07.12.07.68-.17 1.36z"/></svg>
+  </a>
+
+  <script src="i18n.js"></script>
+  <script>AMDi18n.initChrome();</script>
+</body>
+</html>

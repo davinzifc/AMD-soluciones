@@ -13,14 +13,15 @@ Sistema visual y de interacción para la landing v1. Referencia de calidad: clar
 
 ## 2. Information Architecture
 
-```text
-/  (SPA)
-├── #inicio          Hero + promesa
-├── #servicios       Contables | Administrativos | Asesoría / Riesgo / Marca
-├── #sobre-amd       Quiénes somos, misión, líderes (resumen)
-├── #confianza       Métricas + testimonios + clientes
-└── #contacto        Formulario + datos + mapa/ubicación textual (Cali)
-```
+**Multi-page** (shipped landing v1 — mockup v0.1 / `docs/specs/domain/landing` REQ-001/002/015; supersede any earlier scroll-only single-page reading of this section). Route path segments are **English** in both locales (DD-014); Home section anchors and Servicios group anchors stay as content-id fragments, never top-level routes.
+
+| Route | Content | Sidenav |
+|-------|---------|---------|
+| `/` (Home) | Scroll chapters `#inicio → #servicios → #sobre-amd → #confianza → #contacto` | Left dot sidenav (§5), `≥1100px` |
+| `/about-us` | Quiénes somos — misión, visión, líderes | None |
+| `/services` | Servicios — 5 grupos + sub-servicios, anchors `#contabilidad … #marca` | None |
+| `/privacy`, `/terms` | Legal stubs | None |
+| `/**` | 404 — "Volver al inicio" | None |
 
 Rutas futuras (fase 2+): `/admin`, APIs — fuera de este documento de experiencia pública.
 
@@ -54,11 +55,21 @@ Rutas futuras (fase 2+): `/admin`, APIs — fuera de este documento de experienc
 | Contacto | Conversión | Enviar / WhatsApp |
 | 404 (mínimo) | Recuperación | Volver al inicio |
 
+Ruta por fila (§2): Hero → `/` `#inicio`; Servicios → `/` `#servicios` (resumen) + `/services` (detalle); Sobre AMD → `/` `#sobre-amd` (teaser) + `/about-us` (detalle); Confianza/Contacto → `/`; 404 → `/**`.
+
 ## 5. Navigation Model
 
-- **Desktop:** nav sticky glass; logo izquierda; anclas centro; idioma + CTA derecha.
-- **Mobile:** logo + CTA; menú overlay glass; WhatsApp FAB persistente.
-- Sin mega-menús. Scroll-spy opcional en anclas activas.
+**Dual nav** (mockup v0.1 / REQ-002 — supersedes any single sticky-anchor-bar reading of this section):
+
+| Nav | Dónde | Links | Breakpoint |
+|-----|-------|-------|------------|
+| Top nav | Todas las páginas | Brand · `/` · `/about-us` · `/services` · ES\|EN · Contactar | `<900px` colapsa a hamburguesa + drawer overlay |
+| Sidenav flotante | Solo Home (`/`) | Dots + label por ancla (5 secciones) | Oculto `<1100px`; visible `≥1100px` |
+
+- Top nav: sticky glass en toda ruta; nunca contiene las anclas de Home como links primarios.
+- Sidenav: **sin barra opaca** — dots+labels flotan sobre el contenido; ink `#0D141A` en secciones claras, dorado/claro en oscuras (scroll-spy). Ausente en `/about-us` y `/services`.
+- Drawer móvil (`<900px`): links de página siempre; anclas de sección de Home solo cuando la ruta activa es `/`.
+- Sin mega-menús.
 
 ## 6. Layout Patterns
 

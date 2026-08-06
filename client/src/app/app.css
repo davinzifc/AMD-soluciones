@@ -1,0 +1,13 @@
+.app-shell {
+  min-height: 100vh;
+  background: var(--amd-ink);
+  color: #f5f6f8;
+  font-family: var(--font-body);
+}
+
+/* Transparent host slot — `HomeSideNav`'s own nav is `position: fixed` and
+   controls its own visibility (≥1100px via `body.has-side-nav`), so this
+   wrapper must not clip/hide its child (T013). */
+.sidenav-host {
+  display: contents;
+}

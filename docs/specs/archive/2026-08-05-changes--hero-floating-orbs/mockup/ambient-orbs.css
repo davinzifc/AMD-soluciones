@@ -1,0 +1,38 @@
+/**
+ * AmbientOrbs — reusable field styles (drop into any section background).
+ * Pair with ambient-orbs.js · Spec: changes/hero-floating-orbs
+ */
+
+.amd-ambient-orbs {
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.amd-ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  pointer-events: none;
+  will-change: transform, filter;
+  animation-name: amd-ambient-orbit;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.amd-ambient-orbs.is-paused .amd-ambient-orb {
+  animation-play-state: paused;
+}
+
+@keyframes amd-ambient-orbit {
+  100% {
+    transform: translate3d(0, 0, 1px) rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .amd-ambient-orb {
+    animation: none !important;
+  }
+}

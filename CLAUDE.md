@@ -12,7 +12,7 @@ Constitución operativa para Claude Code / agentes en este repositorio. Mirror d
 | `docs/infrastructure.md` | Local/Docker/PROD rules | Arranque de stack, deploy |
 | `docs/specs/general-setup/` | Plantillas requirements/design/task | Al escribir cualquier spec |
 
-**Fase actual:** landing en `client/` (Angular + PrimeNG themed). `server/` NestJS = fase 2 — no improvisar API en fase 1.
+**Fase actual:** landing en `client/` (Angular + PrimeNG themed). `server/` NestJS = fase 2 — no improvisar API en fase 1. Preview estático: GitHub Pages en push a `dev` (**solo fase 1**; se corta al existir `server/` — ver `docs/infrastructure.md`).
 
 Estas piezas forman la baseline constitucional para `/akili-propose`, `/akili-specify`, `/akili-execute`, `/akili-validate`, `/akili-test`.
 
@@ -22,7 +22,7 @@ Estas piezas forman la baseline constitucional para `/akili-propose`, `/akili-sp
 
 ### CodeGraph
 
-CLI no instalado al crear la constitución. Opcional más adelante: `npm i -g @colbymchenry/codegraph` → `codegraph init -i`. No commitear la DB generada.
+CLI no instalado. Código de fase 1 vive en `client/`. Opcional: `npm i -g @colbymchenry/codegraph` → `codegraph init -i` (o re-index). No commitear la DB generada.
 
 ### Local stack
 
@@ -45,7 +45,10 @@ Una sesión AKILI por checkout; adicionales en `git worktree`. No medir (build/L
 
 ## Module Guides
 
-*(Vacío hasta que `client/` o `server/` diverjan del root.)*
+| Module | Guide | Notes |
+|--------|-------|-------|
+| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). Shared ambient field at `core/ambient/` (archived `changes/hero-floating-orbs`). Add `client/AGENTS.md` only when conventions diverge. |
+| `server/` | *(none — not scaffolded)* | NestJS = phase 2 (ADR-003). |
 
 ## Skill Map
 

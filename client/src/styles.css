@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+@import './styles/tokens.css';
+
+/* Fragment-link scroll parity with mockup `styles.css` (REQ-010 gate; not GSAP). */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/*
+ * Canvas must be ink (mockup `styles.css` body). Default browser white
+ * bleeds through the sticky glass topnav on deep pages (/about-us,
+ * /services) where the first paint is translucent over empty canvas.
+ */
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--amd-ink);
+  color: #f5f6f8;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}

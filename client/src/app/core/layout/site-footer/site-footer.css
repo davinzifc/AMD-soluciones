@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+.footer {
+  border-top: 1px solid var(--amd-glass-border);
+  padding: 2rem 0 5.5rem;
+  color: rgba(245, 246, 248, 0.45);
+  font-size: 0.88rem;
+  background: var(--amd-ink);
+}
+
+.wrap {
+  width: min(100% - 2.5rem, 1160px);
+  margin-inline: auto;
+}
+
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--amd-gold-soft);
+}

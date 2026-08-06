@@ -1,0 +1,41 @@
+/**
+ * AMD Soluciones — design tokens (Source of Truth)
+ * Source: docs/ux-ui/design.md §7 · docs/specs/domain/landing/design.md §6 (DD-002)
+ * Consumed by: styles.css (global) and theme-primeng.ts (PrimeNG preset mapping).
+ */
+
+:root {
+  /* Color — brand */
+  --amd-gold: #CFBB66;
+  --amd-gold-soft: #E5D59A;
+
+  /* Color — ink / neutrals */
+  --amd-ink: #0D141A;
+  --amd-ink-soft: #1D1E20;
+  --amd-slate: #56585E;
+  --amd-mist: #F2F3F6;
+  --amd-surface: #FFFFFF;
+  --amd-border: rgba(13, 20, 26, 0.08);
+
+  /* Glass (nav / overlays / FAB chrome) */
+  --amd-glass: rgba(255, 255, 255, 0.08);
+  --amd-glass-border: rgba(255, 255, 255, 0.18);
+  --amd-glass-blur: blur(16px) saturate(140%);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Elevation */
+  --shadow-soft: 8px 8px 20px rgba(13, 20, 26, 0.08), -6px -6px 16px rgba(255, 255, 255, 0.7);
+
+  /* Motion */
+  --amd-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --amd-motion-fast: 200ms;
+  --amd-motion-slow: 400ms;
+
+  /* Typography */
+  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+}

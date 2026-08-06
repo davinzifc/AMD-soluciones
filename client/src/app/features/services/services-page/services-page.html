@@ -1,0 +1,41 @@
+<header class="page-hero">
+  <div class="wrap">
+    <h1>{{ 'svcPageTitle' | localize }}</h1>
+    <p>{{ 'svcPageLead' | localize }}</p>
+
+    <nav class="toc" [attr.aria-label]="'tocAria' | localize">
+      @for (group of groups; track group.id) {
+        <a routerLink="/services" [fragment]="group.id">{{ group.titleKey | localize }}</a>
+      }
+    </nav>
+  </div>
+</header>
+
+<section class="svc-groups">
+  <div class="wrap">
+    @for (group of groups; track group.id) {
+      <article [id]="group.id" class="svc-group">
+        <h2>{{ group.titleKey | localize }}</h2>
+        <p class="svc-lead">{{ group.leadKey | localize }}</p>
+
+        <ul class="svc-subs">
+          @for (sub of group.subs; track sub.titleKey) {
+            <li>
+              <strong>{{ sub.titleKey | localize }}</strong>
+              <span>{{ sub.descKey | localize }}</span>
+            </li>
+          }
+        </ul>
+
+        @if (group.noteKey) {
+          <p class="svc-note">{{ group.noteKey | localize }}</p>
+        }
+      </article>
+    }
+
+    <div class="svc-actions">
+      <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'talkAdvisor' | localize }}</a>
+      <a class="btn btn--ghost" routerLink="/" fragment="servicios">{{ 'backRoad' | localize }}</a>
+    </div>
+  </div>
+</section>

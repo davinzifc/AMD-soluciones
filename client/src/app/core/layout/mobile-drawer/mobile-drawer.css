@@ -1,0 +1,60 @@
+:host {
+  display: contents;
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  border: 0;
+  padding: 0;
+  background: rgba(13, 20, 26, 0.4);
+  cursor: default;
+}
+
+.drawer {
+  display: block;
+  position: fixed;
+  inset: calc(68px + 1.6rem) 0 0;
+  z-index: 40;
+  background: rgba(13, 20, 26, 0.94);
+  backdrop-filter: var(--amd-glass-blur);
+  -webkit-backdrop-filter: var(--amd-glass-blur);
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.drawer:not(.is-open) {
+  display: none;
+}
+
+.drawer:focus-visible {
+  outline: none;
+}
+
+.drawer a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--amd-glass-border);
+  font-size: 1.1rem;
+  color: #f5f6f8;
+  text-decoration: none;
+}
+
+.drawer a.is-active {
+  color: var(--amd-gold-soft);
+}
+
+.drawer a:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: -2px;
+}
+
+@media (min-width: 900px) {
+  .drawer,
+  .drawer-backdrop {
+    display: none;
+  }
+}
