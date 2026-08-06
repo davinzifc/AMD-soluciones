@@ -12,7 +12,7 @@ Constitución operativa para Claude Code / agentes en este repositorio. Mirror d
 | `docs/infrastructure.md` | Local/Docker/PROD rules | Arranque de stack, deploy |
 | `docs/specs/general-setup/` | Plantillas requirements/design/task | Al escribir cualquier spec |
 
-**Fase actual:** landing en `client/` (Angular + PrimeNG themed). `server/` NestJS = fase 2 — no improvisar API en fase 1.
+**Fase actual:** landing en `client/` (Angular + PrimeNG themed). `server/` NestJS = fase 2 — no improvisar API en fase 1. Preview estático: GitHub Pages en push a `dev` (**solo fase 1**; se corta al existir `server/` — ver `docs/infrastructure.md`).
 
 Estas piezas forman la baseline constitucional para `/akili-propose`, `/akili-specify`, `/akili-execute`, `/akili-validate`, `/akili-test`.
 

@@ -1,0 +1,81 @@
+# PHASE 1 ONLY — GitHub Pages client preview
+#
+# Contract: docs/infrastructure.md → "## Phase 1 preview (GitHub Pages)"
+#
+# WHEN PHASE 2 STARTS (Nest `server/` scaffolded):
+#   1. This workflow MUST stop deploying (guard below enforces that).
+#   2. Delete or disable this file once a real staging/PROD host is chosen.
+#   3. Do NOT treat github.io as amdsoluciones.com or as the phase-2 stack.
+#
+# Trigger: push to `dev` (and manual workflow_dispatch).
+
+name: Phase 1 — Pages preview (client)
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+concurrency:
+  group: pages-phase1-preview
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  guard:
+    name: Phase gate
+    runs-on: ubuntu-latest
+    outputs:
+      allow_preview: ${{ steps.gate.outputs.allow_preview }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gate
+        name: Cut off when phase 2 (server/) exists
+        run: |
+          if [ -f server/package.json ]; then
+            echo "allow_preview=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Phase-1 Pages cutoff::server/package.json detected. Auto-deploy to GitHub Pages is DISABLED (phase 2). Remove .github/workflows/deploy-pages-phase1.yml and use the phase-2 host — see docs/infrastructure.md."
+          else
+            echo "allow_preview=true" >> "$GITHUB_OUTPUT"
+            echo "Phase 1 OK — no Nest server scaffold; Pages preview may deploy."
+          fi
+
+  build:
+    name: Build client
+    needs: guard
+    if: needs.guard.outputs.allow_preview == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - name: Production build for project Pages
+        run: npm run build:pages
+      - name: SPA fallback for GitHub Pages (deep links)
+        run: cp dist/client/browser/index.html dist/client/browser/404.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist/client/browser
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: needs.guard.outputs.allow_preview == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
