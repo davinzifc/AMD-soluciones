@@ -1,0 +1,26 @@
+<section id="cifras" class="band" data-band>
+  <video
+    #videoPlayer
+    class="band__video"
+    src="media/manifiesto.mp4"
+    poster="media/manifiesto-poster.webp"
+    muted
+    loop
+    playsinline
+    preload="none"
+    aria-hidden="true"
+    tabindex="-1"
+  ></video>
+  <div class="band__scrim" aria-hidden="true"></div>
+
+  <div class="wrap band__inner">
+    <p class="eyebrow">{{ 'figuresEyebrow' | localize }}</p>
+    <p class="band__line">{{ 'figuresLine' | localize }}</p>
+
+    <ul class="band__metrics" #metricsList>
+      <li><b>{{ metric1() }}</b><span>{{ 'figuresMetricYears' | localize }}</span></li>
+      <li><b>{{ metric2() }}</b><span>{{ 'figuresMetricServices' | localize }}</span></li>
+      <li><b>{{ metric3() }}</b><span>{{ 'figuresMetricTax' | localize }}</span></li>
+    </ul>
+  </div>
+</section>

@@ -886,3 +886,91 @@ probar: que el fondo se vea claro, que el contraste real dé los ratios sobre `-
 2. `figcaption` usa `color: #ffffff` y `text-shadow` con rgba literales. **Es el valor del mockup**
    (`home-redesign.css`, `.about__figure figcaption`), no una invención del worker, y el único gate
    de hardcodes vigente cubre los dos dorados de tinta. Se deja como está.
+
+---
+
+## T009 — `FiguresBand` (`#cifras`) · **PASS** (1 ronda · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high`. **Leader/Reviewer:** Claude Code.
+Segunda tarea que cierra **a la primera**, y la primera de ellas que además crea un componente nuevo.
+
+### Tres correcciones de spec previas al despacho
+
+1. **El atributo `autoplay` no va — la prosa contradecía al escenario testable.** `tasks.md` y
+   `design.md` §5.2 decían `<video autoplay muted loop playsinline poster>`. Pero REQ-005 dice
+   *«WHEN la sección **entra en pantalla** THEN el video MUST reproducirse»*, y eso es un
+   `IntersectionObserver`, no un atributo. El mockup lo implementa así a propósito
+   (`home-redesign.js:216-233`) con dos salvaguardas documentadas por decisión HITL: **pausa fuera del
+   viewport** —ahorro de CPU y batería, no accesibilidad— y **póster fijo bajo reduced-motion**. El
+   delator estaba dentro de la propia tarea: su lista de `### Tests` exige `muted`, `loop`,
+   `playsinline` y `poster`, y **no menciona `autoplay`**. La prosa iba por un lado y el test por otro.
+2. **La métrica «31 servicios» habría duplicado el catálogo.** El mockup la lleva como literal
+   (`data-count="31"`). Portarla es el defecto que DD-035 evita y que **T005 ya tuvo que corregir**
+   en el CTA del ledger. Ahora sale de `SERVICE_GROUPS` vía `deriveCatalogTotal()`.
+3. **Quinta reincidencia de KZ-005.** La banda entrega cinco cadenas de copy visible —eyebrow, frase
+   y tres etiquetas de métrica— y el boundary no incluía `client/src/assets/i18n/`.
+
+### Qué se entregó
+
+- `features/home/figures/` nuevo: `figures-band.{ts,html,css,spec.ts}`. CSS **130 líneas / 2.7 kB**.
+- `<video>` con `muted`, `loop`, `playsinline`, `poster`, `preload="none"`, `aria-hidden="true"`,
+  `tabindex="-1"`. **Sin `controls` y sin `autoplay`.** `preload="none"` sostiene a la persona en 3G.
+- Reproducción por `IntersectionObserver` (threshold 0.2): `play()` al entrar, **`pause()` al salir**.
+  El rechazo de `play()` se captura —la política de reproducción automática del navegador puede
+  bloquearla— y queda el póster, que es el fallback correcto. Sin `IntersectionObserver`, `play()`
+  directo. Bajo `reducedMotion()` **no se observa ni se llama a `play()` nunca**.
+- Conteo animado portado del mockup: 1100 ms, easing `1 - (1-p)³`, `requestAnimationFrame`, una sola
+  vez al entrar. Bajo reduced-motion las métricas **nacen en su valor final**, no cuentan rápido.
+- Cinco claves `figures*` en ES y EN. Los números y sus afijos (`+`, `%`) van en el componente: son
+  datos, no copy.
+- **Sin `.section--light`** — es tinta, y ése es su papel en el ritmo (DD-028).
+- Montada entre Manifiesto y Confianza. `home-page.spec.ts` pasa de cinco a **seis** anclas.
+
+### La sexta ancla, heredada de T007
+
+T007 no podía añadir `cifras` a `home-page.spec.ts`: la sección no existía y el aserto habría dejado
+la suite en rojo. Aterriza aquí, que es la tarea que la crea. **Y con ella aterriza el enlace
+`#cifras` del `MobileDrawer`**, que T004 añadió y que hasta ahora no llevaba a ningún sitio.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+- `npm run test:agent`: **31 ficheros · 276 tests** verde (267 → 276, +9)
+- `npm run lint -- --quiet`: limpio
+- `npm run build`: **452.24 kB** inicial. **DD-039 comprobado en el artefacto, no por inferencia:**
+  `manifiesto.mp4` sale en `dist/client/browser/media/manifiesto.mp4` (**1 943 969 bytes**) como asset
+  estático, y no aparece en ningún chunk. Sus 1.9 MB contra un budget de 1 MB habrían roto el build
+  si hubiera entrado.
+
+### Mutaciones — las tres del brief, corridas por el Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Añadir `controls` al `<video>` | FALLA |
+| 2 | Devolver `31` literal en vez del total derivado | FALLA |
+| 3 | Llamar a `play()` también bajo reduced-motion | FALLA |
+
+El test de derivación no compara contra un número escrito a mano: **altera `SERVICE_GROUPS` en
+caliente** —dentro de un `try/finally` que lo restaura, sin fuga a otros tests— y comprueba que el
+total sigue al catálogo. Un aserto contra `31` habría pasado igual con el catálogo duplicado.
+
+### PENDIENTE DE T012
+
+**jsdom no reproduce video.** Que el elemento tenga los atributos no prueba nada de esto, y no puede
+darse por cubierto aquí:
+
+1. Que el **póster se pinte antes** de que el video cargue, que es lo que ve la persona en 3G.
+2. Que el **scrim dé contraste suficiente** al texto sobre el video real en movimiento — el fotograma
+   cambia, así que el peor caso no es medible sobre una imagen fija.
+3. Que la **reproducción arranque** al entrar en pantalla y **pare** al salir.
+4. Que el conteo se lea bien a la velocidad a la que la banda entra en pantalla.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **`reducedMotion()` se lee una sola vez, en `ngAfterViewInit`.** Un cambio de la preferencia del
+   sistema a mitad de sesión no reconfigura la banda, aunque `MotionService` sí publique el cambio.
+   **No es defecto de T009:** `ledger-section` y el difunto `services-road-section` siguen el mismo
+   patrón, así que es una deriva de todo el proyecto respecto a lo que el docblock de `MotionService`
+   promete. Merece una tarea de seguimiento propia, no un parche en una sección.
+2. Bajo movimiento permitido las métricas renderizan `+0 / 0 / 0%` hasta que la banda entra en
+   pantalla. Es coherente con el conteo desde cero y con el mockup (que también salta a 0 al empezar),
+   pero es lo primero que se ve si la banda ya está en pantalla al cargar. A confirmar en T012.

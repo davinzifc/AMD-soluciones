@@ -537,20 +537,35 @@ El alto de la imagen deriva del texto (`align-self: stretch` + `height: 100%`). 
 
 ## T009 — `FiguresBand` (`#cifras`)
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** T001
-- **Directory boundary:** `client/src/app/features/home/figures/` y
+- **Directory boundary:** `client/src/app/features/home/figures/`,
   **`client/src/app/features/home/home-page/`** (ampliado 2026-09-06: el Scope ordena montar la banda
-  en `home-page.html`, que vive fuera del boundary original)
+  en `home-page.html`) y **`client/src/assets/i18n/`** (**quinta reincidencia de KZ-005**: la banda
+  entrega eyebrow, frase y tres etiquetas de métrica — cinco cadenas de copy visible)
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Requirements:** REQ-005, REQ-003 (ancla `#cifras`), REQ-013
 - **Design refs:** DD-039, §5.2
 
 ### Scope
 
-Sección nueva full-bleed: `<video autoplay muted loop playsinline poster>`, scrim, eyebrow, frase y
-tres métricas con conteo animado. **Sin `.section--light`** — es oscura. Montar en `home-page.html`
-entre Manifiesto y Confianza.
+Sección nueva full-bleed: video de fondo, scrim, eyebrow, frase y tres métricas con conteo animado.
+**Sin `.section--light`** — es oscura. Montar en `home-page.html` entre Manifiesto y Confianza.
+
+> ⚠ **Corregido 2026-09-06 — el atributo `autoplay` no va.** Esta línea decía
+> `<video autoplay muted loop playsinline poster>`, y `design.md` §5.2 lo repite. **Contradice al
+> escenario testable y al mockup, que mandan.** REQ-005 dice *«WHEN la sección **entra en pantalla**
+> THEN el video MUST reproducirse»* — eso es un `IntersectionObserver`, no un atributo. El mockup lo
+> implementa así a propósito (`home-redesign.js:216-233`), con dos salvaguardas documentadas por
+> decisión HITL: **se pausa fuera del viewport** (ahorro de CPU y batería, no accesibilidad) y bajo
+> `prefers-reduced-motion` **se queda en el póster**. Además lleva `preload="none"`, que es lo que
+> sostiene a la persona en 3G y a DD-039. La lista de `### Tests` de esta misma tarea ya es coherente
+> con el mockup: exige `muted`, `loop`, `playsinline` y `poster`, y **no** menciona `autoplay`.
+
+> ⚠ **La métrica «31 servicios» se deriva, no se escribe.** El mockup la lleva como literal
+> (`data-count="31"`). Copiarla duplica el catálogo, que es exactamente el defecto que DD-035 evita y
+> que T005 ya tuvo que corregir en el CTA del ledger. El total sale de `SERVICE_GROUPS` sumando
+> `subs.length`, como hace `LedgerSection.totalServices`.
 
 ### Tests
 
@@ -568,9 +583,11 @@ entre Manifiesto y Confianza.
 
 ### Done when
 
-- [ ] Banda montada con el ancla `#cifras`; `home-page.spec.ts` barre las **seis** anclas
-- [ ] Rama de reduced-motion probada
-- [ ] `npm run build` sin el video en el bundle inicial
+- [x] Banda montada entre Manifiesto y Confianza con el ancla `#cifras`; `home-page.spec.ts` barre las **seis** anclas
+- [x] Rama de reduced-motion probada: no se llama a `play()` y las métricas nacen en su valor final
+- [x] `npm run build` sin el video en el bundle inicial: 452.24 kB, y `manifiesto.mp4` (1.94 MB) sale como asset estático en `dist/client/browser/media/`
+- [x] Las cinco cadenas por clave `figures*` en ES y EN; cero literales en la plantilla
+- [x] Total derivado vía `deriveCatalogTotal(SERVICE_GROUPS)`, no el literal `31`
 
 ---
 
