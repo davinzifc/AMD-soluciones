@@ -45,31 +45,94 @@ describe('AboutTeaserSection', () => {
     expect(fixture.nativeElement.querySelector('#sobre-amd')).toBeTruthy();
   });
 
-  it('renders the teaser title and short body copy (REQ-006)', () => {
+  it('renders all five mockup blocks: eyebrow, quote, body, three pillars, and two CTAs (REQ-004, REQ-006)', () => {
     const fixture = setup();
     const root = fixture.nativeElement as HTMLElement;
-    expect(root.querySelector('h2')?.textContent).toContain('aboutTitle');
-    expect(root.querySelector('.about-copy p')?.textContent).toContain('aboutBody');
-  });
 
-  it('"Ver más" routes to the Quiénes somos deep page at /about-us (REQ-006 scenario, not #sobre-amd)', () => {
-    const fixture = setup();
-    const root = fixture.nativeElement as HTMLElement;
-    const seeMore = root.querySelector('a.btn--gold') as HTMLAnchorElement;
+    // 1. eyebrow
+    const eyebrow = root.querySelector('.eyebrow.eyebrow--ink');
+    expect(eyebrow).toBeTruthy();
+    expect(eyebrow?.textContent).toContain('aboutEyebrow');
 
-    expect(seeMore).toBeTruthy();
-    expect(seeMore.getAttribute('href')).toBe('/about-us');
-    expect(seeMore.textContent).toContain('seeMore');
-  });
+    // 2. quote
+    const quote = root.querySelector('.about__quote');
+    expect(quote).toBeTruthy();
+    expect(quote?.textContent).toContain('aboutQuote');
 
-  it('"Contactar" routes to the Home #contacto fragment', () => {
-    const fixture = setup();
-    const root = fixture.nativeElement as HTMLElement;
-    const contact = root.querySelector('a.btn--ghost') as HTMLAnchorElement;
+    // 3. body
+    const body = root.querySelector('.about__body');
+    expect(body).toBeTruthy();
+    expect(body?.textContent).toContain('aboutLeadBody');
 
+    // 4. exactly three pillars with ord, h3, p
+    const pillars = root.querySelectorAll('.pillars li');
+    expect(pillars.length).toBe(3);
+
+    const expectedPillars = [
+      { ord: '01', title: 'aboutPillar1Title', desc: 'aboutPillar1Desc' },
+      { ord: '02', title: 'aboutPillar2Title', desc: 'aboutPillar2Desc' },
+      { ord: '03', title: 'aboutPillar3Title', desc: 'aboutPillar3Desc' },
+    ];
+
+    pillars.forEach((li, idx) => {
+      const ord = li.querySelector('.pillars__ord');
+      const h3 = li.querySelector('h3');
+      const p = li.querySelector('p');
+
+      expect(ord?.textContent).toContain(expectedPillars[idx].ord);
+      expect(h3?.textContent).toContain(expectedPillars[idx].title);
+      expect(p?.textContent).toContain(expectedPillars[idx].desc);
+    });
+
+    // 5. two CTA buttons with their destinations
+    const meetTeam = root.querySelector('.about__cta a.btn--ink') as HTMLAnchorElement;
+    expect(meetTeam).toBeTruthy();
+    expect(meetTeam.getAttribute('href')).toBe('/about-us');
+    expect(meetTeam.textContent).toContain('aboutMeetTeam');
+
+    const contact = root.querySelector('.about__cta a.btn--ghost-ink') as HTMLAnchorElement;
     expect(contact).toBeTruthy();
     expect(contact.getAttribute('href')).toBe('/#contacto');
     expect(contact.textContent).toContain('aboutCta');
+
+    const allCtas = root.querySelectorAll('.about__cta a');
+    expect(allCtas.length).toBe(2);
+  });
+
+  it('template class inventory contains all mockup classes (REQ-004)', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const templatePath = path.resolve(
+      rootDir,
+      'src/app/features/home/about-teaser/about-teaser-section.html',
+    );
+    const rawHtml = fs.readFileSync(templatePath, 'utf8');
+    const classMatches = rawHtml.matchAll(/class="([^"]+)"/g);
+    const classSet = new Set<string>();
+    for (const match of classMatches) {
+      match[1]
+        .split(/\s+/)
+        .filter(Boolean)
+        .forEach((cls) => classSet.add(cls));
+    }
+
+    const requiredMockupClasses = [
+      'about__lead',
+      'about__figure',
+      'about__copy',
+      'about__quote',
+      'about__body',
+      'pillars',
+      'pillars__ord',
+      'about__cta',
+      'eyebrow',
+      'eyebrow--ink',
+      'btn--ink',
+      'btn--ghost-ink',
+    ];
+
+    for (const cls of requiredMockupClasses) {
+      expect(classSet.has(cls), `Missing mockup class "${cls}" in template`).toBe(true);
+    }
   });
 
   it('does not dump the deep-page misión/visión/leaders content on Home (REQ-006 anti-pattern)', () => {
@@ -80,10 +143,12 @@ describe('AboutTeaserSection', () => {
     }
   });
 
-  it('exposes exactly one Ver más + one Contactar action (teaser only, no clutter)', () => {
+  it('retired teaser keys (aboutTitle, aboutBody, seeMore) are not referenced in template', () => {
     const fixture = setup();
-    const actions = fixture.nativeElement.querySelectorAll('.about-actions a');
-    expect(actions.length).toBe(2);
+    const root = fixture.nativeElement as HTMLElement;
+    for (const key of ['aboutTitle', 'aboutBody', 'seeMore']) {
+      expect(root.textContent).not.toContain(key);
+    }
   });
 
   it('carries .section--light theme marker on root section (REQ-004, DD-041)', () => {
@@ -96,7 +161,7 @@ describe('AboutTeaserSection', () => {
   it('renders figure with responsive image, alt text, and caption via i18n keys (REQ-004, REQ-011)', () => {
     const fixture = setup();
     const root = fixture.nativeElement as HTMLElement;
-    const figure = root.querySelector('.about-visual');
+    const figure = root.querySelector('.about__figure');
     const img = figure?.querySelector('img');
     const figcaption = figure?.querySelector('figcaption');
 
@@ -133,6 +198,23 @@ describe('AboutTeaserSection', () => {
       expect(match![1]).toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold-ink-deep\)/);
       expect(match![1]).not.toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold-soft\)/);
       expect(match![1]).not.toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold\)(?!-ink)/);
+    });
+
+    it('eyebrow and pillars__ord resolve to var(--amd-gold-ink-deep) (REQ-009)', () => {
+      const eyebrowInkMatch = cleanCss.match(/\.eyebrow--ink\s*\{([^}]*)\}/);
+      expect(eyebrowInkMatch).toBeTruthy();
+      expect(eyebrowInkMatch![1]).toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold-ink-deep\)/);
+      expect(eyebrowInkMatch![1]).not.toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold-ink\)(?!-deep)/);
+
+      const pillarsOrdMatch = cleanCss.match(/\.pillars__ord\s*\{([^}]*)\}/);
+      expect(pillarsOrdMatch).toBeTruthy();
+      expect(pillarsOrdMatch![1]).toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold-ink-deep\)/);
+      expect(pillarsOrdMatch![1]).not.toMatch(/(?<![a-zA-Z-])color\s*:\s*var\(--amd-gold-ink\)(?!-deep)/);
+    });
+
+    it('never contains #8a7a2e or #6f6224 literals anywhere in about-teaser CSS (REQ-009)', () => {
+      expect(cleanCss).not.toMatch(/#8a7a2e/i);
+      expect(cleanCss).not.toMatch(/#6f6224/i);
     });
 
     it('does not declare aspect-ratio in base CSS (>= 901px) so height derives from text (REQ-004)', () => {

@@ -699,7 +699,7 @@ su segunda mitad —"testimonios con pausa larga para leer"— queda falsa.
 
 ## T014 — Manifiesto: portar la sección del mockup (cita + pilares)
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** T008
 - **Origen:** **KZ-007** — revisión HITL en navegador, 2026-09-06. T008 estaba redactada como *delta*
   («pasa de tinta a claro, recibe la imagen») y produjo el teaser antiguo repintado. **El mockup manda.**
@@ -750,10 +750,10 @@ REQ-004, ahora en el layout correcto.
 
 ### Done when
 
-- [ ] Eyebrow, cita, cuerpo largo y **tres pilares** presentes, con copy por clave en ES y EN
-- [ ] CTA «Conocer al equipo» en tinta + «Contactar» ghost-ink; fuera el `btn--gold`
-- [ ] Reparto REQ-009 aplicado a eyebrow y ordinales
-- [ ] Inventario de clases del componente ⊇ el del mockup
+- [x] Eyebrow, cita, cuerpo largo y **tres pilares**; 10 claves nuevas en ES y EN
+- [x] CTA «Conocer al equipo» `btn--ink` + «Contactar» `btn--ghost-ink`; `btn--gold` fuera
+- [x] Reparto REQ-009 en eyebrow y ordinales (`--amd-gold-ink-deep`), sin literales `#8a7a2e`/`#6f6224`
+- [x] **Inventario de clases ⊇ el del mockup, verificado por diff**: falta **nada**; único extra `section--light`, que es del proyecto
 
 ---
 
@@ -821,7 +821,7 @@ la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su
 - [ ] Cita grande centrada con sus cuatro puntos; cuatro testimonios intactos
 - [ ] Ticker de **texto plano** con los 9 sectores del mockup y el rótulo debajo
 - [ ] CTA final retirado
-- [ ] Inventario de clases del componente ⊇ el del mockup
+- [x] **Inventario de clases ⊇ el del mockup, verificado por diff**: falta **nada**; único extra `section--light`, que es del proyecto
 - [ ] Regresión de 15 s y ancestría de `ClientWall` siguen en verde
 
 ---

@@ -1162,3 +1162,72 @@ support», el valor del mockup.
 2. La advertencia sobre el sanitizador **sigue siendo válida para bindings de estilo normales**
    (`[style.background-image]`, `[style]`); lo que no aplica es a custom properties. Conviene no
    generalizar la lección al revés.
+
+---
+
+## T014 — Manifiesto: portar la sección del mockup · **PASS** (1 ronda · 2026-09-06)
+
+**Origen:** KZ-007 — revisión HITL en navegador. T008 dejó `#sobre-amd` clara y con foto, pero era el
+teaser antiguo repintado. **El brief de T008 —del Leader— prohibió explícitamente portar la cita y los
+pilares**, apoyándose en la prosa de `requirements.md`/§5.5 en vez de en el mockup, que es el
+artefacto aprobado por el cliente. Esta tarea lo corrige.
+
+### Qué se entregó
+
+Estructura del mockup completa: `about__lead` (grid `minmax(0,26rem) minmax(0,1fr)`, figura a la
+izquierda), `eyebrow--ink` «Por qué existimos», `about__quote` «Tu contabilidad no debería ser una
+caja negra.», `about__body` con el cuerpo largo, **`ol.pillars` con los tres pilares** (01 Cercanía ·
+02 Cumplimiento · 03 Claridad) y `about__cta` con «Conocer al equipo» en `btn--ink` + «Contactar» en
+`btn--ghost-ink`. Recuperado `margin-block: -1.75rem` de la figura, el «poco más alto que el texto».
+
+**10 claves i18n nuevas** en ES y EN. `aboutTitle`, `aboutBody` y `seeMore` quedaron huérfanas y se
+retiraron de ambos diccionarios, con un aserto que lo guarda. La página `/about-us` usa
+`aboutPageTitle`, otra clave — comprobado antes de borrar.
+
+### El mockup incumple REQ-009 aquí, y el port no lo copió
+
+`home-redesign.css:98` pinta `.eyebrow--ink` con el literal `#8a7a2e` y `:573` hace lo mismo con
+`.pillars__ord`. Ese valor es `--amd-gold-ink` (**3.86:1**), que sólo alcanza el piso de texto grande.
+El eyebrow es 12 px y el ordinal 15.2 px: **los dos van a `--amd-gold-ink-deep`**, y ningún literal
+hexadecimal entra al CSS del componente. Portar el mockup al pie de la letra habría reintroducido el
+defecto que la Pivot T001 encontró.
+
+### El test que evita la reincidencia
+
+**Diff de inventario de clases** contra la sección del mockup, dentro del propio spec del componente.
+Verificado también por el Reviewer, por separado:
+
+```
+FALTA EN ANGULAR : NADA
+EXTRA EN ANGULAR : section--light   (marcador del proyecto, no del mockup)
+```
+
+Es el aserto que KZ-007 propone como estándar, y es mecánico: leer las `class="…"` de ambos y
+comparar conjuntos. Habría atrapado T008 en su primera ronda.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+**32 ficheros · 292 tests** verde (291 → 292), lint limpio, `main` **451.23 kB**.
+
+### Mutaciones — cinco, tres del brief y dos añadidas por el Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Borrar un `.pillars li` | FALLA |
+| 2 | `.eyebrow` **base** → `--amd-gold-ink` | **PASA — y es correcto** (ver abajo) |
+| 2b | `.eyebrow--ink` → `--amd-gold-ink` | FALLA |
+| 2c | `.pillars__ord` → `--amd-gold-ink` | FALLA |
+| 2d | Literal `#8a7a2e` en `.eyebrow--ink` | FALLA (2 tests) |
+| 3 | Quitar la clase `about__quote` | FALLA el inventario (2 tests) |
+
+**La mutación 2 fue un error del Reviewer, no un hueco del test.** Apuntaba a la regla `.eyebrow`
+base, que `.eyebrow--ink` —misma especificidad, declarada después— pisa en todos los elementos del
+componente, porque la plantilla siempre usa las dos clases juntas. Cambiar ese `color` **no cambia
+nada renderizado**, así que el test hace bien en no fallar. Repetida sobre la regla que sí gobierna
+(2b), falla como debe.
+
+### ADVISORY
+
+1. **`.eyebrow` base declara un `color` muerto.** Es redundante con `.eyebrow--ink` y nunca gana.
+   Misma clase de defecto que el `height: auto` de T006: una declaración que parece hacer trabajo y no
+   lo hace. Inocua, pero candidata a limpieza.
