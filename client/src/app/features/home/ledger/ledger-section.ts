@@ -1,8 +1,21 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { MotionService } from '../../../core/motion/motion.service';
+import { onPassiveScroll } from '../../../core/motion/scroll-listener';
 import {
   SERVICE_GROUPS,
   type ServiceGroup,
@@ -40,7 +53,7 @@ export function buildLedgerLines(groups: readonly ServiceGroup[]): readonly Ledg
 }
 
 /**
- * Ledger section on Home (T005 · REQ-002 · REQ-003 · DD-035 · design.md §5.1).
+ * Ledger section on Home (T005/T006 · REQ-002 · REQ-003 · REQ-009 · REQ-010 · REQ-012 · DD-035 · design.md §5.1).
  * Replaces `ServicesRoadSection` with an editorial index layout of the five service lines.
  *
  * State & Accordion:
@@ -49,6 +62,11 @@ export function buildLedgerLines(groups: readonly ServiceGroup[]): readonly Ledg
  * - Reactivating the open row closes it (state null / "ninguna abierta" permitted).
  * - Activating "Más info" does not toggle the accordion (protected by `closest('a')`).
  * - Collapsed detail region is marked `inert` to prevent keyboard focus trap (REQ-002 · DD-036).
+ *
+ * Motion & Parallax:
+ * - Dynamic spine tracking via `onPassiveScroll()` (mockup `home-redesign.js` parity).
+ * - Static spine at 100% under `prefers-reduced-motion: reduce` (REQ-002/REQ-010).
+ * - Reveal animations via `IntersectionObserver` with `.is-in` class (fallback when IO undefined).
  */
 @Component({
   selector: 'app-ledger-section',
@@ -56,8 +74,18 @@ export function buildLedgerLines(groups: readonly ServiceGroup[]): readonly Ledg
   templateUrl: './ledger-section.html',
   styleUrl: './ledger-section.css',
 })
-export class LedgerSection {
+export class LedgerSection implements AfterViewInit, OnDestroy {
+  @ViewChild('headEl') private readonly headEl?: ElementRef<HTMLElement>;
+  @ViewChild('bodyEl') private readonly bodyEl?: ElementRef<HTMLElement>;
+  @ViewChild('spineEl') private readonly spineEl?: ElementRef<HTMLElement>;
+  @ViewChildren('lineEl') private readonly lineEls?: QueryList<ElementRef<HTMLElement>>;
+
   private readonly locale = inject(LocaleService);
+  private readonly motion = inject(MotionService);
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  private cleanupScroll?: () => void;
+  private revealObserver?: IntersectionObserver;
 
   protected readonly lines: readonly LedgerLine[] = buildLedgerLines(SERVICE_GROUPS);
   protected readonly totalServices = SERVICE_GROUPS.reduce((acc, g) => acc + g.subs.length, 0);
@@ -135,5 +163,101 @@ export class LedgerSection {
     }
     event.preventDefault();
     this.toggle(id);
+  }
+
+  ngAfterViewInit(): void {
+    if (this.motion.reducedMotion()) {
+      const spine =
+        this.spineEl?.nativeElement ??
+        this.elementRef.nativeElement.querySelector<HTMLElement>('[data-spine]');
+      if (spine) {
+        spine.style.height = '100%';
+      }
+    } else {
+      this.cleanupScroll = onPassiveScroll(() => this.updateSpine());
+      this.updateSpine();
+    }
+    this.setupRevealObserver();
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupScroll?.();
+    this.revealObserver?.disconnect();
+  }
+
+  /**
+   * Mockup `home-redesign.js` spine progress: tracks scroll position within `.ledger__body`.
+   * Under `prefers-reduced-motion: reduce`, the spine stays static at 100% (REQ-002 / REQ-010).
+   */
+  private updateSpine(): void {
+    const body =
+      this.bodyEl?.nativeElement ??
+      this.elementRef.nativeElement.querySelector<HTMLElement>('.ledger__body');
+    const spine =
+      this.spineEl?.nativeElement ??
+      this.elementRef.nativeElement.querySelector<HTMLElement>('[data-spine]');
+    if (!body || !spine) {
+      return;
+    }
+
+    if (this.motion.reducedMotion()) {
+      spine.style.height = '100%';
+      return;
+    }
+
+    const r = body.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    const progress = r.height > 0 ? (vh * 0.72 - r.top) / r.height : 0;
+    spine.style.height = `${Math.max(0, Math.min(1, progress)) * 100}%`;
+  }
+
+  /**
+   * Mockup reveal with IntersectionObserver parity (services-road-section.ts pattern):
+   * 1. If reducedMotion() -> marks all visible immediately without observer.
+   * 2. If IntersectionObserver is undefined -> marks all visible immediately.
+   * 3. Otherwise observes with threshold 0.18 and rootMargin '0px 0px -10% 0px', unobserving on intersection.
+   */
+  private setupRevealObserver(): void {
+    const head =
+      this.headEl?.nativeElement ??
+      this.elementRef.nativeElement.querySelector<HTMLElement>('.ledger__head');
+    const lines = this.lineEls?.length
+      ? this.lineEls.toArray().map((ref) => ref.nativeElement)
+      : Array.from(this.elementRef.nativeElement.querySelectorAll<HTMLElement>('.line'));
+    const items = head ? [head, ...lines] : lines;
+    if (items.length === 0) {
+      return;
+    }
+
+    if (this.motion.reducedMotion()) {
+      for (const el of items) {
+        el.classList.add('is-in');
+      }
+      return;
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      for (const el of items) {
+        el.classList.add('is-in');
+      }
+      return;
+    }
+
+    this.revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) {
+            continue;
+          }
+          entry.target.classList.add('is-in');
+          this.revealObserver?.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.18, rootMargin: '0px 0px -10% 0px' },
+    );
+
+    for (const el of items) {
+      this.revealObserver.observe(el);
+    }
   }
 }

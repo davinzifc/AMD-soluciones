@@ -1,6 +1,6 @@
 <section id="servicios" class="ledger section--light">
   <div class="wrap">
-    <header class="ledger__head">
+    <header class="ledger__head" #headEl>
       <div>
         <p class="eyebrow">{{ 'ledgerEyebrow' | localize }}</p>
         <h2>{{ 'ledgerTitle' | localize }}</h2>
@@ -11,13 +11,14 @@
       </div>
     </header>
 
-    <div class="ledger__body">
-      <div class="spine" aria-hidden="true"><i data-spine></i></div>
+    <div class="ledger__body" #bodyEl>
+      <div class="spine" aria-hidden="true"><i data-spine #spineEl></i></div>
 
       <ol class="lines" data-lines>
         @for (line of lines; track line.id) {
           <li
             class="line"
+            #lineEl
             [attr.data-line]="line.id"
             [class.is-open]="isOpen(line.id)"
             [class.is-hot]="isHot(line.id)"

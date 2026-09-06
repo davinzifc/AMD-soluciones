@@ -359,7 +359,7 @@ DC-4) que hoy viven en `services-road-section.spec.ts` y que T007 borra. Reimpla
 
 ## T006 — `LedgerSection`: CSS, revelado de imagen, spine y colapsado inerte
 
-- **Status:** [ ]
+- **Status:** [x] PASS (2 rondas · 2026-09-06)
 - **Depends on:** T005
 - **Directory boundary:** `client/src/app/features/home/ledger/`
 - **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
@@ -423,11 +423,11 @@ el contenedor de la foto, la foto termina en el borde del contenido, y `height: 
 
 ### Done when
 
-- [ ] CSS portado; el componente bajo el `maximumError` de 32 kB de `anyComponentStyle`
-- [ ] Reparto de dorado aplicado según el cuadro de arriba, con su aserto en verde y falsable
-- [ ] Colapsado inerte, verificado por orden de foco
-- [ ] Spine estático bajo reduced-motion
-- [ ] Declarado explícitamente en `execution.md` qué queda pendiente de T012
+- [x] CSS portado (539 líneas, **11.7 kB** — por debajo incluso del aviso de 16 kB)
+- [x] Reparto de dorado aplicado según el cuadro de arriba, con su aserto en verde y falsable
+- [x] Colapsado inerte, verificado por orden de foco
+- [x] Spine estático bajo reduced-motion
+- [x] Declarado explícitamente en `execution.md` qué queda pendiente de T012
 
 ---
 

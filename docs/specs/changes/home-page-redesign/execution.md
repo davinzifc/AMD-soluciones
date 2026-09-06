@@ -607,3 +607,99 @@ renombrado no filtra "Líneas" al menú de páginas.
 3. **La tercera copia de los ids de ancla ya está en producción** (`mobile-drawer.html`). El nuevo
    aserto guarda al drawer contra la deriva, pero `top-nav.ts` y `section-nav.ts` siguen sin un test
    que las case entre sí — la ADVISORY 2 de T003 sigue viva y ahora tiene un consumidor más.
+
+---
+
+## T006 — `LedgerSection`: CSS, revelado, spine y colapsado inerte · **PASS** (2 rondas · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high` (`term_eaef2a67`). **Leader/Reviewer:** Claude Code.
+
+### Qué se entregó
+
+- **CSS portado** desde `mockup/home-redesign.css` + `home-redesign-claro.css` a
+  `ledger-section.css`: **539 líneas · 11.7 kB**, por debajo incluso del aviso de 16 kB (el error
+  está en 32 kB). Se entregó **una sola capa clara** —los valores de `home-redesign-claro.css`
+  escritos directamente— en vez de portar el oscuro y sobreescribirlo. Las cuatro derivadas de
+  sección (`--ink-text`, `--ink-text-2`, `--ink-text-3`, `--hairline`) más `--ledger-ground` se
+  redefinen en el scope de `.ledger`, patrón DD-024, sin tocar `tokens.css`.
+- **Spine** con `onPassiveScroll` y la fórmula del mockup (`home-redesign.js:96-103`), estático al
+  100 % bajo reduced-motion y sin suscribirse al scroll en ese caso.
+- **Revelado** con `IntersectionObserver`, guard de tres caminos en paridad con
+  `services-road-section.ts`, clase `is-in`, `disconnect()` en `ngOnDestroy`.
+- **12 tests nuevos** (273 → 285). El `[inert]` de la plantilla venía de T005 y no se tocó; lo que
+  faltaba era el test que lo guarda.
+
+### El reparto de dorado — el punto que hace fallar la tarea
+
+El mockup pinta los cuatro usos del acento con `var(--amd-gold-ink)`
+(`home-redesign-claro.css:108, 110, 115, 147`). **Un port fiel satisface la tarea e incumple
+REQ-009**: `#8a7a2e` da 3.86:1, que sólo alcanza el piso de texto grande, y tres de los cuatro son
+texto pequeño. El reparto entregado, verificado regla por regla:
+
+| Regla | Token | Línea |
+|---|---|---|
+| `.ledger .eyebrow` (12px) | `--amd-gold-ink-deep` | 66 |
+| `.ledger .linkarrow` (14.4px/700) | `--amd-gold-ink-deep` | 82 |
+| `.line__count b` (18.4px/700) | `--amd-gold-ink-deep` | 291 |
+| `.line__ord` activo, regla base | `--amd-gold-ink` | 245 |
+| `.line__ord` activo, `max-width: 899px` | `--amd-gold-ink-deep` | 413 |
+| `:focus-visible` (contorno) · `+` activo · subrayado · spine (rellenos) | `--amd-gold` | 105, 130, 187, 263, 335 |
+
+Ni un `color: var(--amd-gold)` ni `var(--amd-gold-soft)` en las 539 líneas.
+
+### Ronda 1 — FAIL: declaración muerta en `.line__media img`
+
+`height: auto` seguido de `height: 100%` en la misma regla. Gana la segunda, así que la primera es
+código muerto, y el comentario de encima afirmaba «Invariant 3: height: auto / 100% preserves aspect
+ratio» — un efecto que la regla no tiene.
+
+**La causa está en el brief del Leader, no en el Implementer.** El brief pidió las tres invariantes
+de `design.md` §5.1 como obligatorias, pero **la invariante 3 no aplica al ledger**: existe para un
+`<img>` cuyo layout depende de `aspect-ratio`, y aquí la única imagen vive en un contenedor absoluto
+de altura definida (`top`/`bottom`) con `object-fit: cover`. El valor correcto es `height: 100%`,
+que es además el del mockup. El worker satisfizo la letra del brief añadiendo una declaración inerte
+en lugar de discutirla — comportamiento esperable de un brief que pide algo que no aplica.
+
+Ronda 2: línea borrada, comentario corregido para que nadie la reintroduzca. **La invariante 3 pasa
+a T008**, donde la foto del Manifiesto sí deriva su altura del texto y `aspect-ratio` sí gobierna.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+- `npm run test:agent`: **31 ficheros · 285 tests** en verde
+- `npm run lint -- --quiet`: limpio · `npm run build`: 452.25 kB inicial
+- Barrido de propiedades duplicadas por regla en el CSS: **ninguna**
+
+### Mutaciones — cuatro del Reviewer, ninguna en el brief del worker
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | `.line__ord` de la media query → `--amd-gold-ink` | FALLA |
+| 2 | `color: var(--amd-gold)` inyectado en `.ledger__hint` | FALLA |
+| 3 | Guard de `IntersectionObserver` indefinido borrado | FALLA |
+| 4 | Suscripción al scroll bajo reduced-motion | FALLA |
+
+Las dos del brief (quitar `inert`; eyebrow → `--amd-gold-ink`) las corrió el Implementer y fallan.
+
+### PENDIENTE DE T012 — declarado, es entregable de la tarea
+
+jsdom no compone `transform`, no mide cajas y no evalúa contraste. **Que el CSS esté presente no
+prueba ninguna de estas cinco**, y ninguna puede darse por cubierta aquí:
+
+1. **Invariante 1 — recorte real.** Que `overflow: hidden` en `.line__media` recorte de verdad el
+   `scale(1.06)` del hover, sin borde duro.
+2. **Invariante 2 — borde de contenido.** Que la foto termine en `right: 0` del contenedor y no
+   sangre a viewport, a 375 · 768 · 899 · 960 · 1200 · 1600 px.
+3. **Composición de `mix-blend-mode: multiply`** sobre `--amd-mist` — el revelado "impreso en la
+   hoja" es el gesto que D-1 aprobó, y jsdom no lo compone.
+4. **Cinemática del spine y momento del revelado** en scroll continuo, con la sección ya montada en
+   la Home (llega en T007).
+5. **Contraste medido en navegador**: 5.49:1 para texto normal y 3.86:1 para el ordinal ≥ 900px
+   sobre `#F2F3F6`. El aserto de esta tarea es sobre el **texto del CSS**, no sobre el render.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **El ledger aún no está montado en la Home** — lo hace T007, que además retira
+   `ServicesRoadSection`. Hasta entonces el CSS no se ve en la página.
+2. El aserto de "ningún dorado como `color:`" recorre el CSS **línea a línea**. Una declaración
+   partida en dos líneas (`color:\n  var(--amd-gold)`) se le escaparía. No ocurre hoy; si el fichero
+   se reformatea con un printer que parta declaraciones, hay que revisarlo.

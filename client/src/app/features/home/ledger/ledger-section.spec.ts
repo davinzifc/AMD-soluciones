@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
+import { MotionService } from '../../../core/motion/motion.service';
 import {
   SERVICE_GROUPS,
   SERVICE_GROUP_IDS,
@@ -48,7 +49,7 @@ const SENTINELS: Record<string, string> = {
   ledgerHint: '«LEDGER_HINT»',
 };
 
-function setup() {
+function setup(reduce = false) {
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
@@ -56,6 +57,12 @@ function setup() {
         provide: LocaleService,
         useValue: {
           translate: (key: string) => SENTINELS[key] ?? key,
+        },
+      },
+      {
+        provide: MotionService,
+        useValue: {
+          reducedMotion: () => reduce,
         },
       },
     ],
@@ -501,6 +508,252 @@ describe('LedgerSection', () => {
       expect(h2.textContent?.trim()).toBe('«LEDGER_TITLE»');
       expect(hint.textContent?.trim()).toBe('«LEDGER_HINT»');
       expect(root.textContent).not.toContain('roadHint');
+    });
+  });
+
+  // ── Focus order & inert keyboard accessibility (REQ-002, REQ-010, DD-036) ─────
+  describe('focus order and inert detail (REQ-002, REQ-010, DD-036)', () => {
+    function getFocusableElements(container: HTMLElement): HTMLElement[] {
+      const candidates = Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      return candidates.filter((el) => {
+        if (el.hasAttribute('disabled')) return false;
+        if (el.tabIndex < 0 || el.getAttribute('tabindex') === '-1') return false;
+        let curr: HTMLElement | null = el;
+        while (curr && curr !== container) {
+          if (curr.hasAttribute('inert') || (curr as HTMLElement & { inert?: boolean }).inert) {
+            return false;
+          }
+          curr = curr.parentElement;
+        }
+        return true;
+      });
+    }
+
+    it('the "Más info" link of a closed row is NOT reachable in sequential Tab focus order', () => {
+      const fixture = setup();
+      const root = fixture.nativeElement as HTMLElement;
+      const closedLine = lineFor(root, 'administrativa');
+      const closedLink = closedLine.querySelector('a.linkarrow') as HTMLAnchorElement;
+      const openLine = lineFor(root, 'contabilidad');
+      const openLink = openLine.querySelector('a.linkarrow') as HTMLAnchorElement;
+
+      // 1. Initial state: contabilidad is open, administrativa is closed
+      let focusable = getFocusableElements(root);
+      expect(focusable).toContain(openLink);
+      expect(focusable).not.toContain(closedLink);
+
+      // 2. Open administrativa
+      const btn02 = closedLine.querySelector('.line__btn') as HTMLButtonElement;
+      btn02.click();
+      fixture.detectChanges();
+
+      focusable = getFocusableElements(root);
+      expect(focusable).toContain(closedLink);
+      expect(focusable).not.toContain(openLink);
+
+      // 3. Re-close administrativa (none open)
+      btn02.click();
+      fixture.detectChanges();
+
+      focusable = getFocusableElements(root);
+      expect(focusable).not.toContain(closedLink);
+      expect(focusable).not.toContain(openLink);
+    });
+  });
+
+  // ── Spine scroll tracking and reduced motion (REQ-002, REQ-010) ──────────────
+  describe('spine scroll tracking and reduced motion (REQ-002, REQ-010)', () => {
+    function mockRect(el: HTMLElement, top: number, height: number): void {
+      vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
+        top,
+        height,
+        bottom: top + height,
+        left: 0,
+        right: 0,
+        width: 0,
+        x: 0,
+        y: top,
+        toJSON: () => ({}),
+      } as DOMRect);
+    }
+
+    function setInnerHeight(value: number): void {
+      Object.defineProperty(window, 'innerHeight', { value, configurable: true });
+    }
+
+    afterEach(() => {
+      setInnerHeight(768);
+      vi.restoreAllMocks();
+    });
+
+    it('under prefers-reduced-motion, spine stays fixed at 100% and does not follow scroll', () => {
+      const fixture = setup(true);
+      const root = fixture.nativeElement as HTMLElement;
+      const body = root.querySelector('.ledger__body') as HTMLElement;
+      const spine = root.querySelector('[data-spine]') as HTMLElement;
+
+      expect(spine.style.height).toBe('100%');
+
+      setInnerHeight(1000);
+      mockRect(body, 720, 1000);
+      window.dispatchEvent(new Event('scroll'));
+
+      // In reduced motion, spine stays 100% fixed, does not become 0%
+      expect(spine.style.height).toBe('100%');
+    });
+
+    it('when motion is allowed, spine height tracks passive scroll progress', () => {
+      const fixture = setup(false);
+      const root = fixture.nativeElement as HTMLElement;
+      const body = root.querySelector('.ledger__body') as HTMLElement;
+      const spine = root.querySelector('[data-spine]') as HTMLElement;
+
+      setInnerHeight(1000);
+      // vh = 1000, 0.72 * vh = 720
+      // top = 720, height = 1000 -> (720 - 720) / 1000 = 0%
+      mockRect(body, 720, 1000);
+      window.dispatchEvent(new Event('scroll'));
+      expect(spine.style.height).toBe('0%');
+
+      // top = 220, height = 1000 -> (720 - 220) / 1000 = 500 / 1000 = 50%
+      mockRect(body, 220, 1000);
+      window.dispatchEvent(new Event('scroll'));
+      expect(spine.style.height).toBe('50%');
+
+      // top = -280, height = 1000 -> (720 - (-280)) / 1000 = 1000 / 1000 = 100%
+      mockRect(body, -280, 1000);
+      window.dispatchEvent(new Event('scroll'));
+      expect(spine.style.height).toBe('100%');
+    });
+  });
+
+  // ── Scroll reveal and IntersectionObserver parity (REQ-002, REQ-010) ──────────
+  describe('scroll-in reveal and IntersectionObserver parity (REQ-002, REQ-010)', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('marks all content visible immediately when IntersectionObserver is undefined', () => {
+      vi.stubGlobal('IntersectionObserver', undefined);
+      const fixture = setup(false);
+      const root = fixture.nativeElement as HTMLElement;
+      const head = root.querySelector('.ledger__head') as HTMLElement;
+      const lines = root.querySelectorAll('.line');
+
+      expect(head.classList.contains('is-in')).toBe(true);
+      expect(lines.length).toBe(5);
+      lines.forEach((line) => {
+        expect(line.classList.contains('is-in')).toBe(true);
+      });
+    });
+
+    it('marks all content visible immediately under prefers-reduced-motion without observer', () => {
+      const fixture = setup(true);
+      const root = fixture.nativeElement as HTMLElement;
+      const head = root.querySelector('.ledger__head') as HTMLElement;
+      const lines = root.querySelectorAll('.line');
+
+      expect(head.classList.contains('is-in')).toBe(true);
+      lines.forEach((line) => {
+        expect(line.classList.contains('is-in')).toBe(true);
+      });
+    });
+
+    it('observes header and all lines when IntersectionObserver is available and motion is allowed', () => {
+      const observed: Element[] = [];
+      class StubIO {
+        constructor(private readonly cb: IntersectionObserverCallback) {}
+        observe(el: Element): void {
+          observed.push(el);
+        }
+        unobserve(): void {
+          /* no-op */
+        }
+        disconnect(): void {
+          /* no-op */
+        }
+        takeRecords(): IntersectionObserverEntry[] {
+          return [];
+        }
+        readonly root = null;
+        readonly rootMargin = '';
+        readonly thresholds = [];
+      }
+      vi.stubGlobal('IntersectionObserver', StubIO);
+
+      const fixture = setup(false);
+      const root = fixture.nativeElement as HTMLElement;
+      const head = root.querySelector('.ledger__head') as HTMLElement;
+      const lines = Array.from(root.querySelectorAll('.line'));
+
+      expect(head.classList.contains('is-in')).toBe(false);
+      expect(observed).toContain(head);
+      lines.forEach((line) => {
+        expect(line.classList.contains('is-in')).toBe(false);
+        expect(observed).toContain(line);
+      });
+      expect(observed.length).toBe(6); // 1 header + 5 lines
+    });
+  });
+
+  // ── Reparto de dorado (REQ-009) ──────────────────────────────────────────────
+  describe('reparto de dorado en CSS portado (REQ-009)', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const cssPath = path.resolve(rootDir, 'src/app/features/home/ledger/ledger-section.css');
+    const rawCss = fs.readFileSync(cssPath, 'utf8');
+
+    // Strip comments to ensure assertions test rules rather than explanatory text
+    const cleanCss = rawCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it('.ledger .eyebrow resolves to var(--amd-gold-ink-deep)', () => {
+      const match = cleanCss.match(/\.ledger\s+\.eyebrow\s*\{([^}]*)\}/);
+      expect(match).toBeTruthy();
+      expect(match![1]).toMatch(/color\s*:\s*var\(--amd-gold-ink-deep\)/);
+      expect(match![1]).not.toMatch(/color\s*:\s*var\(--amd-gold-ink\)(?!-deep)/);
+    });
+
+    it('.ledger .linkarrow resolves to var(--amd-gold-ink-deep)', () => {
+      const match = cleanCss.match(/\.ledger\s+\.linkarrow\s*\{([^}]*)\}/);
+      expect(match).toBeTruthy();
+      expect(match![1]).toMatch(/color\s*:\s*var\(--amd-gold-ink-deep\)/);
+      expect(match![1]).not.toMatch(/color\s*:\s*var\(--amd-gold-ink\)(?!-deep)/);
+    });
+
+    it('.line__count b resolves to var(--amd-gold-ink-deep)', () => {
+      const match = cleanCss.match(/\.line__count\s+b\s*\{([^}]*)\}/);
+      expect(match).toBeTruthy();
+      expect(match![1]).toMatch(/color\s*:\s*var\(--amd-gold-ink-deep\)/);
+      expect(match![1]).not.toMatch(/color\s*:\s*var\(--amd-gold-ink\)(?!-deep)/);
+    });
+
+    it('.line__ord activo resolves to var(--amd-gold-ink) in base rule (>= 900px)', () => {
+      const [baseCss] = cleanCss.split(/@media/);
+      const match = baseCss.match(/(?:\.line\.is-(?:hot|open)\s+\.line__ord)[^{]*\{([^}]*)\}/);
+      expect(match).toBeTruthy();
+      expect(match![1]).toMatch(/color\s*:\s*var\(--amd-gold-ink\)(?!-deep)/);
+    });
+
+    it('.line__ord activo resolves to var(--amd-gold-ink-deep) inside < 900px media query', () => {
+      const mediaMatch = cleanCss.match(/@media[^{]*max-width\s*:\s*(?:899|900)px[^{]*\{([\s\S]*?\}\s*\})/);
+      expect(mediaMatch).toBeTruthy();
+      const mediaBlock = mediaMatch![1];
+      const ordMatch = mediaBlock.match(/(?:\.line\.is-(?:hot|open)\s+\.line__ord)[^{]*\{([^}]*)\}/);
+      expect(ordMatch).toBeTruthy();
+      expect(ordMatch![1]).toMatch(/color\s*:\s*var\(--amd-gold-ink-deep\)/);
+    });
+
+    it('never uses var(--amd-gold) or var(--amd-gold-soft) as color: in ledger CSS', () => {
+      const lines = cleanCss.split('\n');
+      for (const line of lines) {
+        if (/(?<![a-zA-Z-])color\s*:/.test(line)) {
+          const forbiddenGold = /(?<![a-zA-Z-])color\s*:[^;]*var\(--amd-gold(-soft)?\)(?!\s*-\s*ink)/;
+          expect(line).not.toMatch(forbiddenGold);
+        }
+      }
     });
   });
 });
