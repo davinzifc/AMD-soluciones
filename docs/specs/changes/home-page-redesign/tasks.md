@@ -593,9 +593,13 @@ Sección nueva full-bleed: video de fondo, scrim, eyebrow, frase y tres métrica
 
 ## T010 — `ClientWall`: carrusel infinito de logos
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** T001
-- **Directory boundary:** `client/src/app/features/home/clients/`
+- **Directory boundary:** `client/src/app/features/home/clients/` y **`client/src/assets/i18n/`**
+  (ampliado 2026-09-06 — **sexta reincidencia de KZ-005**: el muro rotula su cinta
+  («Empresas que ya operan con AMD», `mockup/index.html:363`) y esa cadena es copy visible.
+  **Las 13 razones sociales NO son copy**: son nombres propios y viven en `client-logos.data.ts`,
+  nunca en los diccionarios)
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Requirements:** REQ-007 (los cinco escenarios)
 - **Design refs:** DD-032, DD-033, §5.3
@@ -627,10 +631,12 @@ Fallback con `@supports` para navegadores sin `mask-image`: el nombre en texto.
 
 ### Done when
 
-- [ ] 13 máscaras renderizadas, copia duplicada oculta a asistencia técnica
-- [ ] Duración derivada de medición, no literal en CSS
-- [ ] Retícula estática bajo reduced-motion, con los 13 visibles
-- [ ] Fallback `@supports` declarado
+- [x] 26 elementos: 13 originales con `role="img"` y razón social, 13 copias `aria-hidden` sin rol. **147 618 bytes** de máscaras, bajo el techo de 200 kB
+- [x] `duracion(anchoMitad, pxPorSegundo)` pura y exportada, recalculada en `resize` y en `document.fonts.ready`
+- [x] Retícula estática bajo reduced-motion, con los 13 originales visibles y la copia oculta
+- [x] Fallback `@supports` declarado: el nombre en texto vía `content: attr(aria-label)`
+- [x] `clientsLabel` en ES y EN; las 13 razones sociales en `client-logos.data.ts`
+- [x] `--logo` conserva su `url()` en los 13, verificado en el DOM renderizado
 
 ---
 

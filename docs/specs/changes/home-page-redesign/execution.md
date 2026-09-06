@@ -974,3 +974,90 @@ darse por cubierto aquí:
 2. Bajo movimiento permitido las métricas renderizan `+0 / 0 / 0%` hasta que la banda entra en
    pantalla. Es coherente con el conteo desde cero y con el mockup (que también salta a 0 al empezar),
    pero es lo primero que se ve si la banda ya está en pantalla al cargar. A confirmar en T012.
+
+---
+
+## T010 — `ClientWall`: carrusel infinito de logos · **PASS** (1 ronda · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high`. **Leader/Reviewer:** Claude Code.
+La tarea que el handoff marcaba como **la más frágil del plan**, cerrada a la primera.
+
+### Corrección de spec previa al despacho — sexta reincidencia de KZ-005, con un matiz
+
+El boundary era sólo `features/home/clients/`, pero el muro **rotula su cinta**
+(«Empresas que ya operan con AMD», `mockup/index.html:363`) y esa cadena es copy visible. Ampliado a
+`client/src/assets/i18n/`.
+
+**El matiz importa y se dejó escrito en la tarea:** las **13 razones sociales NO son copy**. Son
+nombres propios — «Fundación Ballet Capital» se llama igual en inglés — y viven en
+`client-logos.data.ts`, nunca en los diccionarios. Sin decirlo, la ampliación del boundary invita
+justo al error contrario: traducir trece empresas.
+
+### Las tres trampas, y cómo quedaron
+
+Cada una tenía un porqué medido, y el brief las dio como razones, no como reglas:
+
+1. **Sin `gap`.** La animación desplaza `translateX(-50%)`; con `gap` ese 50 % no cae en el mismo
+   punto del patrón —queda desfasado medio hueco— y **el bucle salta en cada vuelta**. El aire va
+   como `margin-inline` de cada `<li>`. Medido en el mockup: costura de 0.00 px a 1440, −0.03 a 768,
+   −0.13 a 375, contra la tolerancia de ≤ 0.5 px de REQ-007.
+2. **Duración calculada, no fijada.** `duracion(anchoMitad, pxPorSegundo)` exportada y pura, a
+   42 px/s sobre `scrollWidth / 2` —que es exactamente lo que recorre la animación—, recalculada en
+   `resize` y en `document.fonts.ready`. Fijarla en el CSS haría que la cinta **corriese más rápido
+   cuanto más estrecha la pantalla**, justo donde más cuesta leerla.
+3. **La copia existe para el bucle, no para el lector.** 26 elementos: 13 con `role="img"` y la razón
+   social, 13 con `aria-hidden="true"` y **sin rol**. Renderizada en la plantilla con un segundo
+   `@for`, no clonada en JS como el mockup: declarativo y testable en jsdom.
+
+### La trampa que no estaba en la spec: el `url()` y el sanitizador de Angular
+
+El mockup pasa `style="--logo: url(...)"` en línea. **En Angular el binding de estilos pasa por el
+sanitizador y el `url()` puede acabar vacío** — la máscara no se ve y **nada falla**: sin error, el
+`<span>` queda transparente. El brief lo señaló y exigió un aserto.
+
+Vía elegida por el Implementer: `DomSanitizer.bypassSecurityTrustStyle`, con el valor construido
+desde una plantilla fija y un `slug` de un fichero de datos estático — sin entrada de usuario. El
+test comprueba que **los 13** conservan `media/logos/<slug>.webp` en el `--logo` del DOM renderizado.
+Es el único aserto de esta tarea capaz de atrapar ese fallo silencioso.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+- `npm run test:agent`: **32 ficheros · 292 tests** verde (276 → 292, +16)
+- `npm run lint -- --quiet`: limpio · `npm run build`: 452.24 kB inicial
+- Máscaras: **147 618 bytes** los 13 `.webp`, bajo el techo de 200 kB del NFR de performance
+
+### Mutaciones — las tres del brief, corridas por el Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Triplicar el conjunto en vez de duplicarlo | FALLA (2 tests) |
+| 2 | Quitar `aria-hidden` de la copia | FALLA (4 tests) |
+| 3 | `gap` en la cinta en lugar de `margin-inline` | **FALLA** |
+
+La 3 se despachó como pregunta abierta —«si no falla nada, escríbelo»— porque el efecto sólo se mide
+en T012. El Implementer **sí** escribió el aserto que guarda la regla: lee la regla
+`.clients__track` del CSS y prohíbe `gap:` con un lookbehind que deja pasar `row-gap`, que la
+retícula de reduced-motion sí necesita.
+
+### PENDIENTE DE T012
+
+**jsdom no compone `mask-image` ni mide la cinta.** Un test verde aquí **no** prueba que el carrusel
+se vea. Quedan sin probar, y no pueden darse por cubiertas:
+
+1. **La costura del bucle** (≤ 0.5 px de desfase) a 1440, 768 y 375 px.
+2. **La velocidad constante** entre esos tres anchos, ±10 %.
+3. Que las **máscaras se compongan** y los logos se vean con `currentColor`.
+4. Que la **pausa** en `:hover` y `:focus-within` funcione de verdad.
+5. Que la **retícula de reduced-motion** deje los 13 en pantalla, que es el punto entero del
+   escenario — parar la cinta sin más dejaría a la mayoría fuera.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **Reduced-motion está implementado por tres vías a la vez**: `@media (prefers-reduced-motion)` en
+   el CSS, una clase `.is-reduced-motion` gobernada por la señal de `MotionService`, y bindings
+   `[style.animation]`/`[style.display]` en la plantilla. Ninguna es incorrecta y la clase es la que
+   hace el escenario testable en jsdom —el `@media` no lo es—, pero tres mecanismos para un
+   comportamiento decaen: alguien retira uno creyendo que otro lo cubre. Candidato a simplificación
+   cuando T012 confirme cuál basta.
+2. El muro **no está montado**: lo monta **T011**, con su aserto de ancestría (KZ-004). Hasta
+   entonces el componente existe y no se ve.
