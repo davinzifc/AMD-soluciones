@@ -96,3 +96,55 @@ suite se rompa o, peor, que no se rompa.
    estado esperado, antes de emitir el veredicto. Un `--stat` que perdió un fichero es la señal.
 
 **Estado:** Proposed · Severidad: Media · Origen: Reviewer T007, 2026-09-06
+
+---
+
+## KZ-007 (propuesto) — Una tarea escrita como *delta de comportamiento* no porta el diseño, y la revisión no lo detecta
+
+**Medido (2026-09-06, HITL).** El usuario abrió la Home en el navegador y encontró que **dos de las
+seis secciones no se parecen al mockup aprobado**: `#sobre-amd` (Manifiesto) y `#confianza`. Once
+tareas habían pasado con PASS del Reviewer antes de que nadie lo notara.
+
+Comparación estructural posterior, clase por clase, mockup contra implementación:
+
+| Sección | Cómo estaba escrita su tarea | Resultado |
+|---|---|---|
+| `#servicios` (T006) | «**Portar el CSS del ledger** desde `mockup/…`» | ✅ fiel |
+| `#cifras` (T009) | «Sección nueva… CSS de referencia: `mockup/…`» | ✅ fiel |
+| `#sobre-amd` (T008) | «La sección **pasa de `--amd-ink` a claro** y recibe la imagen» | ❌ el teaser viejo repintado |
+| `#confianza` (T011) | «**Retirar `setInterval`**… montar `ClientWall`… pasa a blanco» | ❌ el Confianza viejo con el muro pegado |
+
+**La correlación es exacta.** Las tareas redactadas como **port del mockup** salieron fieles. Las
+redactadas como **delta de comportamiento sobre el componente existente** —«de tinta a claro»,
+«retirar el temporizador»— produjeron componentes que cumplen su Done-when al 100 % y **no se parecen
+al diseño aprobado**. `design.md` §5.5 («Cambios en componentes existentes») es una tabla de deltas, y
+las tareas la copiaron literalmente: en ningún punto del spec existe la frase «que `#confianza` se
+parezca al mockup».
+
+**Causa raíz del lado del Reviewer, y es la parte grave.** El Reviewer validó **cada tarea contra su
+propio Done-when**, que es lo que la metodología pide, y por eso las once pasaron. **Nunca abrió el
+mockup.** Un Done-when se satisface entero mientras el resultado diverge del artefacto aprobado, y
+ningún aserto en jsdom puede notarlo porque ninguno mira el mockup.
+
+Agravante concreto: en **T008 el propio Leader detectó el hueco** —dejó escrito que «la cita y los
+pilares no los porta ninguna tarea» y lo reportó al HITL— **y aun así decidió no portarlos**,
+apoyándose en el texto de `requirements.md` §5.5 en vez de en el mockup. La información estaba; la
+jerarquía de fuentes era la equivocada.
+
+**Estandarización propuesta.**
+
+1. **El mockup manda sobre la prosa del spec.** Cuando `requirements.md`/`design.md`/`tasks.md`
+   describan una sección que el mockup dibuja, el mockup es la fuente de verdad del *qué se ve*, y la
+   prosa lo es del *cómo se comporta*. Ante discrepancia, se para y se resuelve en HITL — no se elige
+   la prosa por defecto.
+2. **`/akili-specify`: toda tarea que toque una sección dibujada en el mockup lleva un `Done when` de
+   fidelidad**, con el rango de líneas del markup y del CSS de referencia. Una tarea de delta sin ese
+   ítem es una tarea incompleta.
+3. **`/akili-execute`, paso de revisión: el Reviewer compara el inventario de clases del componente
+   contra el de su sección en el mockup** antes de emitir veredicto. Es mecánico y barato:
+   `class="…"` de ambos, ordenados, diff. Habría atrapado T008 y T011 en su primera ronda.
+4. **La medición visual no puede vivir sólo en la última tarea.** T012 (gate de navegador) es la
+   última del grafo, así que toda divergencia visual se acumula hasta el final — once tareas en este
+   caso. El diff de inventario del punto 3 es la versión barata que sí puede correr en cada tarea.
+
+**Estado:** Proposed · Severidad: **Crítica** · Origen: HITL 2026-09-06 (revisión en navegador del usuario)
