@@ -235,14 +235,25 @@ AND IT MUST el conteo animado de las métricas mostrar directamente el valor fin
 - **Descripción:** La sección `#confianza` SHALL presentar prueba social en tres grados de
   concreción: qué dicen (testimonio), quiénes son (clientes) y dónde operan (sectores).
 
-**Scenario: el testimonio no rota solo**
+**Scenario: el testimonio rota a ritmo de lectura y se detiene al leerlo**
+
+> ⚠ **REVERTIDO POR HITL (2026-09-06).** Este escenario decía lo contrario: *«el testimonio no rota
+> solo… it must NOT existir ningún temporizador»*, y T011 retiró el `setInterval` con una regresión de
+> 15 s que lo guardaba. **El cliente pidió en revisión que los testimonios pasen solos**, «a una
+> velocidad adecuada para leerlos, ni muy rápido ni muy lento».
+>
+> **La preocupación original sigue siendo válida y se cubre de otra forma:** lo que no puede pasar es
+> que el texto se sustituya *mientras alguien lo está leyendo*. Por eso la rotación **se detiene** al
+> pasar el cursor o al entrar el foco, y no existe bajo `prefers-reduced-motion`. El mockup no rota
+> solo: esto es una decisión del cliente por encima del mockup, no paridad con él.
 
 ```text
-GIVEN la sección `#confianza` con sus CUATRO testimonios
-WHEN el usuario no interactúa durante al menos 15 segundos
-THEN el testimonio visible MUST permanecer sin cambiar
-AND IT MUST cambiar únicamente al activar uno de los puntos de navegación
-BUT it must NOT existir ningún temporizador que sustituya el texto mientras se lee
+GIVEN la sección `#confianza` con sus CUATRO testimonios y sin interacción
+WHEN transcurre la pausa de lectura
+THEN el testimonio visible MUST avanzar al siguiente, en ciclo
+AND IT MUST seguir siendo alcanzable cualquier testimonio activando su punto
+AND IT MUST detenerse la rotación mientras el puntero esté encima o el foco dentro
+BUT it must NOT rotar en absoluto bajo `prefers-reduced-motion: reduce`
 ```
 
 > **Cuatro, no tres.** Producción sirve `q1…q4`; el mockup dibujó tres puntos sólo como

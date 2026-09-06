@@ -950,10 +950,93 @@ accesible del enlace.
 
 ---
 
+## T018 — Ajustes HITL: etiquetas del nav, aterrizaje del sub-header y rotación de testimonios
+
+- **Status:** [ ]
+- **Depends on:** T015, T017
+- **Origen:** Revisión HITL en navegador, 2026-09-06 (tercera pasada).
+- **Directory boundary:** `client/src/app/core/layout/`, `client/src/app/app.config.ts`,
+  `client/src/app/features/home/trust/`, `client/src/assets/i18n/`
+- **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
+- **Requirements:** REQ-008, **REQ-006 (revertido por HITL — leer el aviso del escenario)**, REQ-011
+- **Design refs:** DD-029, DD-030, **DD-034 (revertido)**
+
+### 1 · Etiquetas del menú de páginas → las del mockup
+
+| Clave | Hoy | Mockup |
+|---|---|---|
+| `navHome` | Home / Home | **Inicio** / Home |
+| `navAboutPage` | Quiénes somos / About us | **Nosotros** / About |
+| `navServicesPage` | Servicios / Services | Servicios / Services *(sin cambio)* |
+| `navCta` | Contactar / Contact | **Contacto** / Contact |
+
+**Colisión resuelta (HITL):** el mockup dice «Inicio» en el menú de páginas **y** en el índice de
+secciones, lo que rompería el test de no-repetición de T004. Decisión: el menú de páginas queda
+exactamente como el mockup, y **`navSectionInicio` pasa de «Inicio» a «Arriba»** en ES (en EN ya vale
+«Top» desde T004). «Arriba» describe lo que hace el ancla: subir al hero.
+
+### 2 · El sub-header no aparece al aterrizar en un ancla
+
+**Causa raíz medida.** Hay **dos números que deberían ser el mismo y viven en ficheros distintos**:
+
+- `app.config.ts` → `ViewportScroller.setOffset` reserva **137 px** a ≥ 900 px (69 del top-nav + 44
+  del sub-header + 1.5rem de aire).
+- `section-nav.ts:88` → enciende la barra con `window.scrollY > heroHeight - 120`.
+
+Al pulsar «Scroll» se aterriza en `ledgerTop − 137`, y con el `margin-top: -68px` del hero eso cae
+**85 px por debajo** del umbral: la banda reservada para el sub-header queda **vacía**. En el mockup
+funciona por 4 px de margen (offset 116 contra umbral 120); aquí el offset es mayor y el margen
+negativo del hero se come el resto.
+
+**El arreglo no es mover el 120.** Extraer el cálculo del alto del chrome a **una sola función
+compartida** en `core/layout/` (o `core/motion/`), consumida por el `setOffset` de `app.config.ts`
+**y** por el umbral de `SectionNav`. La barra se enciende cuando el borde inferior del hero alcanza
+ese alto de chrome, no cuando `scrollY` supera un literal. Así los dos números no pueden volver a
+separarse.
+
+### 3 · Los testimonios vuelven a rotar solos
+
+> ⚠ **Esto revierte REQ-006 y DD-034, por decisión del cliente.** Los dos documentos ya están
+> actualizados: **léelos antes de tocar el código.** T011 retiró el `setInterval` y dejó una regresión
+> de 15 s que lo prohibía; **ese test se borra**, porque su sujeto ya no es un defecto.
+
+- Pausa de lectura: **9 s**, en una constante exportada y nombrada.
+- **Se detiene** mientras el puntero esté encima de la sección de testimonios o el foco dentro
+  (`:hover` / `:focus-within`, o sus equivalentes en TS). Es lo que impide sustituir texto que alguien
+  está leyendo, que era la objeción original de REQ-006.
+- **Sin temporizador** bajo `prefers-reduced-motion: reduce`.
+- Activar un punto sigue funcionando y **reinicia** la cuenta.
+- Los cuatro testimonios y los 44×44 de los puntos **no se tocan** (KZ-001).
+
+### Tests
+
+- Las cuatro etiquetas del menú coinciden con el mockup, en ES y EN
+- El test de **no-repetición de T004 sigue verde** con `navSectionInicio` = «Arriba»
+- **Una sola fuente** para el alto del chrome: aserto de que `app.config.ts` y `SectionNav` consumen
+  la misma función, no dos literales
+- Con timers falsos: el testimonio **avanza** a los 9 s; **no avanza** con hover/foco simulado; **no
+  avanza** bajo reduced-motion; activar un punto reinicia la cuenta
+- El test de regresión de 15 s de T011 **se borra**, no se deja pasando
+
+- **Verification:** `cd client && npm run test:agent && npm run lint -- --quiet && npm run build`
+- **Falsable con:** devolver `navSectionInicio` a «Inicio» → el test de no-repetición debe FALLAR.
+  Quitar la pausa por hover → el test de pausa debe FALLAR.
+- **Evidence disqualifier:** jsdom no hace scroll real. Que las dos piezas compartan función **no
+  prueba** que el sub-header aparezca al pulsar «Scroll». **T012** lo mide en navegador.
+
+### Done when
+
+- [ ] Menú de páginas idéntico al mockup; `navSectionInicio` = «Arriba»/«Top»; no-repetición en verde
+- [ ] Alto del chrome en **una sola función** compartida por el offset de anclaje y el umbral del sub-header
+- [ ] Testimonios rotan a 9 s, se detienen al hover/foco, y no rotan bajo reduced-motion
+- [ ] La regresión de 15 s borrada; REQ-006 y DD-034 ya reflejan la reversión
+
+---
+
 ## T012 — Gate de medición en navegador
 
 - **Status:** [ ]
-- **Depends on:** T007, T009, T011, **T014, T015, T016, T017**
+- **Depends on:** T007, T009, T011, **T014, T015, T016, T017, T018**
 - **Directory boundary:** `client/` (devDependency + script)
 - **Recommended skills:** `angular-developer`
 - **Requirements:** REQ-001 (los dos escenarios), REQ-007 escenarios "el bucle no salta" y
