@@ -1,16 +1,20 @@
-/* Home About teaser (REQ-006 · design.md §6 AboutTeaserSection). Mirrors
-   mockup `landing.css` `.about-*` rules — dark ink section (no
-   `section--light`, mockup index.html #sobre-amd) — reimplemented on AMD
-   tokens (no template purple, REQ-011). */
+/* Home About teaser (T008 · REQ-004, REQ-009, REQ-011 · DD-028, DD-031, DD-041 · design.md §5.5).
+   Light section with real photography. Height derives from copy; gold accent uses ink tokens. */
 
 :host {
   display: block;
 }
 
 .about-teaser {
+  /* DD-024: Component-scoped derived ink tokens for light ground */
+  --ink-text: var(--amd-ink);
+  --ink-text-2: var(--amd-slate);
+  --hairline: var(--amd-border);
+
   padding: 5.5rem 0;
-  background: var(--amd-ink);
-  color: #f5f6f8;
+  background: var(--amd-surface);
+  color: var(--amd-ink);
+  border-top: 1px solid var(--amd-border);
 }
 
 .wrap {
@@ -24,50 +28,58 @@
   align-items: center;
 }
 
-@media (min-width: 900px) {
-  .about-grid {
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 4rem;
-  }
-}
-
 .about-visual {
-  margin: 0;
-  aspect-ratio: 4 / 3;
-  border-radius: var(--radius-lg);
-  background:
-    linear-gradient(145deg, rgba(207, 187, 102, 0.25), transparent 50%),
-    linear-gradient(200deg, #2a333c, #12181e);
-  border: 1px solid var(--amd-glass-border);
   position: relative;
+  margin: 0;
+  align-self: stretch;
+  min-height: 17rem;
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  border: 1px solid var(--amd-border);
 }
 
-.about-visual::before {
+.about-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 38%;
+  display: block;
+}
+
+.about-visual::after {
   content: '';
   position: absolute;
-  inset: 18% 14%;
-  border: 1px solid rgba(207, 187, 102, 0.35);
-  border-radius: var(--radius-md);
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 52%, rgba(13, 20, 26, 0.92) 100%);
 }
 
 .about-visual figcaption {
   position: absolute;
   left: 1.25rem;
-  bottom: 1.25rem;
-  font-size: 0.85rem;
-  color: rgba(245, 246, 248, 0.65);
+  bottom: 1rem;
+  z-index: 1;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(13, 20, 26, 0.8);
 }
 
 .about-copy h2 {
+  font-family: var(--font-display);
   font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  letter-spacing: -0.025em;
+  color: var(--amd-ink);
   margin: 0 0 1.25rem;
 }
 
 .about-copy p {
-  color: rgba(245, 246, 248, 0.72);
-  margin: 0 0 1.25rem;
+  color: var(--amd-slate);
+  margin: 0 0 1.5rem;
   max-width: 34rem;
+  line-height: 1.6;
 }
 
 .about-actions {
@@ -117,13 +129,48 @@
 
 .btn--ghost {
   background: transparent;
-  border-color: var(--amd-glass-border);
-  color: #f5f6f8;
+  border-color: var(--amd-border);
+  color: var(--amd-ink);
 }
 
 .btn--ghost:hover {
   border-color: var(--amd-gold);
-  color: var(--amd-gold-soft);
+  color: var(--amd-gold-ink-deep);
+}
+
+@media (min-width: 900px) {
+  .about-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 4rem;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 899px) {
+  /* Apilado: texto primero, foto después — se lee antes de mirar. */
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .about-copy {
+    order: 1;
+    max-width: none;
+  }
+
+  /* Apilado no hay fila que estirar: se recupera una relación fija */
+  .about-visual {
+    order: 2;
+    max-width: 30rem;
+    align-self: auto;
+    margin-block: 0;
+    min-height: 0;
+  }
+
+  .about-visual img {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

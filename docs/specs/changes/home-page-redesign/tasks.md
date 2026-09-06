@@ -483,9 +483,12 @@ y sus tests de contenido. `g*Sum` y `g*Body` **se conservan**: el ledger las reu
 
 ## T008 — `AboutTeaserSection` → Manifiesto claro
 
-- **Status:** [ ]
+- **Status:** [x] PASS (2 rondas · 2026-09-06)
 - **Depends on:** T001
-- **Directory boundary:** `client/src/app/features/home/about-teaser/`
+- **Directory boundary:** `client/src/app/features/home/about-teaser/` y
+  **`client/src/assets/i18n/`** (ampliado 2026-09-06 — **cuarta reincidencia de KZ-005**: la tarea
+  mete una imagen, que necesita `alt`, y el fichero que edita ya arrastra un literal español
+  hardcodeado, `<figcaption>Cali · Colombia</figcaption>`. Ambos son copy y viven en los diccionarios)
 - **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
 - **Requirements:** REQ-004, REQ-001 (tono de la sección), **REQ-009 escenario "acento legible
   sobre papel"** (añadido en la Pivot T001: la sección pasa a clara, así que su acento dorado cambia
@@ -513,6 +516,8 @@ El alto de la imagen deriva del texto (`align-self: stretch` + `height: 100%`). 
 - El CTA a `/about-us` sigue presente con su `routerLink`
 - **Reparto de dorado (REQ-009).** Aserto sobre el texto del CSS: ningún `var(--amd-gold)` ni
   `var(--amd-gold-soft)` como `color:` en la sección; el acento resuelve a un token de tinta.
+- **Cero literales de copy en la plantilla** (REQ-011). Incluye el `alt` de la imagen nueva y el
+  `<figcaption>`, que hoy dice `Cali · Colombia` en duro.
 
 - **Verification:** `cd client && npm run test:agent -- --include="src/app/features/home/about-teaser/**/*.spec.ts"`
 - **Falsable con:** quitar `.section--light` → el test debe FALLAR (y con él, la inversión del nav
@@ -522,10 +527,11 @@ El alto de la imagen deriva del texto (`align-self: stretch` + `height: 100%`). 
 
 ### Done when
 
-- [ ] Sección clara con `.section--light`
-- [ ] `--amd-gold-soft` retirado como color de texto; acento en token de tinta
-- [ ] Imagen con alto derivado del texto, sin `aspect-ratio`
-- [ ] CTA a `/about-us` intacto
+- [x] Sección clara (`--amd-surface`, igual que el mockup) con `.section--light`
+- [x] `--amd-gold-soft` retirado como color de texto; acento en `--amd-gold-ink-deep`
+- [x] Imagen con alto derivado del texto **a ≥ 900 px**, sin `aspect-ratio` en la regla base. **Corregido en ronda 2:** por debajo de 900 px sí lleva `aspect-ratio: 4/3` con `height: auto`, como el mockup — apilado no hay fila que estirar (ver `execution.md`)
+- [x] CTA a `/about-us` intacto
+- [x] `aboutFigureAlt` y `aboutFigureCaption` en ES y EN; `Cali · Colombia` eliminado
 
 ---
 

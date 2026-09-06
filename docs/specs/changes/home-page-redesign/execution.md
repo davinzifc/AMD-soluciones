@@ -778,3 +778,111 @@ habría convertido una afirmación no verificada del spec en evidencia.
    tocarlo. Dueña natural: T013 (docs) o una tarea de seguimiento.
 2. `ledger-section.ts:57` («Replaces `ServicesRoadSection`») y `:215` (paridad de patrón) se
    conservan a propósito: describen correctamente el origen del componente y siguen siendo ciertos.
+
+---
+
+## T008 — `AboutTeaserSection` → Manifiesto claro · **PASS** (2 rondas · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high`. **Leader/Reviewer:** Claude Code.
+
+### Decisión de modelo (HITL 2026-09-06)
+
+Se evaluó subir el Implementer a `gemini-3.1-pro-high`. **Se mantiene Flash**, y el motivo es el
+dato, no la preferencia: de los dos FAIL observados hasta ese punto (T004 y T006), **los dos
+trazaban al brief del Leader**, no a la capacidad del worker — en T004 el brief pedía literalmente
+`toBe(9)` y no la identidad de las anclas; en T006 exigía una invariante que no aplicaba al elemento.
+La tarea que mejor preparé (T007) cerró **a la primera**. La correlación está con la precisión del
+brief. Se adoptaron en cambio **dos cambios permanentes de brief**:
+
+1. **Declarar el requisito que el test debe guardar, no el aserto a escribir.** «`toBe(9)`» es una
+   instrucción; «un aserto que no distinga *cuáles* son las anclas no guarda el requisito» es lo que
+   evita el defecto.
+2. **Licencia explícita de rechazo.** Si algo del brief contradice la spec o no aplica, el worker
+   para y lo dice; señalarlo cuenta como trabajo hecho. Es lo que faltó en T006, donde el worker
+   añadió CSS muerto antes que discutir el brief.
+
+### Cuarta reincidencia de KZ-005, corregida antes de despachar
+
+El boundary de T008 era sólo `about-teaser/`. Pero la tarea mete una imagen —que necesita `alt`— y
+el fichero que edita ya arrastraba **`<figcaption>Cali · Colombia</figcaption>`** en duro, una
+violación preexistente de REQ-011. Ambos son copy. Boundary ampliado a `client/src/assets/i18n/` y
+Done-when nuevo exigiendo `alt` y `figcaption` por clave en los dos idiomas.
+
+### Alcance acotado a la baja, a propósito
+
+El mockup trae para `#sobre-amd` un eyebrow, una cita grande y **tres pilares** (Cercanía,
+Cumplimiento, Claridad). **Ninguna tarea del plan los pide**: REQ-004 (escenario único), `design.md`
+§5.5 y el Scope de T008 coinciden los tres en lo estrecho — clara, imagen, dorado, CTA. El brief se
+lo prohibió explícitamente y el worker **respetó el acotado**.
+
+> **Abierto para HITL, no bloquea.** La *descripción* de REQ-004 dice «fusionar el manifiesto y el
+> teaser de Nosotros». Lo entregado es el teaser actual en claro y con foto: la cita y los pilares no
+> los porta ninguna tarea. O se añaden como tarea nueva, o se baja la descripción de REQ-004 a lo que
+> el código hace. Hoy el requisito afirma más de lo que se entrega.
+
+### Ronda 1 — FAIL: un test que prohíbe de más y bloquea su propio arreglo
+
+El worker escribió `expect(cleanCss).not.toMatch(/aspect-ratio/)` — prohibición **en todo el
+fichero**. REQ-004 no dice eso: su escenario abre con `GIVEN la sección #sobre-amd en >= 901 px`, y
+la prohibición está acotada a ese ancho por una razón concreta — ahí figura y texto son dos columnas
+de la misma fila, así que un `aspect-ratio` haría que la foto impusiera el alto sobre el texto. Por
+debajo **no hay fila que estirar** y el argumento desaparece.
+
+**El aserto tapaba una omisión real.** El bloque de apilado del mockup (`home-redesign.css`,
+`@media (max-width: 960px)`) no se había portado, así que por debajo de 900 px la figura conservaba
+del bloque base `align-self: stretch` y `min-height: 17rem` y quedaba **clavada en 17 rem sea cual
+sea el ancho** — a 768 px, una tira de ~704×272 (letterbox 2.6:1). Y la foto iba **antes** del texto
+en el DOM, al revés de la decisión del mockup («se lee antes de mirar»).
+
+Mismo modo de fallo que T004: **un aserto verde que asegura algo distinto de lo que dice**, con el
+agravante de que aquí además **impedía escribir el CSS correcto** — quien intentara arreglarlo vería
+fallar un test que parece guardar el requisito.
+
+### Ronda 2 — PASS
+
+- Test partido por `@media`: sin `aspect-ratio` en la regla base; **con** `aspect-ratio: 4/3`
+  acompañado de `height: auto` dentro del bloque de apilado.
+- Bloque de apilado portado a `@media (max-width: 899px)` —complementario exacto del
+  `min-width: 900px` que ya tenía el fichero, sin hueco—: `.about-copy { order: 1 }`,
+  `.about-visual { order: 2; max-width: 30rem; align-self: auto; margin-block: 0; min-height: 0 }`,
+  `img { height: auto; aspect-ratio: 4/3 }`.
+- Test nuevo del **orden de lectura** apilado, que compara los `order` numéricos.
+
+**`height: auto` no es decorativo ahí.** El `<img>` lleva `width="1600" height="1067"`, y un `<img>`
+con esos atributos **ignora `aspect-ratio`** salvo que el CSS declare `height: auto`. Sin esa línea
+la relación fija no hace nada y el fallo es **silencioso**. Ésta es la invariante 3 de `design.md`
+§5.1 en el único sitio de la Home donde de verdad gobierna — la misma que en T006 se retiró del
+ledger por inaplicable.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+- `npm run test:agent`: **30 ficheros · 267 tests** verde (259 → 267, +8)
+- `npm run lint -- --quiet`: limpio · `npm run build`: 452.22 kB inicial
+
+### Mutaciones — cinco, tres de ellas de la ronda 2
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Quitar `.section--light` de la raíz | FALLA |
+| 2 | Acento de vuelta a `var(--amd-gold-soft)` | FALLA (caen 2 tests) |
+| 3 | Quitar `height: auto` del `<img>` apilado | **FALLA** — guarda la parte que hace funcionar la relación fija |
+| 4 | `aspect-ratio` en la regla **base** de la figura | FALLA |
+| 5 | Invertir el `order` (foto antes que texto) | FALLA |
+
+Las 3, 4 y 5 las corrió el Reviewer tras la ronda 2.
+
+### PENDIENTE DE T012
+
+jsdom **no aplica media queries ni calcula layout ni evalúa contraste**. Los asertos de esta tarea
+son sobre el **texto del CSS** y el **orden del DOM**, que es el techo de este runner. Quedan sin
+probar: que el fondo se vea claro, que el contraste real dé los ratios sobre `--amd-surface`, que a
+768 px la foto salga en 4:3 y que el texto se lea antes de la foto.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **`margin-block: -1.75rem` del mockup no se portó.** Es el gesto de «la foto un poco más alta que
+   el texto» en el layout de dos columnas. No lo pide ningún requisito y no afecta a REQ-004; queda
+   como diferencia visual deliberada frente al mockup, a decidir en la revisión HITL de T012.
+2. `figcaption` usa `color: #ffffff` y `text-shadow` con rgba literales. **Es el valor del mockup**
+   (`home-redesign.css`, `.about__figure figcaption`), no una invención del worker, y el único gate
+   de hardcodes vigente cubre los dos dorados de tinta. Se deja como está.
