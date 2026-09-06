@@ -125,4 +125,63 @@ describe('TopNav', () => {
     expect(drawerState.isOpen()).toBe(true);
     expect(menuBtn.getAttribute('aria-expanded')).toBe('true');
   });
+
+  it('stays isOnLight() === false on deep pages (e.g. /about-us) even if .section--light elements exist in DOM', () => {
+    const { fixture } = setup();
+    const mockAboutSection = document.createElement('section');
+    mockAboutSection.id = 'about-story';
+    mockAboutSection.className = 'section--light';
+    vi.spyOn(mockAboutSection, 'getBoundingClientRect').mockReturnValue({
+      top: 0,
+      bottom: 500,
+      height: 500,
+      width: 1000,
+      left: 0,
+      right: 1000,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    document.body.appendChild(mockAboutSection);
+
+    try {
+      fixture.componentInstance.updateScrollSpy();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.isOnLight()).toBe(false);
+      expect(fixture.nativeElement.querySelector('.topnav')?.classList.contains('on-light')).toBe(false);
+    } finally {
+      mockAboutSection.remove();
+    }
+  });
+
+  it('activates isOnLight() === true when a Home section in SECTION_ANCHOR_IDS with .section--light is active', () => {
+    const { fixture } = setup();
+    const mockCifrasSection = document.createElement('section');
+    mockCifrasSection.id = 'cifras';
+    mockCifrasSection.className = 'section--light';
+    vi.spyOn(mockCifrasSection, 'getBoundingClientRect').mockReturnValue({
+      top: 0,
+      bottom: 500,
+      height: 500,
+      width: 1000,
+      left: 0,
+      right: 1000,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    document.body.appendChild(mockCifrasSection);
+
+    try {
+      fixture.componentInstance.updateScrollSpy();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.isOnLight()).toBe(true);
+      expect(fixture.nativeElement.querySelector('.topnav')?.classList.contains('on-light')).toBe(true);
+    } finally {
+      mockCifrasSection.remove();
+    }
+  });
 });
+
+
+

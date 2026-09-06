@@ -179,3 +179,50 @@
     display: none;
   }
 }
+
+/* Chrome inversion over light sections (DD-030 · REQ-008 · mockup parity) */
+.topnav.on-light {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+}
+
+.topnav.on-light .brand {
+  color: var(--amd-ink, #0d141a);
+}
+
+.topnav.on-light .brand__text span {
+  color: var(--amd-slate, #475569);
+}
+
+.topnav.on-light .topnav__links {
+  color: var(--amd-slate, #475569);
+}
+
+.topnav.on-light .topnav__links a:hover,
+.topnav.on-light .topnav__links a.is-active {
+  color: var(--amd-ink, #0d141a);
+}
+
+.topnav.on-light .topnav__links a.is-active {
+  box-shadow: inset 0 -2px 0 var(--amd-gold-ink);
+}
+
+.topnav.on-light .lang {
+  border-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.topnav.on-light .lang button {
+  color: var(--amd-slate, #475569);
+}
+
+.topnav.on-light .lang button[aria-pressed='true'] {
+  background: rgba(207, 187, 102, 0.24);
+  color: var(--amd-gold-ink-deep);
+}
+
+.topnav.on-light .menu-btn {
+  border-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--amd-ink, #0d141a);
+}

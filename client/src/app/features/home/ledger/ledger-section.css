@@ -1,0 +1,4 @@
+/* Minimal scaffold for LedgerSection (T005) - complete visual styling is scoped to T006 */
+:host {
+  display: block;
+}

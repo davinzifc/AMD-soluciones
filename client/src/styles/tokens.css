@@ -8,6 +8,8 @@
   /* Color — brand */
   --amd-gold: #CFBB66;
   --amd-gold-soft: #E5D59A;
+  --amd-gold-ink: #8a7a2e;       /* 3.86:1 sobre mist — relleno y texto GRANDE (>=24px, o >=18.66px bold) */
+  --amd-gold-ink-deep: #6f6224;  /* 5.49:1 sobre mist — texto NORMAL sobre claro */
 
   /* Color — ink / neutrals */
   --amd-ink: #0D141A;

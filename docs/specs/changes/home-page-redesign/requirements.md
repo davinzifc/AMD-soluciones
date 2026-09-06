@@ -428,31 +428,55 @@ BUT it must NOT decidirse el tema de ambos midiendo un único punto común
 
 - **Persona:** todos, y especialmente baja visión
 - **Descripción:** Sobre fondos claros el dorado `--amd-gold` SHALL usarse únicamente como
-  relleno; el texto de acento SHALL usar un dorado oscurecido que cumpla contraste.
+  relleno; el texto de acento SHALL usar un dorado oscurecido que cumpla contraste **al tamaño al
+  que realmente se renderiza**.
 - **Contexto medido:** `#CFBB66` da **1.73:1** sobre `--amd-mist` y **1.92:1** sobre
   `--amd-surface` — reprueba WCAG AA incluso en texto grande (mínimo 3:1). Sobre `--amd-ink` da
   9.68:1 y se conserva sin cambios.
+- **Corregido 2026-09-06 (Pivot T001).** Un solo dorado de tinta **no basta**. `#8a7a2e` da
+  **3.86:1** sobre mist: alcanza el piso de texto grande pero no el de texto normal, y los usos
+  reales del acento sobre papel son casi todos texto pequeño — eyebrow 12px normal, "Más info"
+  14.4px bold, contador 18.4px bold, ordinal 18.4px por debajo de 900px. Ninguno llega al piso de
+  texto grande (24px normal / 18.66px bold). Hacen falta **dos** tokens, y los dos ya existían en
+  el mockup sin tokenizar: `#8a7a2e` y `#6f6224` (**5.49:1** sobre mist).
 
 **Scenario: acento legible sobre papel**
 
 ```text
 GIVEN cualquier texto de acento sobre un fondo claro de la Home
-WHEN se mide su contraste contra el fondo
+WHEN se mide su contraste contra el fondo, al tamaño y peso con que se renderiza
 THEN MUST ser >= 4.5:1 para texto normal y >= 3:1 para texto grande
-AND IT MUST usarse el token `--amd-gold-ink` para ese texto
-BUT it must NOT usarse `--amd-gold` como color de texto sobre `--amd-mist` ni `--amd-surface`
+AND IT MUST usarse `--amd-gold-ink-deep` cuando el texto NO alcanza el piso de texto grande
+  (< 24px normal, o < 18.66px en negrita)
+AND IT MUST usarse `--amd-gold-ink` cuando SÍ lo alcanza
+BUT it must NOT usarse `--amd-gold` **ni `--amd-gold-soft`** como color de texto sobre
+  `--amd-mist` ni `--amd-surface` — `#E5D59A` da **1.32:1**, peor aún que `#CFBB66`
+  (**corregido 2026-09-06**: la prohibición original nombraba sólo `--amd-gold`, y `--amd-gold-soft`
+  se usa hoy como color de texto en secciones que este spec vuelve claras: `about-teaser`, `trust`
+  y el `TopNav` invertido)
 AND IT MUST seguir usándose `--amd-gold` como relleno decorativo (spine, subrayado, anillo del
   control de apertura) donde no es texto
+AND IT MUST seguir siendo válido `--amd-gold-ink` como relleno sobre claro, donde no es texto
 ```
+
+**El reparto medido, para que nadie tenga que re-derivarlo.** Con la tipografía aprobada:
+
+| Uso | Tamaño · peso | Piso WCAG | Token |
+|---|---|---|---|
+| `.eyebrow` de sección clara | 12px · normal | 4.5:1 | `--amd-gold-ink-deep` |
+| Enlaces "Más info" del ledger | 14.4px · 700 | 4.5:1 | `--amd-gold-ink-deep` |
+| Contador de servicios (`.line__count b`) | 18.4px · 700 | 4.5:1 | `--amd-gold-ink-deep` |
+| Ordinal activo del ledger, ≥ 900px | 24–38.4px · 600 | 3:1 | `--amd-gold-ink` |
+| Ordinal activo del ledger, < 900px | 18.4px · 600 | 4.5:1 | `--amd-gold-ink-deep` |
 
 **Scenario: el token se declara en la fuente de verdad**
 
 ```text
-GIVEN el token `--amd-gold-ink`
+GIVEN los tokens `--amd-gold-ink` y `--amd-gold-ink-deep`
 WHEN se busca su declaración
-THEN MUST estar en `client/src/styles/tokens.css`
-AND IT MUST estar documentado en `docs/ux-ui/design.md` §7
-BUT it must NOT quedar ningún valor `#8a7a2e` hardcodeado en CSS de componente
+THEN MUST estar los dos en `client/src/styles/tokens.css`
+AND IT MUST estar los dos documentados en `docs/ux-ui/design.md` §7, **con la regla de reparto**
+BUT it must NOT quedar ningún valor `#8a7a2e` ni `#6f6224` hardcodeado en CSS de componente
 ```
 
 ---
@@ -544,7 +568,8 @@ AND IT MUST el conjunto de máscaras de logos pesar <= 200 kB
 GIVEN `docs/ux-ui/design.md` después de implementar este spec
 WHEN se busca la descripción del modelo de navegación, los tokens y el modo oscuro
 THEN §2 y §5 MUST describir el sub-header desde 900 px, no un sidenav de puntos >= 1100 px
-AND IT MUST §7 declarar el token `--amd-gold-ink` con su regla de uso
+AND IT MUST §7 declarar los tokens `--amd-gold-ink` y `--amd-gold-ink-deep` con su regla de
+  reparto por tamaño, no sólo sus valores
 AND IT MUST §11 describir el ritmo claro dominante, no "dark premium con secciones light
   intercaladas"
 BUT it must NOT quedar ninguna referencia al rail lateral en la baseline
@@ -619,7 +644,7 @@ revisión HITL.
 | REQ-006 | §4 Confianza | §4 `landing/trust` | Retira la auto-rotación |
 | REQ-007 | §8 Component inventory | §3 Accessibility | Componente nuevo |
 | REQ-008 | **§2, §5** | §8 | **Supersede** el sidenav de puntos |
-| REQ-009 | **§7 Tokens**, §10 | §3 Accessibility | Token nuevo `--amd-gold-ink` |
+| REQ-009 | **§7 Tokens**, §10 | §3 Accessibility | Tokens nuevos `--amd-gold-ink` y `--amd-gold-ink-deep`, con su regla de reparto |
 | REQ-010 | §10 | §3 Accessibility | |
 | REQ-011 | §1 principio 6 | §13 punto 5 | |
 | REQ-012 | §9 Responsive | §3 | |

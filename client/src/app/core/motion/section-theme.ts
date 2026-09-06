@@ -13,6 +13,8 @@ export interface SectionTone {
  * - Inclusive boundaries: matches if `y >= section.top && y <= section.bottom`.
  * - Last match wins: when sections touch at an exact boundary or overlap, the later
  *   section in DOM/iteration order is returned.
+ * - Viewport-relative contract: coordinates (`top`, `bottom`, and probe `y`) MUST be
+ *   viewport-relative (e.g. from `getBoundingClientRect()`), never document `offsetTop`.
  * - Returns `null` if `y` falls outside all sections or if `sections` is empty.
  */
 export function probeSectionThemeAt(

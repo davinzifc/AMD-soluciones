@@ -25,9 +25,9 @@ intencional. T011 sí va filtrada: su Evidence disqualifier sólo exige que el r
 
 ---
 
-## T001 — Token `--amd-gold-ink` y assets de medios
+## T001 — Tokens de dorado sobre claro y assets de medios
 
-- **Status:** [ ]
+- **Status:** [x] — cerrada en el intento 3 tras la Pivot T001 (HITL: opción A, dos tokens).
 - **Depends on:** none
 - **Directory boundary:** `client/src/styles/`, `client/public/media/`
 - **Recommended skills:** `ui-ux-pro-max`
@@ -36,7 +36,14 @@ intencional. T011 sí va filtrada: su Evidence disqualifier sólo exige que el r
 
 ### Scope
 
-Declarar `--amd-gold-ink: #8a7a2e` en `client/src/styles/tokens.css`. Copiar desde
+Declarar **dos** tokens en `client/src/styles/tokens.css`, junto al resto de los de marca:
+
+    --amd-gold-ink: #8a7a2e;       /* 3.86:1 sobre mist — relleno y texto GRANDE sobre claro */
+    --amd-gold-ink-deep: #6f6224;  /* 5.49:1 sobre mist — texto NORMAL sobre claro */
+
+Ninguno es un color nuevo: `#8a7a2e` ya estaba suelto en `.eyebrow--ink` del mockup y `#6f6224` en
+`home-redesign.css:187` y `:273`. La regla de reparto y el cuadro de qué uso lleva cuál están en
+`requirements.md` → REQ-009, escenario "acento legible sobre papel". Copiar desde
 `docs/specs/changes/home-page-redesign/mockup/assets/` a `client/public/media/`: las 5 fotos de
 línea, la foto del manifiesto, el póster, `manifiesto.mp4` y las 13 máscaras de logo a
 `client/public/media/logos/`. Copiar también `prepare-logos.py` junto a las máscaras: sin el
@@ -44,22 +51,34 @@ script, añadir un cliente obliga a reconstruir a mano la política de máscara.
 
 ### Tests
 
-- Test unitario de contraste sobre los tokens: `--amd-gold-ink` sobre `--amd-mist` **≥ 4.5:1**, y
-  `--amd-gold` sobre `--amd-mist` **< 3:1** — el segundo aserto documenta por qué existe el primero.
-- Aserto de que `#8a7a2e` no aparece hardcodeado en ningún CSS de componente.
+Test unitario de contraste, leyendo los valores **parseados desde `tokens.css`**, nunca de
+literales copiados en el test. Los tres asertos, con su razón de ser:
+
+| Par | Umbral | Mide | Por qué está |
+|---|---|---|---|
+| `--amd-gold-ink-deep` / `--amd-mist` | **≥ 4.5:1** | 5.49:1 | Es el token de texto normal: si no pasa 4.5:1 no sirve para nada |
+| `--amd-gold-ink` / `--amd-mist` | **≥ 3:1** y **< 4.5:1** | 3.86:1 | La cota superior es la que importa: **pinea que este token NO vale para texto normal**. Sin ella, alguien lo sube algún día y el reparto de REQ-009 se disuelve sin que falle nada |
+| `--amd-gold` / `--amd-mist` | **< 3:1** | 1.73:1 | Reprueba incluso el nivel de texto grande. Documenta por qué existen los otros dos |
+
+- Aserto de que **ni `#8a7a2e` ni `#6f6224`** aparecen hardcodeados en ningún CSS de componente.
+- **KZ-nuevo (advisory del Reviewer, aplicado):** la cabecera del fichero de test no puede afirmar
+  un umbral distinto del que asevera el código. En el intento 1 decía `>= 3.5:1` con un aserto de
+  `>= 3.0`; ese `3.5` no salía de ninguna fuente del spec.
 
 - **Verification:** `cd client && npm run test:agent && npm run build`
-- **Falsable con:** cambiar `--amd-gold-ink` a `#cfbb66` → el test de contraste debe FALLAR. Si no
+- **Falsable con:** cambiar `--amd-gold-ink-deep` a `#8a7a2e` → el aserto de ≥ 4.5:1 debe FALLAR
+  (3.86 < 4.5). Y cambiar `--amd-gold-ink` a `#cfbb66` → su aserto de ≥ 3:1 debe FALLAR. Si no
   falla, el test no está midiendo el token sino un literal.
 - **Evidence disqualifier:** que el build pase **no** prueba que los assets se sirvan; sólo que
   compilan. La ruta real se verifica en T012.
 
 ### Done when
 
-- [ ] `--amd-gold-ink` declarado junto al resto de tokens de marca
-- [ ] `client/public/media/` con 8 imágenes, 1 video y `logos/` con 13 máscaras + el script
-- [ ] Test de contraste en verde y falsable
-- [ ] `npm run build` sin exceder los budgets de `angular.json`
+- [x] `--amd-gold-ink` y `--amd-gold-ink-deep` declarados junto al resto de tokens de marca
+- [x] `client/public/media/` con 7 imágenes, 1 video y `logos/` con 13 máscaras + el script
+- [x] Los tres asertos de contraste en verde y falsables, incluida la **cota superior** de `--amd-gold-ink`
+- [x] Cabecera del fichero de test coherente con los umbrales que asevera
+- [x] `npm run build` sin exceder los budgets de `angular.json`
 
 ---
 
@@ -105,9 +124,13 @@ hace la lógica verificable en jsdom.
 
 ## T003 — `SectionNav` sustituye a `HomeSideNav`
 
-- **Status:** [ ]
+- **Status:** [x] — cerrada en el intento 3 (i18n real, offset recalculado, fallback eliminado)
 - **Depends on:** T002
-- **Directory boundary:** `client/src/app/core/layout/`, `client/src/app/app.{ts,html,spec.ts}`
+- **Directory boundary:** `client/src/app/core/layout/`, `client/src/app/app.{ts,html,spec.ts}`,
+  **`client/src/assets/i18n/`** y **`client/src/app/app.config.ts`** (ampliado 2026-09-06 por el
+  mismo principio que en T005: quien escribe el copy crea sus claves, y quien crea una barra fija
+  arregla el offset de anclaje que esa barra invalida. Ojo: T004 también toca los diccionarios —
+  las dos tareas se serializan)
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Requirements:** REQ-008 escenarios "nunca dos índices", "aparece al salir del hero",
   "dice en qué sección estás", "oculto significa no tabulable", "el chrome se invierte"
@@ -130,6 +153,25 @@ queda vacío: **se reescribe contra `SectionNav` o se borra, no se deja en verde
 **KZ-002:** la visibilidad por ancho va en media query del CSS del componente. Un selector
 `body`/`html` nunca casa bajo la encapsulación de Angular.
 
+**i18n del sub-header: claves reales, sin red de seguridad.** Las seis etiquetas y el `aria-label`
+van a los **dos** diccionarios con paridad ES/EN. Cuatro claves ya existen (`navServices`,
+`navAbout`, `navTrust`, `navContact`); faltan la de Inicio, la de Cifras y la del `aria-label`.
+
+> ⚠ **Prohibido el patrón `translated !== key ? translated : '<literal español>'`.** Que una clave
+> ausente se renderice **como la clave** es la propiedad que hace visible el defecto; un fallback en
+> español lo vuelve **indetectable para siempre**, porque la clave cruda nunca llega a pantalla y lo
+> que ve un visitante EN es texto en español. Es el mismo defecto que REQ-011 ya señala en
+> `testimonialLabel()`. Tampoco se declaran esas claves en el `fakeLocaleService` de un test
+> mientras no existan en los diccionarios: eso deja el test verde afirmando sobre un mundo que no
+> existe, y ni el gate de paridad ES/EN ni `i18n-values-gate` pueden verlo.
+
+**El offset de anclaje deja de servir en cuanto existe el sub-header.** `app.config.ts` fija
+`ViewportScroller.setOffset()` en `72 + 1.5rem = 96px`, pero el sub-header ocupa de 68 a **112 px**:
+toda sección enlazada aterriza 16 px **por debajo** de la barra. Y no es hipotético para los enlaces
+del propio `SectionNav`, que sólo se pueden activar cuando la barra ya está visible. Recalcular el
+offset contando el sub-header cuando corresponda, y **re-basar el `1099` al breakpoint de 900 px**:
+ese 1099 era el umbral del rail que DD-029 acaba de retirar.
+
 ### Tests
 
 - `SectionNav` monta en `/` y **no** en `/about-us` ni `/services`
@@ -138,6 +180,12 @@ queda vacío: **se reescribe contra `SectionNav` o se borra, no se deja en verde
 - `aria-current` sobre la sección activa y sólo sobre ella; cambia al cambiar la sección activa
 - Con secciones simuladas claras y oscuras, `TopNav` y `SectionNav` resuelven tema **por separado**
 - **KZ-004:** aserto de ancestría — el host de `SectionNav` contiene realmente los seis enlaces
+- **REQ-011:** toda clave que use el sub-header existe en `es.json` **y** `en.json`. Ningún literal
+  de copy en el código ni fallback en español.
+- El sub-header **vuelve a ocultarse** al reentrar en el hero (la mitad no probada del escenario
+  "aparece al salir del hero")
+- Scroll-spy en la **última** sección (`contacto`), que es donde el bucle "última coincidencia gana"
+  se comporta distinto
 
 - **Verification:** `cd client && npm run test:agent && npm run lint -- --quiet`
 - **Falsable con:** ocultar el `SectionNav` con `opacity: 0` en vez de retirarlo del flujo → el test
@@ -148,11 +196,14 @@ queda vacío: **se reescribe contra `SectionNav` o se borra, no se deja en verde
 
 ### Done when
 
-- [ ] `section-nav/` creado con test propio; `home-side-nav/` borrado por completo
-- [ ] `body.has-side-nav` fuera de `app.ts`; `isHomeRoute()` intacto
-- [ ] `app.spec.ts` y `about-page.spec.ts` reescritos — ningún test conservado en falso verde
-- [ ] Un solo índice de secciones a 375/768/900/1200/1600 px (lo mide T012)
-- [ ] Suite completa compila y pasa
+- [x] Claves del sub-header en ES y EN, sin fallback en español
+- [x] Offset de anclaje recalculado con el sub-header, y el `1099` re-basado a 900
+
+- [x] `section-nav/` creado con test propio; `home-side-nav/` borrado por completo
+- [x] `body.has-side-nav` fuera de `app.ts`; `isHomeRoute()` intacto
+- [x] `app.spec.ts` y `about-page.spec.ts` reescritos — ningún test conservado en falso verde
+- [x] Un solo índice de secciones a 375/768/900/1200/1600 px (lo mide T012)
+- [x] Suite completa compila y pasa
 
 ---
 
@@ -172,6 +223,21 @@ queda vacío: **se reescribe contra `SectionNav` o se borra, no se deja en verde
 `'Manifiesto'` / `'Manifesto'`. Hoy `navServices` y `navServicesPage` **valen ambas `'Servicios'`**:
 el panel de hamburguesa muestra la misma etiqueta dos veces, lo que ya viola REQ-008 en < 900 px.
 
+> ⚠ **Segunda colisión, sólo en EN — descubierta al cerrar T003 (2026-09-06).** T003 creó
+> `navSectionInicio`, heredando su valor de `sideHome`. Resultado en los diccionarios de hoy:
+>
+> | Menú de páginas | Índice de secciones | ES | EN |
+> |---|---|---|---|
+> | `navHome` = "Home" | `navSectionInicio` = "Inicio" / **"Home"** | limpio | **choca** |
+> | `navServicesPage` = "Services" | `navServices` = "Services" | choca | **choca** |
+>
+> La segunda la arregla el renombrado de arriba. **La primera no la cubre nadie**, y sin ella el
+> test de no-repetición de esta tarea **no puede pasar en EN** — el propio test que la tarea exige
+> escribir. Dale a `navSectionInicio` un valor EN distinto de "Home" (p. ej. "Top" o "Start"); el ES
+> ya está bien. Es un caso ejemplar de por qué el test de no-repetición debe comparar **valores**,
+> no claves: con claves distintas y valores iguales, un test de claves pasa y el usuario ve dos
+> "Home" en el mismo menú.
+
 Añadir `#cifras` al panel (pasa de 7 a 8 enlaces — `mobile-drawer.spec.ts:50` tiene una cuenta
 rígida `toBe(7)` que hay que actualizar, no eliminar). Retirar `sideHome` y `sideNavAria` de ambos
 diccionarios: mueren con el rail.
@@ -179,20 +245,24 @@ diccionarios: mueren con el rail.
 ### Tests
 
 - Test de **no repetición**: el conjunto de etiquetas de página y el de sección son disjuntos, en
-  ES y en EN
+  ES y en EN. **Compara valores traducidos, nunca nombres de clave** — ver el aviso del Scope: hoy
+  hay dos pares con clave distinta y valor idéntico.
 - El panel lista las **seis** anclas de la Home, `#cifras` incluida
 - Paridad de claves ES/EN (el test existente debe seguir en verde tras añadir y quitar claves)
 - Ninguna clave retirada queda referenciada en plantilla ni en código
 
 - **Verification:** `cd client && npm run test:agent`
 - **Falsable con:** devolver `navServices` a `'Servicios'` → el test de no-repetición debe FALLAR.
-  Si pasa, sólo está comparando claves y no valores.
+  Si pasa, sólo está comparando claves y no valores. **Segunda mutación, obligatoria:** devolver
+  `navSectionInicio` en `en.json` a `"Home"` → el test debe FALLAR **en la comprobación del inglés**.
+  Si sólo falla en español, el test no está barriendo los dos idiomas.
 - **Evidence disqualifier:** el test de paridad ES/EN **no** detecta claves huérfanas (sólo compara
   los dos conjuntos entre sí). La huerfanía necesita su propio aserto.
 
 ### Done when
 
-- [ ] Etiquetas de sección y de página disjuntas en los dos idiomas
+- [ ] Etiquetas de sección y de página disjuntas en los dos idiomas, **verificado por valor**
+- [ ] `navSectionInicio` con un valor EN distinto de "Home"
 - [ ] Ocho enlaces en el panel; cuenta del spec actualizada
 - [ ] `sideHome` y `sideNavAria` fuera de ambos diccionarios y sin referencias
 
@@ -200,12 +270,16 @@ diccionarios: mueren con el rail.
 
 ## T005 — `LedgerSection`: datos, plantilla y acordeón
 
-- **Status:** [ ]
+- **Status:** [x] — cerrada en el intento 3 (falsabilidad de los tests de copy y de emparejamiento)
 - **Depends on:** T001
-- **Directory boundary:** `client/src/app/features/home/ledger/`
+- **Directory boundary:** `client/src/app/features/home/ledger/` **y `client/src/assets/i18n/`**
+  (ampliado 2026-09-06: la plantilla del ledger estrena copy, y las claves las tiene que crear quien
+  escribe la plantilla. Dejárselas a T004 abre una ventana en la que el ledger renderiza español en
+  duro y nada falla). **Ojo: T004 también edita los diccionarios — las dos tareas se serializan.**
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Requirements:** REQ-002 escenarios "anatomía de una fila", "acordeón exclusivo", "contador de
-  escala"; REQ-003 escenario "Más info sigue llevando al capítulo correcto"
+  escala"; REQ-003 escenario "Más info sigue llevando al capítulo correcto"; **REQ-011** (copy
+  traducido, sin literales en plantilla)
 - **Design refs:** DD-035, §5.1
 
 ### Scope
@@ -220,6 +294,20 @@ que "Más info" navegue sin alternar. Raíz `<section id="servicios" class="… 
 
 **No se monta todavía** — el cambio de `HomePage` es T007.
 
+**Copy del ledger: claves nuevas, cero literales.** El encabezado, el CTA agregado y el sustantivo
+del contador son copy nuevo y van a los **dos** diccionarios con paridad ES/EN. En particular:
+
+- El CTA agregado ("Ver los 31 servicios") **no puede llevar el 31 en duro**: es exactamente el
+  literal que DD-035 existe para evitar. Se deriva con `SERVICE_GROUPS.reduce(…)` y se interpola en
+  la clave, como ya hace `svcShowMore` con su marcador. `ServicesPage` ya deriva ese total
+  (`services-page.ts:58`, `totalServices`) — misma fuente, mismo número.
+- El sustantivo del contador va traducido: con `servicios` en duro, la versión EN renderiza
+  "16 servicios".
+- **`roadHint` NO se reutiliza.** Su texto habla de *nodos* del camino que este spec borra, y T007
+  tiene en su Done-when "`roadHint` fuera": si el ledger depende de esa clave, T007 no puede cumplir
+  su tarea sin dejar el ledger mudo, y nada falla al hacerlo. Crear `ledgerHint` con el copy del
+  mockup (`mockup/index.html:252`).
+
 ### Tests
 
 Los tres primeros son **gates declarados de requisitos archivados y cerrados** (spec de `/services`,
@@ -232,6 +320,11 @@ DC-4) que hoy viven en `services-road-section.spec.ts` y que T007 borra. Reimpla
 - Reactivar la fila abierta la cierra (estado "ninguna abierta")
 - El contador de Contabilidad es 16 **derivado**, no literal
 - La Home **no** vuelca el catálogo de sub-servicios (guard contra `subC01t`)
+- **REQ-011:** ningún literal de copy en la plantilla. Aserto sobre el texto de
+  `ledger-section.html`: no aparece ninguna palabra en español fuera de un `| localize`.
+- **El total del CTA es derivado**, no literal: cambiar `subs` de cualquier grupo debe cambiarlo
+- `roadHint` **no** aparece en la plantilla del ledger
+- Paridad ES/EN de las claves nuevas (la cubre `i18n-key-parity.spec.ts`, que ya existe)
 
 - **Verification:** `cd client && npm run test:agent -- --include="src/app/features/home/ledger/**/*.spec.ts"`
 - **Falsable con:** añadir un sexto id a `SERVICE_GROUPS` → el test de los cinco ids debe FALLAR.
@@ -241,10 +334,13 @@ DC-4) que hoy viven en `services-road-section.spec.ts` y que T007 borra. Reimpla
 
 ### Done when
 
-- [ ] Cinco filas derivadas de `SERVICE_GROUPS`, sin catálogo duplicado
-- [ ] Los tres gates archivados reimplantados y verdes
-- [ ] Acordeón exclusivo con `aria-expanded` sincronizado en las cinco filas
-- [ ] Contador derivado, leído del DOM renderizado
+- [x] Cinco filas derivadas de `SERVICE_GROUPS`, sin catálogo duplicado
+- [x] Cero literales de copy en la plantilla; claves nuevas en ES y EN con paridad
+- [x] Total del CTA derivado, no el literal `31`
+- [x] `ledgerHint` propia; el ledger no depende de `roadHint`
+- [x] Los tres gates archivados reimplantados y verdes
+- [x] Acordeón exclusivo con `aria-expanded` sincronizado en las cinco filas
+- [x] Contador derivado, leído del DOM renderizado
 
 ---
 
@@ -255,12 +351,33 @@ DC-4) que hoy viven en `services-road-section.spec.ts` y que T007 borra. Reimpla
 - **Directory boundary:** `client/src/app/features/home/ledger/`
 - **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
 - **Requirements:** REQ-002 escenarios "revelado de imagen" y "una fila cerrada no es tabulable por
-  dentro"; REQ-010 escenario "recorrido completo por teclado"; REQ-012
-- **Design refs:** DD-036, DD-040, §5.1 "Tres invariantes de CSS"
+  dentro"; REQ-010 escenario "recorrido completo por teclado"; REQ-012; **REQ-009 escenario "acento
+  legible sobre papel"** (añadido en la Pivot T001 — esta es la tarea que *aplica* el reparto)
+- **Design refs:** DD-036, DD-040, **DD-031**, §5.1 "Tres invariantes de CSS"
 
 ### Scope
 
-Portar el CSS del ledger desde `mockup/home-redesign.css` + `home-redesign-claro.css`. Spine con
+Portar el CSS del ledger desde `mockup/home-redesign.css` + `home-redesign-claro.css`.
+
+> ⚠ **El port NO puede ser literal en el color del acento (Pivot T001).** El mockup pinta los cuatro
+> usos con `var(--amd-gold-ink)` (`home-redesign-claro.css:108, 110, 115, 147`), y eso **incumple
+> REQ-009**: `#8a7a2e` da 3.86:1, que sólo basta para texto grande, y tres de esos cuatro usos son
+> texto pequeño. El reparto correcto está en `requirements.md` → REQ-009, cuadro "El reparto medido":
+>
+> | Uso del mockup | Token que va en `client/` |
+> |---|---|
+> | `.ledger .eyebrow` (12px normal) | `--amd-gold-ink-deep` |
+> | `.ledger .linkarrow` "Más info" (14.4px/700) | `--amd-gold-ink-deep` |
+> | `.line__count b` (18.4px/700) | `--amd-gold-ink-deep` |
+> | `.line__ord` activo, **≥ 900px** (24–38.4px) | `--amd-gold-ink` |
+> | `.line__ord` activo, **< 900px** (18.4px) | `--amd-gold-ink-deep` |
+>
+> El ordinal cambia de token en el mismo breakpoint en que cambia de tamaño. `:focus-visible`
+> (`:151`) es contorno, no texto: `--amd-gold-ink` sirve.
+> Y **ningún dorado de marca como texto sobre claro**: ni `--amd-gold` (1.73:1) ni
+> `--amd-gold-soft` (1.32:1).
+
+Spine con
 `onPassiveScroll` (el helper ya existe y lo comparte `hero-section`), al 100 % fijo bajo
 reduced-motion. Marcar el detalle colapsado como **`inert`**.
 
@@ -275,9 +392,18 @@ el contenedor de la foto, la foto termina en el borde del contenido, y `height: 
 - Bajo reduced-motion el spine no sigue el scroll
 - Sin `IntersectionObserver`, todo el contenido queda visible (paridad con el guard que hoy tiene
   `ServicesRoadSection`)
+- **Reparto de dorado (REQ-009).** Aserto sobre el **texto del CSS portado**: eyebrow, "Más info" y
+  contador resuelven a `--amd-gold-ink-deep`; el ordinal a `--amd-gold-ink` en la regla base y a
+  `--amd-gold-ink-deep` en la media query de < 900px. Ningún `var(--amd-gold)` ni
+  `var(--amd-gold-soft)` como `color:` dentro del ledger.
+  **Por qué un aserto sobre el texto y no sobre el render:** jsdom no resuelve variables CSS en
+  cascada, así que el efecto real lo mide T012. Este aserto sólo impide el port literal, que es el
+  modo de fallo concreto — y es exactamente el defecto que la Pivot T001 encontró tarde.
 
 - **Verification:** `cd client && npm run test:agent -- --include="src/app/features/home/ledger/**/*.spec.ts" && npm run build`
 - **Falsable con:** quitar `inert` del detalle colapsado → el test de tabulabilidad debe FALLAR.
+  Y devolver el eyebrow a `var(--amd-gold-ink)` (el valor literal del mockup) → el aserto de reparto
+  debe FALLAR.
 - **Evidence disqualifier:** **jsdom no puede probar el revelado de imagen ni el recorte**: no
   compone `transform` ni mide cajas. Que el CSS esté presente no prueba que la foto no se desborde.
   Esa clase la mide **T012** y la revisa el HITL. No reportar el revelado como cubierto aquí.
@@ -285,6 +411,7 @@ el contenedor de la foto, la foto termina en el borde del contenido, y `height: 
 ### Done when
 
 - [ ] CSS portado; el componente bajo el `maximumError` de 32 kB de `anyComponentStyle`
+- [ ] Reparto de dorado aplicado según el cuadro de arriba, con su aserto en verde y falsable
 - [ ] Colapsado inerte, verificado por orden de foco
 - [ ] Spine estático bajo reduced-motion
 - [ ] Declarado explícitamente en `execution.md` qué queda pendiente de T012
@@ -338,8 +465,10 @@ Actualizar la lista de anclas de `home-page.spec.ts`, a la que le falta `cifras`
 - **Depends on:** T001
 - **Directory boundary:** `client/src/app/features/home/about-teaser/`
 - **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
-- **Requirements:** REQ-004, REQ-001 (tono de la sección)
-- **Design refs:** DD-028, DD-041, §5.5
+- **Requirements:** REQ-004, REQ-001 (tono de la sección), **REQ-009 escenario "acento legible
+  sobre papel"** (añadido en la Pivot T001: la sección pasa a clara, así que su acento dorado cambia
+  de régimen de contraste)
+- **Design refs:** DD-028, DD-041, **DD-031**, §5.5
 
 ### Scope
 
@@ -350,10 +479,18 @@ que cambia de tono. Se conserva el CTA a `/about-us`.
 El alto de la imagen deriva del texto (`align-self: stretch` + `height: 100%`). Devolverle un
 `aspect-ratio` la vuelve a imponer sobre el layout.
 
+> ⚠ **Al volverse clara, el dorado de esta sección cambia de régimen (Pivot T001).**
+> `about-teaser-section.css:126` usa hoy `color: var(--amd-gold-soft)` — **1.32:1 sobre papel**, el
+> peor de la familia. Sobre tinta era legible; sobre claro no. Todo texto de acento de esta sección
+> pasa a `--amd-gold-ink-deep`, salvo que alcance el piso de texto grande (≥24px, o ≥18.66px en
+> negrita), en cuyo caso vale `--amd-gold-ink`. El dorado pleno se queda **sólo como relleno**.
+
 ### Tests
 
 - La sección lleva `.section--light`
 - El CTA a `/about-us` sigue presente con su `routerLink`
+- **Reparto de dorado (REQ-009).** Aserto sobre el texto del CSS: ningún `var(--amd-gold)` ni
+  `var(--amd-gold-soft)` como `color:` en la sección; el acento resuelve a un token de tinta.
 
 - **Verification:** `cd client && npm run test:agent -- --include="src/app/features/home/about-teaser/**/*.spec.ts"`
 - **Falsable con:** quitar `.section--light` → el test debe FALLAR (y con él, la inversión del nav
@@ -364,6 +501,7 @@ El alto de la imagen deriva del texto (`align-self: stretch` + `height: 100%`). 
 ### Done when
 
 - [ ] Sección clara con `.section--light`
+- [ ] `--amd-gold-soft` retirado como color de texto; acento en token de tinta
 - [ ] Imagen con alto derivado del texto, sin `aspect-ratio`
 - [ ] CTA a `/about-us` intacto
 
@@ -520,6 +658,21 @@ cuatro clases de defecto que jsdom no puede ver.
 | Velocidad del carrusel entre anchos | ±10 % |
 | Pausa del carrusel en hover | `paused`, y `running` al salir |
 | Foto del ledger dentro de su contenedor durante la transición | sin desbordamiento |
+| **Contraste de cada texto dorado sobre claro** | **≥ 4.5:1, o ≥ 3:1 si el elemento alcanza el piso de texto grande** |
+
+**Cómo se mide el contraste (novena fila, añadida por la Pivot T001).** Para **cada elemento cuyo
+`color` computado resuelva a un token de la familia dorada** —`--amd-gold`, `--amd-gold-soft`,
+`--amd-gold-ink`, `--amd-gold-ink-deep`— sobre un fondo claro. **El barrido tiene que ser por
+familia, no por los dos tokens de tinta**: si sólo mira los tokens correctos, no puede detectar
+justamente el defecto que busca, que es alguien usando el dorado equivocado. Leer con
+`getComputedStyle` su `color`,
+`fontSize`, `fontWeight` y el `background-color` **efectivo** del ancestro que lo pinta, y elegir el
+umbral **por el tamaño computado**: `≥ 3:1` sólo si `fontSize ≥ 24px`, o `fontSize ≥ 18.66px` con
+`fontWeight ≥ 700`; `≥ 4.5:1` en cualquier otro caso. Que la regla se aplique sola a partir del
+tamaño medido es el punto: es lo único que impide repetir el defecto que originó la Pivot T001,
+donde el umbral se eligió a mano sobre una suposición de tamaño que nadie había medido.
+Medir a **375 y a 1200 px** como mínimo: el ordinal del ledger cambia de tamaño en 900 px y por
+tanto cambia de umbral.
 
 - **Verification:** `cd client && npm run verify:visual`
 - **Falsable con:** poner el ledger en `--amd-ink` → la proporción de tinta debe salir fuera de
@@ -533,8 +686,9 @@ cuatro clases de defecto que jsdom no puede ver.
 
 ### Done when
 
-- [ ] `verify:visual` reporta las ocho mediciones con su número
-- [ ] Las ocho dentro de umbral, o reportadas como INCONCLUSO con su dispersión
+- [ ] `verify:visual` reporta las **nueve** mediciones con su número
+- [ ] Las nueve dentro de umbral, o reportadas como INCONCLUSO con su dispersión
+- [ ] El contraste se mide a 375 y 1200 px, y el umbral lo elige el tamaño computado, no una constante
 - [ ] Playwright sólo como devDependency; el bundle no cambia
 
 ---
@@ -556,7 +710,7 @@ La baseline sigue describiendo lo que este spec elimina. Editar:
 |---|---|---|
 | §2 IA | "Left dot sidenav (§5), `≥1100px`" | Sub-header de secciones desde 900 px |
 | §5 Navigation Model | Tabla del "Sidenav flotante ≥1100px" y su regla de contraste | `SectionNav` desde 900 px, con `aria-current` |
-| §7 Tokens | Sin `--amd-gold-ink` | Token declarado, con la regla: el dorado de marca no es texto sobre claro |
+| §7 Tokens | Sin dorado de tinta | **Los dos** tokens declarados (`--amd-gold-ink`, `--amd-gold-ink-deep`) con la **regla de reparto por tamaño** de REQ-009, y la regla de que el dorado de marca no es texto sobre claro |
 | §11 Dark Mode | "tema principal dark premium con secciones light intercaladas" | Ritmo claro dominante; el oscuro es puntuación |
 
 ### Tests
@@ -565,7 +719,8 @@ Sin test automatizado — es documentación. La verificación es un **barrido de
 referencia al rail lateral sobrevive en la baseline.
 
 - **Verification:** `grep -rn "sidenav\|1100px\|dot sidenav" docs/ux-ui/design.md` → sin resultados,
-  y `grep -n "amd-gold-ink" docs/ux-ui/design.md` → con resultado
+  y `grep -n "amd-gold-ink-deep" docs/ux-ui/design.md` → con resultado (si aparece el token
+  profundo, el otro ya está: se documentan juntos porque la regla es el reparto entre ambos)
 - **Falsable con:** dejar cualquiera de las tres menciones de §2/§5 → el primer grep devuelve línea
   y el gate FALLA.
 - **Evidence disqualifier:** un grep sin resultados prueba **ausencia del término**, no que la
@@ -575,7 +730,7 @@ referencia al rail lateral sobrevive en la baseline.
 
 - [ ] §2, §5, §7 y §11 reescritas
 - [ ] Barrido de cierre sin menciones supervivientes al rail
-- [ ] `--amd-gold-ink` documentado con su regla de uso
+- [ ] Los dos tokens de tinta documentados, **con la regla de reparto por tamaño**, no sólo sus valores
 
 ---
 
@@ -633,7 +788,7 @@ afirmación más débil posible.
 | REQ-008 | Oculto significa no tabulable | T003 |
 | REQ-008 | El panel de hamburguesa cubre las seis secciones | T004 |
 | REQ-008 | Chrome invierte en su posición | T002 (lógica) + T003 (dos barras) |
-| REQ-009 | Acento legible sobre papel | T001 (tokens) + T012 (renderizado) |
+| REQ-009 | Acento legible sobre papel | T001 (tokens) + **T006/T008 (aplicación del reparto)** + T012 (renderizado) |
 | REQ-009 | Token en la fuente de verdad | T001, T013 |
 | REQ-010 | Recorrido por teclado | T003, T006 |
 | REQ-010 | Reduced-motion apaga todo | T006, T009, T010 |

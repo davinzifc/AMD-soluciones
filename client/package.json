@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "start:dev": "ng serve",
     "start": "npm run license:apply && ng serve",
     "build": "npm run license:apply && ng build",
     "build:pages": "npm run license:apply && ng build --configuration production --base-href /AMD-soluciones/",

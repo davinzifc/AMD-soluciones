@@ -1,0 +1,113 @@
+/*
+ * SectionNav (DD-029, DD-030, DD-037, §5.4):
+ * Single section index for Home ≥900px, replaces the lateral dot rail.
+ * Hidden while inside the hero; appears once scrolled past the hero.
+ *
+ * KZ-002: Visibility across breakpoints must be controlled via media query
+ * inside the component CSS, never with body/html parent selectors which
+ * fail under Angular emulated view encapsulation.
+ *
+ * DD-037 / WCAG: When hidden, must be removed from keyboard tab order.
+ * Handled via [inert] / visibility: hidden / tabindex="-1".
+ */
+
+:host {
+  display: block;
+}
+
+.subnav {
+  position: fixed;
+  top: 69px; /* height of sticky top-nav (68px min-height + 1px bottom border) */
+  left: 0;
+  right: 0;
+  z-index: 38;
+  display: none;
+  background: rgba(13, 20, 26, 0.82);
+  backdrop-filter: var(--amd-glass-blur);
+  -webkit-backdrop-filter: var(--amd-glass-blur);
+  border-bottom: 1px solid var(--amd-glass-border, rgba(207, 187, 102, 0.15));
+  opacity: 0;
+  transform: translateY(-100%);
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--amd-motion-fast) var(--amd-ease),
+    transform var(--amd-motion-slow) var(--amd-ease),
+    visibility var(--amd-motion-fast);
+}
+
+@media (min-width: 900px) {
+  .subnav {
+    display: block;
+  }
+}
+
+.subnav.is-on {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.wrap {
+  width: min(100% - 2.5rem, 1160px);
+  margin-inline: auto;
+}
+
+.subnav__inner {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  height: 44px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.subnav__inner::-webkit-scrollbar {
+  display: none;
+}
+
+.subnav a {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.7rem;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245, 246, 248, 0.65);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color var(--amd-motion-fast) var(--amd-ease);
+}
+
+.subnav a:hover {
+  color: #f5f6f8;
+}
+
+.subnav a.is-active,
+.subnav a[aria-current='true'] {
+  color: var(--amd-gold);
+  border-bottom-color: var(--amd-gold);
+}
+
+/* Chrome inversion over light sections (DD-030, DD-031, DD-041) */
+.subnav.on-light {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+}
+
+.subnav.on-light a {
+  color: var(--amd-slate, #475569);
+}
+
+.subnav.on-light a:hover {
+  color: var(--amd-ink, #0d141a);
+}
+
+.subnav.on-light a.is-active,
+.subnav.on-light a[aria-current='true'] {
+  color: var(--amd-gold-ink-deep);
+  border-bottom-color: var(--amd-gold-ink);
+}

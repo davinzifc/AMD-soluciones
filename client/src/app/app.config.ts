@@ -34,21 +34,25 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
-    // ViewportScroller anchor offset function (REQ-002 / T008):
+    // ViewportScroller anchor offset function (REQ-008 · T003):
     // Offsets anchor scrolling dynamically so sticky chrome does not cover headings.
-    // Adapts to breakpoint matching CSS scroll-margin-top: calc(var(--nav-h) + 1.5rem)
-    // on desktop (>1099px) and calc(var(--nav-h) + 4.5rem) on mobile/tablet (<=1099px)
-    // under the sticky chip rail.
+    // Reconciles with actual geometry: TopNav (68px min-height + 1px border = 69px)
+    // plus SectionNav sub-header (44px height = 113px total) visible only at >=900px.
+    // At >=900px: clears 113px + 1.5rem breathing room (137px at 16px root).
+    // At <900px: clears 69px + 1.5rem breathing room (93px at 16px root).
     provideAppInitializer(() => {
       const scroller = inject(ViewportScroller);
       scroller.setOffset(() => {
         if (typeof window === 'undefined') {
           return [0, 0];
         }
-        const navH = 72;
+        const topNavH = 69; // 68px min-height + 1px bottom border
+        const sectionNavH = 44; // sub-header height
         const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-        const isMobileOrTablet = window.innerWidth <= 1099;
-        const yOffset = isMobileOrTablet ? navH + 4.5 * rootFontSize : navH + 1.5 * rootFontSize;
+        const breathingRoom = 1.5 * rootFontSize;
+        const hasSubNav = window.innerWidth >= 900;
+        const chromeH = hasSubNav ? topNavH + sectionNavH : topNavH;
+        const yOffset = chromeH + breathingRoom;
         return [0, yOffset];
       });
     }),

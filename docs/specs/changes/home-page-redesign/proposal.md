@@ -209,6 +209,13 @@ usaba suelto en `.eyebrow--ink` para las secciones claras — mismo tono (H 48.6
 (52 %), sólo más oscuro. Da **3.86:1** sobre mist y **4.28:1** sobre blanco. Sobre papel además
 lee a bronce de libro contable, que es mejor que el brillo.
 
+> **Extendido en ejecución (Pivot T001, 2026-09-06).** Este párrafo se quedó corto: `#8a7a2e` a
+> 3.86:1 alcanza el piso de **texto grande**, pero los cuatro usos listados arriba se renderizan a
+> 12–18.4px, por debajo de ese piso, así que todos exigen 4.5:1. Hacen falta **dos** tokens de
+> tinta. El segundo tampoco es un color nuevo: `#6f6224` (**5.49:1** sobre mist) ya está en el
+> mockup, en `home-redesign.css:187` y `:273`, para el botón de idioma activo y el enlace activo
+> del sub-header. Detalle y evidencia en `execution.md` → `## Pivot Record: T001`.
+
 Donde el dorado es **relleno** y no texto, se queda pleno `#cfbb66`: el spine del "camino", el
 subrayado del título activo y el anillo del botón `+`, que ahora va **relleno de dorado con los
 trazos en tinta** (9.7:1) en vez de trazos dorados sobre papel (1.7:1). El dorado gana presencia
@@ -544,7 +551,7 @@ Explícito, porque es lo que el usuario pidió preservar:
 | **D-5** | ¿El testimonio rota solo o solo con los puntos? | **Solo con los puntos.** Un carrusel automático es contenido en movimiento y volvería a exigir control de pausa. |
 | **D-6** | ¿Copy nuevo en ES/EN lo escribe AMD o se propone desde aquí? | Se proponen las claves ya redactadas en ES (§8); AMD valida y aporta EN. |
 | **D-7** | ¿La sección Nosotros se queda sin fotografía? | **Sí por ahora** (ver §5). Cuando exista fotografía propia de AMD, esta es la primera sección donde debe entrar — probablemente como banda full-bleed, no como columna vertical. |
-| ~~**D-8**~~ | ¿Se formaliza `--amd-gold-ink: #8a7a2e` en `client/src/styles/tokens.css`? | **RESUELTA: sí.** No admite otra respuesta: sin ese token el dorado de marca es ilegible como texto sobre claro (1.73:1) y el ledger claro —ya aprobado— no pasa accesibilidad. Y no es un color nuevo: es el valor que el mockup ya usaba hardcodeado en `.eyebrow--ink`, que al formalizarlo deja de estar suelto. `/akili-specify` debe registrarlo en `design.md` **y** propagarlo a `docs/ux-ui/design.md`, que es la fuente de verdad de tokens. |
+| ~~**D-8**~~ | ¿Se formaliza `--amd-gold-ink: #8a7a2e` en `client/src/styles/tokens.css`? | **RESUELTA: sí.** No admite otra respuesta: sin ese token el dorado de marca es ilegible como texto sobre claro (1.73:1) y el ledger claro —ya aprobado— no pasa accesibilidad. Y no es un color nuevo: es el valor que el mockup ya usaba hardcodeado en `.eyebrow--ink`, que al formalizarlo deja de estar suelto. `/akili-specify` debe registrarlo en `design.md` **y** propagarlo a `docs/ux-ui/design.md`, que es la fuente de verdad de tokens. **Ampliada en la Pivot T001 (HITL 2026-09-06):** la respuesta sigue siendo sí, pero con **dos** tokens, no uno — se añade `--amd-gold-ink-deep: #6f6224` para el texto normal sobre claro. La decisión original no se revierte: se le añade el caso que no cubría. |
 | ~~**D-9**~~ | ¿AMD tiene autorización de los 13 clientes para mostrar su marca? | **RESUELTA (HITL 2026-09-06): sí.** Son los logos que ya se muestran en `amdsoluciones.com` y el permiso lo tienen los dueños del sitio. Queda en pie sólo la recomendación operativa: pedir el original vectorial de **SK Glam** (208x123 px, se amplía 1.49x) y de **Obed Services** (JPG con fondo negro incrustado) — no bloquea nada, mejora dos piezas. |
 
 ---

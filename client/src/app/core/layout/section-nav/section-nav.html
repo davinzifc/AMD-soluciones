@@ -1,0 +1,24 @@
+<nav
+  class="subnav"
+  [class.is-on]="isOn()"
+  [class.on-light]="isOnLight()"
+  [inert]="!isOn()"
+  [attr.inert]="!isOn() ? '' : null"
+  [attr.aria-hidden]="!isOn() ? 'true' : null"
+  [attr.aria-label]="'navSectionsAria' | localize"
+>
+  <div class="wrap subnav__inner">
+    @for (anchor of anchors; track anchor.id) {
+      <a
+        routerLink="/"
+        [fragment]="anchor.id"
+        [attr.data-anchor-id]="anchor.id"
+        [attr.tabindex]="!isOn() ? -1 : null"
+        [attr.aria-current]="isActive(anchor.id) ? 'true' : null"
+        [class.is-active]="isActive(anchor.id)"
+      >
+        {{ anchor.labelKey | localize }}
+      </a>
+    }
+  </div>
+</nav>

@@ -37,7 +37,7 @@ client/
 │   ├── manifiesto.mp4                  (1.9 MB)
 │   └── logos/*.webp                    (13 máscaras, 144 kB)
 └── src/
-    ├── styles/tokens.css               ← MOD (+ --amd-gold-ink)
+    ├── styles/tokens.css               ← MOD (+ --amd-gold-ink, --amd-gold-ink-deep)
     └── app/
         ├── core/
         │   ├── motion/
@@ -125,7 +125,7 @@ auto-rotación.
 | **Secciones** | `#inicio` (intacta) · `#servicios` (ledger) · `#sobre-amd` (manifiesto) · `#cifras` (nueva) · `#confianza` (trust + muro) · `#contacto` (intacta) |
 | **Componentes nuevos** | `LedgerSection`, `FiguresBand`, `ClientWall`, `SectionNav` |
 | **Componentes borrados** | `ServicesRoadSection`, `HomeSideNav` |
-| **Tokens** | Todos de `docs/ux-ui/design.md` §7 + **`--amd-gold-ink: #8a7a2e`** (nuevo) |
+| **Tokens** | Todos de `docs/ux-ui/design.md` §7 + **`--amd-gold-ink: #8a7a2e`** y **`--amd-gold-ink-deep: #6f6224`** (nuevos) |
 | **Motion** | `onPassiveScroll` existente para el spine; CSS puro para el marquee; sin GSAP |
 | **reduced-motion** | Vía `MotionService.reducedMotion()`, que ya está inyectado en cuatro componentes |
 
@@ -204,7 +204,7 @@ hero.
 | `MobileDrawer` | Añade `#cifras`; las etiquetas de sección pasan a "Líneas"/"Manifiesto" — hoy muestra **"Servicios" dos veces** |
 | `TopNav` | Empieza a invertirse sobre tramos claros; hoy nunca lo hace |
 | `App` | Se retira el montaje del rail y la clase `body.has-side-nav` (que **no la estiliza nadie**); se monta `SectionNav`. `isHomeRoute()` sobrevive: es el único gate Home-vs-deep del shell |
-| `tokens.css` | `--amd-gold-ink: #8a7a2e` |
+| `tokens.css` | `--amd-gold-ink: #8a7a2e` · `--amd-gold-ink-deep: #6f6224` |
 
 ---
 
@@ -221,7 +221,7 @@ hero.
 | **DD-028** | Ritmo claro/oscuro | Claro dominante; el oscuro es puntuación (hero, banda, cierre) | Oscuro dominante (v1 del mockup) | Medido: la v1 dejaba 68.2 % en tinta y 2.4 pantallas antes del primer respiro. El cliente la rechazó por eso. **Supersede `docs/ux-ui/design.md` §11** |
 | **DD-029** | Índice de secciones | `SectionNav` único desde 900 px | Rail lateral ≥1100 px; mantener ambos | Dos piezas para la misma función son dos scroll-spies, dos temas y dos juegos de etiquetas que no pueden divergir. Además el rail dejaba **900–1099 px sin ningún índice**. **Supersede §2 y §5** |
 | **DD-030** | El algoritmo de tema | Extraer `probeSectionThemeAt` a `core/motion/section-theme.ts` como función **pura** | Duplicarlo en `TopNav` y `SectionNav`; dejarlo morir con el rail | Es la única implementación del repo y REQ-008 la necesita para dos barras. Como función pura además pasa a ser testeable en jsdom, que es donde el resto del spec no llega |
-| **DD-031** | Dorado sobre claro | Token `--amd-gold-ink: #8a7a2e` para texto; `--amd-gold` sólo como relleno | Usar `--amd-gold` como texto; aclarar el fondo | Medido: `#CFBB66` da 1.73:1 sobre mist. Reprueba WCAG incluso en texto grande. **No es un color nuevo**: es el valor que ya estaba hardcodeado en `.eyebrow--ink` |
+| **DD-031** | Dorado sobre claro | **Dos** tokens de tinta: `--amd-gold-ink: #8a7a2e` (3.86:1) para relleno y texto grande, `--amd-gold-ink-deep: #6f6224` (5.49:1) para texto normal; `--amd-gold` sólo como relleno | Un solo token de tinta; usar `--amd-gold` como texto; aclarar el fondo | Medido: `#CFBB66` da 1.73:1 sobre mist, reprueba incluso en texto grande. **Corregido en la Pivot T001**: con un solo token a 3.86:1, tres de los cuatro usos del acento incumplen WCAG porque se renderizan a 12–18.4px, por debajo del piso de texto grande. **Ninguno de los dos es un color nuevo**: `#8a7a2e` estaba suelto en `.eyebrow--ink` y `#6f6224` en `home-redesign.css:187` y `:273` |
 | **DD-032** | Logos de clientes | Máscaras monocromas de un canal + `mask-image` + `currentColor` | `<img>` en color; SVG por logo; dos juegos por tema | Los 13 originales traen ratios de 0.82 a 4.18, un JPG con fondo negro y uno rosa invisible sobre papel. El monocromo normaliza los cuatro problemas a la vez y **una pieza sirve en los dos temas** |
 | **DD-033** | Cinta del muro | `margin-inline` por elemento y duración calculada en JS desde el ancho medido | `gap` + duración fija en CSS | Con `gap` el 50 % queda desfasado medio hueco y el bucle salta. Con duración fija la cinta acelera en móvil, justo donde cuesta más leerla |
 | **DD-034** | Testimonios | Sin auto-rotación; **cuatro**, no tres; puntos elevados a control primario | Mantener `setInterval`; reducir a tres como el mockup | Un carrusel automático sustituye texto que se está leyendo. El muro de logos **no** lo hace: no reemplaza contenido y todo logo vuelve en ~50 s. Reducir a tres sería pérdida de contenido que ningún requisito pide |

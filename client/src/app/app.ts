@@ -1,10 +1,10 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 
-import { HomeSideNav } from './core/layout/home-side-nav/home-side-nav';
 import { MobileDrawer } from './core/layout/mobile-drawer/mobile-drawer';
+import { SectionNav } from './core/layout/section-nav/section-nav';
 import { SiteFooter } from './core/layout/site-footer/site-footer';
 import { TopNav } from './core/layout/top-nav/top-nav';
 import { WhatsappFab } from './core/layout/whatsapp-fab/whatsapp-fab';
@@ -13,16 +13,12 @@ import { WhatsappFab } from './core/layout/whatsapp-fab/whatsapp-fab';
  * App shell host (T004): chrome (TopNav/MobileDrawer/WhatsappFab/SiteFooter)
  * wraps the routed page content.
  *
- * T005 Home-vs-deep shell flag: `isHomeRoute` (same URL check as
- * `MobileDrawer`) drives two things:
- * - `body.has-side-nav` toggles on navigation (design §6 breakpoint table).
- * - the `.sidenav-host` slot — and the real `HomeSideNav` it mounts (T013)
- *   — renders inside `<main>` only on `/` (REQ-002 "deep page has no
- *   section sidenav").
+ * Home-vs-deep shell flag (T003): `isHomeRoute` gates `SectionNav`
+ * rendering inside `<main>` only on `/` (REQ-008).
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TopNav, MobileDrawer, WhatsappFab, SiteFooter, HomeSideNav],
+  imports: [RouterOutlet, TopNav, MobileDrawer, WhatsappFab, SiteFooter, SectionNav],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -37,15 +33,9 @@ export class App {
     { initialValue: this.router.url },
   );
 
-  /** True only on Home (`/`) — no Home section sidenav host on deep pages (REQ-002). */
+  /** True only on Home (`/`) — gates SectionNav mounting on Home (REQ-008). */
   protected readonly isHomeRoute = computed(() => {
     const path = this.currentUrl().split(/[?#]/)[0];
     return path === '/' || path === '';
   });
-
-  constructor() {
-    effect(() => {
-      document.body.classList.toggle('has-side-nav', this.isHomeRoute());
-    });
-  }
 }

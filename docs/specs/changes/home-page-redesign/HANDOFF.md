@@ -50,7 +50,7 @@ python3 -m http.server 4310
 | D-1 | ¿Ledger oscuro o claro? | **Claro**, aprobado por el cliente. De 68.2 % a 39.8 % de tinta; el aire llega en la pantalla 1 en vez de la 2.4. Es lo que sirve `index.html` |
 | D-2 | ¿Foto propia o stock? | Placeholders de Pexels, rutas intercambiables por rol |
 | D-3 | ¿Cifras con video o foto? | **Video** (`manifiesto.mp4`, 1.9 MB), póster como fallback |
-| D-8 | ¿`--amd-gold-ink` en `tokens.css`? | **Sí** — sin él el ledger claro no pasa contraste |
+| D-8 | ¿`--amd-gold-ink` en `tokens.css`? | **Sí** — sin él el ledger claro no pasa contraste. **Ampliada en la Pivot T001 (2026-09-06): son dos tokens**, `--amd-gold-ink: #8a7a2e` (relleno y texto grande) y `--amd-gold-ink-deep: #6f6224` (texto normal) |
 | D-9 | ¿Permiso de los 13 clientes? | **Sí** — ya se muestran en `amdsoluciones.com` |
 
 Además, por decisión HITL: **rail lateral descartado** (sub-header desde 900 px) y **muro de
