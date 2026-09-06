@@ -697,10 +697,139 @@ su segunda mitad —"testimonios con pausa larga para leer"— queda falsa.
 
 ---
 
+## T014 — Manifiesto: portar la sección del mockup (cita + pilares)
+
+- **Status:** [ ]
+- **Depends on:** T008
+- **Origen:** **KZ-007** — revisión HITL en navegador, 2026-09-06. T008 estaba redactada como *delta*
+  («pasa de tinta a claro, recibe la imagen») y produjo el teaser antiguo repintado. **El mockup manda.**
+- **Directory boundary:** `client/src/app/features/home/about-teaser/` y `client/src/assets/i18n/`
+- **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
+- **Requirements:** REQ-004 (descripción: *fusionar el manifiesto y el teaser*), **REQ-009**, REQ-011
+- **Design refs:** DD-028, DD-031, §5.5 · **Mockup: `index.html` `<section id="sobre-amd">`;
+  `home-redesign.css:518-578`**
+
+### Scope
+
+Portar la sección **entera** del mockup. Inventario que hoy falta:
+
+| Elemento del mockup | Hoy |
+|---|---|
+| `p.eyebrow.eyebrow--ink` «Por qué existimos» | ausente |
+| `h2.about__quote` «Tu contabilidad no debería ser una caja negra.» | dice «Quiénes somos» |
+| `p.about__body` (3 frases, la larga) | versión corta |
+| `ol.pillars` — 01 Cercanía · 02 Cumplimiento · 03 Claridad | **ausente entero** |
+| `.about__cta`: «Conocer al equipo» `btn--ink` + «Contactar» `btn--ghost-ink` | «Ver más» `btn--gold` + «Contactar» |
+| `.about__lead` grid `minmax(0,26rem) minmax(0,1fr)`, `align-items: stretch` | grid `1.1fr 0.9fr` |
+| `.about__figure` con `margin-block: -1.75rem` | sin él |
+
+**El alto lo marca el texto y la foto se estira a él** con un pequeño desborde arriba y abajo
+(`margin-block: -1.75rem`), que es lo que hace que la acompañe sin dominarla. Es la invariante de
+REQ-004, ahora en el layout correcto.
+
+> ⚠ **REQ-009 se aplica otra vez, y el mockup lo incumple.** `home-redesign.css:98` pinta
+> `.eyebrow--ink` con `#8a7a2e` (`--amd-gold-ink`, 3.86:1) y `:573` hace lo mismo con `.pillars__ord`.
+> **Los dos son texto pequeño**: el eyebrow es 0.75rem (12px) y el ordinal 0.95rem/600 (15.2px) —
+> ninguno alcanza el piso de texto grande. **Ambos van a `--amd-gold-ink-deep`.** Ningún literal
+> `#8a7a2e` en el CSS del componente: se usa el token.
+
+### Tests
+
+- Los cinco elementos existen: eyebrow, `about__quote`, `about__body`, **tres** `pillars li`, y los
+  dos botones del CTA con sus rutas
+- **Fidelidad de inventario:** el conjunto de clases del componente contiene el del mockup
+- Reparto de dorado: eyebrow y `pillars__ord` resuelven a `--amd-gold-ink-deep`; cero `#8a7a2e` literal
+- Cero literales de copy en la plantilla; paridad ES/EN
+- Sin `aspect-ratio` en la regla base de la figura (REQ-004 ≥ 901 px); el apilado móvil lo conserva
+
+- **Verification:** `cd client && npm run test:agent && npm run lint -- --quiet && npm run build`
+- **Falsable con:** borrar un `pillars li` → el test de tres debe FALLAR. Devolver el eyebrow a
+  `--amd-gold-ink` → el aserto de reparto debe FALLAR.
+- **Evidence disqualifier:** jsdom no mide layout. Que las clases estén **no** prueba que los pilares
+  caigan en tres columnas ni que la foto acompañe al texto. **T012.**
+
+### Done when
+
+- [ ] Eyebrow, cita, cuerpo largo y **tres pilares** presentes, con copy por clave en ES y EN
+- [ ] CTA «Conocer al equipo» en tinta + «Contactar» ghost-ink; fuera el `btn--gold`
+- [ ] Reparto REQ-009 aplicado a eyebrow y ordinales
+- [ ] Inventario de clases del componente ⊇ el del mockup
+
+---
+
+## T015 — Confianza: portar la sección del mockup
+
+- **Status:** [ ]
+- **Depends on:** T011
+- **Origen:** **KZ-007** — revisión HITL en navegador, 2026-09-06. T011 estaba redactada como *delta*
+  («retirar `setInterval`, montar `ClientWall`») y dejó el Confianza antiguo con el muro pegado.
+- **Directory boundary:** `client/src/app/features/home/trust/` y `client/src/assets/i18n/`
+- **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
+- **Requirements:** REQ-006 (los tres escenarios se conservan), REQ-009, REQ-011
+- **Design refs:** DD-028, DD-034, §5.5 · **Mockup: `index.html` `<section id="confianza">`;
+  `home-redesign.css:630-668` y `:751-756`**
+
+### Scope
+
+| Elemento del mockup | Hoy |
+|---|---|
+| `p.eyebrow.eyebrow--ink` «Confianza que se nota», centrado | `h2` grande + `p` lead |
+| `figure.quote` — cita grande centrada, `max-width: 44rem`, `clamp(1.2rem, 2.6vw, 1.7rem)` | tarjeta blanca pequeña, alineada a la izquierda |
+| `.quote__dots` centrados, `margin-top: 2rem` | tras un hueco enorme |
+| `.ticker` — sectores como **texto plano** en cinta continua, 38 s, `gap: 3.5rem`, borde arriba y abajo | `logo-pill`: **tarjetas con borde y sombra** |
+| `.ticker__label` «Sectores que acompañamos» **debajo** de la cinta | encima |
+| `text-align: center` en toda la sección | izquierda |
+| **Sin** tarjetas de métricas | 4 tarjetas (10+ · 98% · ES/EN · Cali) |
+| **Sin** CTA final | «Contactar» |
+
+**Decisiones HITL (2026-09-06):**
+
+- **Las cuatro métricas se retiran.** No están en el mockup. Sus claves `m1…m4` quedan huérfanas:
+  **retirarlas de ambos diccionarios**, junto con `trustTitle` y `trustLead` si dejan de usarse.
+- **Los sectores pasan a la lista del mockup (9)**: Comercio, Servicios profesionales, Salud,
+  Construcción, Transporte, Educación, Manufactura, Tecnología, Agroindustria. Sustituyen a las ocho
+  actuales (Cripto, Moda, Oro, Educación, Fundaciones, Minimarket, Ploteo, Turismo).
+- **El CTA «Contactar» final se retira** — el mockup cierra con el ticker.
+
+**Lo que NO cambia:** los **cuatro** testimonios (DD-034: el mockup dibuja tres como ilustración),
+la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su ancestría.
+
+> ⚠ **REQ-009.** El mockup pinta el punto activo y el eyebrow con `#8a7a2e` literal. El punto activo
+> es **relleno** → `--amd-gold-ink` vale. El eyebrow es texto de 12px → **`--amd-gold-ink-deep`**.
+> Ningún `#8a7a2e` literal en el CSS del componente.
+
+### Tests
+
+- Eyebrow presente; **no** hay `h2` de título ni párrafo lead
+- **Cero** elementos de métrica en el DOM; `m1…m4` fuera de ambos diccionarios y sin referencias
+- La cita es `figure.quote` centrada; los cuatro puntos y los cuatro testimonios siguen
+- El ticker tiene **9 sectores duplicados** (18 elementos) y son `<span>` de texto, **no** tarjetas
+- El rótulo del ticker va **después** de la cinta en orden de documento
+- **Fidelidad de inventario:** el conjunto de clases del componente contiene el del mockup
+- Se conservan: sin temporizador (regresión de 15 s), ancestría de `ClientWall`, 44×44
+
+- **Verification:** `cd client && npm run test:agent && npm run lint -- --quiet && npm run build`
+- **Falsable con:** reintroducir una tarjeta de métrica → el test de cero debe FALLAR. Poner el
+  rótulo antes de la cinta → el test de orden debe FALLAR.
+- **Evidence disqualifier:** jsdom no compone la cinta ni mide el centrado. La velocidad del ticker y
+  la costura son de **T012**.
+
+### Done when
+
+- [ ] Eyebrow en vez de título + lead; sección centrada
+- [ ] Métricas fuera del DOM y `m1…m4` fuera de los diccionarios, sin referencias
+- [ ] Cita grande centrada con sus cuatro puntos; cuatro testimonios intactos
+- [ ] Ticker de **texto plano** con los 9 sectores del mockup y el rótulo debajo
+- [ ] CTA final retirado
+- [ ] Inventario de clases del componente ⊇ el del mockup
+- [ ] Regresión de 15 s y ancestría de `ClientWall` siguen en verde
+
+---
+
 ## T012 — Gate de medición en navegador
 
 - **Status:** [ ]
-- **Depends on:** T007, T009, T011
+- **Depends on:** T007, T009, T011, **T014, T015**
 - **Directory boundary:** `client/` (devDependency + script)
 - **Recommended skills:** `angular-developer`
 - **Requirements:** REQ-001 (los dos escenarios), REQ-007 escenarios "el bucle no salta" y
