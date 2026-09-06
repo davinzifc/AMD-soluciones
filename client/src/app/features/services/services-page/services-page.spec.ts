@@ -1,14 +1,22 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { SERVICE_GROUP_IDS, ServicesPage } from './services-page';
 
-function setup() {
+interface SetupOptions {
+  readonly localeService?: Record<string, unknown>;
+}
+
+function setup(options: SetupOptions = {}) {
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
-      { provide: LocaleService, useValue: { translate: (key: string) => key } },
+      // Default stub unchanged for every pre-existing test in this file — locale
+      // never switches under it, so it cannot exercise REQ-008's language-switch
+      // scenario (see the dedicated describe block below for that stub).
+      { provide: LocaleService, useValue: options.localeService ?? { translate: (key: string) => key } },
     ],
   });
   const fixture = TestBed.createComponent(ServicesPage);
@@ -342,6 +350,80 @@ describe('ServicesPage', () => {
 
       expect(ghostCta.getAttribute('href')).toContain('https://wa.me/');
       expect(ghostCta.getAttribute('href')).not.toContain('servicios');
+    });
+  });
+
+  describe('language switch preserves chapter and expansion state (REQ-008 "Cambio de idioma en el catálogo")', () => {
+    it('conserva el capítulo activo y la expansión de Contabilidad al cambiar ES→EN, y re-renderiza las etiquetas', () => {
+      // Stub de LocaleService con diccionario como señal intercambiable (patrón de
+      // contact-section.spec.ts ~L264-292). Necesario porque moreLabel/quoteLine son
+      // computed() que solo se invalidan si su dependencia de locale.translate() es una
+      // señal real, igual que el LocaleService de producción.
+      const dictSignal = signal<Record<string, string>>({
+        g1Title: 'Contabilidad',
+        svcShowMore: 'Ver {n} más',
+        svcShowLess: 'Ver menos',
+      });
+      const localeSignal = signal<'es' | 'en'>('es');
+      const mockLocale = {
+        translate: (key: string) => dictSignal()[key] ?? key,
+        locale: localeSignal.asReadonly(),
+        dictionary: dictSignal.asReadonly(),
+      };
+
+      const fixture = setup({ localeService: mockLocale });
+      const component = fixture.componentInstance;
+      const root = fixture.nativeElement as HTMLElement;
+
+      // Mueve el capítulo activo lejos del valor por defecto ('contabilidad') a propósito:
+      // si el cambio de idioma reseteara activeGroup a su valor inicial, esta prueba lo
+      // detectaría (de lo contrario "conservar" sería indistinguible de "no hacer nada").
+      component.activeGroup.set('riesgo');
+      // Expande Contabilidad; es una señal independiente de activeGroup.
+      component.toggleGroup('contabilidad');
+      fixture.detectChanges();
+
+      const contabilidadList = root.querySelector('#contabilidad .subs') as HTMLElement;
+      const moreButton = root.querySelector('#contabilidad button.more') as HTMLButtonElement;
+      const contabilidadTitle = root.querySelector('#contabilidad h2') as HTMLElement;
+      const riesgoRail = root.querySelector('.rail a[data-rail="riesgo"]') as HTMLAnchorElement;
+      const contabilidadRail = root.querySelector('.rail a[data-rail="contabilidad"]') as HTMLAnchorElement;
+      const allRailLinks = Array.from(root.querySelectorAll('.rail__list a')) as HTMLAnchorElement[];
+
+      // Estado ES previo al cambio de idioma (línea base de la prueba).
+      // WHAT THIS DOES NOT PROVE: does not verify the CSS collapse/expand animation.
+      expect(contabilidadList.getAttribute('data-collapsed')).toBeNull();
+      expect(moreButton.getAttribute('aria-expanded')).toBe('true');
+      // WHAT THIS DOES NOT PROVE: does not verify scroll-spy re-derives this from real scroll position.
+      expect(riesgoRail.getAttribute('aria-current')).toBe('true');
+      expect(contabilidadRail.getAttribute('aria-current')).toBeNull();
+      expect(allRailLinks.filter((a) => a.getAttribute('aria-current') === 'true').length).toBe(1);
+      // WHAT THIS DOES NOT PROVE: does not verify the ES copy is linguistically correct, only that it renders.
+      expect(contabilidadTitle.textContent?.trim()).toBe('Contabilidad');
+      expect(moreButton.textContent?.trim()).toBe('Ver menos');
+
+      // WHEN cambia a EN: intercambia el diccionario igual que LocaleService.setLocale() real.
+      dictSignal.set({
+        g1Title: 'Accounting',
+        svcShowMore: 'See {n} more',
+        svcShowLess: 'Show less',
+      });
+      localeSignal.set('en');
+      fixture.detectChanges();
+
+      // AND IT MUST conservar el capítulo y el estado de expansión.
+      // WHAT THIS DOES NOT PROVE: does not verify CSS collapse animation or real user scroll after the switch.
+      expect(contabilidadList.getAttribute('data-collapsed')).toBeNull();
+      expect(moreButton.getAttribute('aria-expanded')).toBe('true');
+      expect(riesgoRail.getAttribute('aria-current')).toBe('true');
+      expect(contabilidadRail.getAttribute('aria-current')).toBeNull();
+      expect(allRailLinks.filter((a) => a.getAttribute('aria-current') === 'true').length).toBe(1);
+
+      // THEN todo el texto del índice, controles y CTAs aparece en EN. Esta es la aserción
+      // que impide que la prueba sea tautológica: un componente que ignora el locale (o que
+      // solo conserva estado congelando la vista) pasaría todo lo de arriba pero fallaría aquí.
+      expect(contabilidadTitle.textContent?.trim()).toBe('Accounting');
+      expect(moreButton.textContent?.trim()).toBe('Show less');
     });
   });
 });

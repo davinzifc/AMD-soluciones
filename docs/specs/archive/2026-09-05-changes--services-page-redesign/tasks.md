@@ -150,7 +150,7 @@ Las descripciones de PR siguen `cognitive-doc-design`: qué revisar primero, qu�
 
 ## T006 — CSS: portar el mockup a la página
 
-- **Status:** [~] PASS automatizado; **bloqueado** hasta el check en navegador (DC-2/DC-3/DC-7)
+- **Status:** [x] PASS (Reviewer, 2026-09-05 — check en navegador ejecutado: contraste AA, ≥44px, sin scroll horizontal; DC-2 cerrado por T008)
 - **Depends on:** T004
 - **Directory boundary:** `client/src/app/features/services/services-page/services-page.css`
 - **Recommended skills:** ui-ux-pro-max, frontend-design
@@ -206,6 +206,20 @@ Las descripciones de PR siguen `cognitive-doc-design`: qué revisar primero, qu�
 - [x] 8 claves i18n nuevas en ES y EN.
 - [x] `ViewportScroller.setOffset` en forma de función, adaptado al breakpoint.
 - [x] Gate de fidelidad de contenido con prueba de falsabilidad demostrada.
+
+## T009 — Corregir el desbordamiento horizontal en móvil y tablet
+
+- **Status:** [x] PASS (Reviewer, 2026-09-05 — medido en navegador a 375/768/1400)
+- **Depends on:** T006
+- **Añadida** tras el PRODUCT_BUG de `/akili-test`.
+- **Verification:** suite + lint + **build** + medición por iframe a 375/768/1400px.
+
+### Done when
+- [x] `minmax(0, 1fr)` en la media query `≤1099px`.
+- [x] Eliminada la dependencia de `50vw` en el rail móvil.
+- [x] Scroll horizontal interno de los chips conservado.
+- [x] Escritorio ≥1100px intacto.
+- [x] KZ-002 respetado: sin `body`/`html`, sin `overflow-x: hidden` de tapadera.
 
 ## Cobertura requisito → tarea
 
