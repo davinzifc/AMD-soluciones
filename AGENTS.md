@@ -105,14 +105,16 @@ Updated: **2026-08**
 
 | Tier | Claude Code / Cursor | OpenCode | Antigravity | Fallback |
 |------|----------------------|----------|-------------|----------|
-| T1 Architect | `opus` | `<CONFIRM SLUG>` | Gemini Pro `<CONFIRM ID>` | strongest available |
-| T2 Coder | `sonnet` | `<CONFIRM SLUG>` | Gemini Flash `<CONFIRM ID>` | mid-tier coder |
-| T3 Auditor | `opus` | `<CONFIRM SLUG>` | Gemini Pro `<CONFIRM ID>` | ≠ T2 model |
-| T4 Context-Ingest | `sonnet` | `<CONFIRM SLUG>` | Gemini Flash `<CONFIRM ID>` | long-context model |
-| T5 Fast-Cheap | `haiku` | `<CONFIRM SLUG>` | Gemini Flash `<CONFIRM ID>` | cheapest |
-| T6 Multimodal | `sonnet` | `<CONFIRM SLUG>` | Gemini Pro/Flash vision `<CONFIRM ID>` | vision-capable |
+| T1 Architect | `opus` | `<CONFIRM SLUG>` | `gemini-3.1-pro-high` | strongest available |
+| T2 Coder | `sonnet` | `<CONFIRM SLUG>` | `gemini-3.8-flash-high` | mid-tier coder |
+| T3 Auditor | `opus` | `<CONFIRM SLUG>` | `gemini-3.1-pro-high` | ≠ T2 model |
+| T4 Context-Ingest | `sonnet` | `<CONFIRM SLUG>` | `gemini-3.8-flash-medium` | long-context model |
+| T5 Fast-Cheap | `haiku` | `<CONFIRM SLUG>` | `gemini-3.8-flash-low` | cheapest |
+| T6 Multimodal | `sonnet` | `<CONFIRM SLUG>` | `gemini-3.1-pro-high` | vision-capable |
 
-**CLI invocations:** Cursor IDE (this checkout) · Claude Code `<CONFIRM: claude?>` · OpenCode `<CONFIRM: opencode?>` · Antigravity **`agy`** (confirm if different).
+**CLI invocations:** Cursor IDE (this checkout) · Claude Code `claude` · OpenCode `<CONFIRM: opencode?>` · Antigravity **`agy`** — verificado 2026-09-05 en `~/.local/bin/agy` (`agy -p "…" --model <slug> --effort high --mode accept-edits`).
+
+**Delegated execution (HITL 2026-09-05):** cuando una spec declara *Execution ownership*, el Implementer y el Tester corren en Antigravity (`gemini-3.8-flash-high`) y Claude Code conserva Leader (T1) y Reviewer (T3). El Leader no escribe código de producción en ese modo; dos fallos de Antigravity en la misma tarea escalan a HITL.
 
 **Cross-host dispatch:** T6 Multimodal → prefer Antigravity (Gemini vision) when the session host lacks vision. Routing preference only — no named dispatcher tool.
 

@@ -102,14 +102,18 @@ Updated: **2026-08**
 
 | Tier | Claude Code / Cursor | OpenCode | Antigravity | Fallback |
 |------|----------------------|----------|-------------|----------|
-| T1 Architect | `opus` | `<CONFIRM SLUG>` | Gemini Pro `<CONFIRM ID>` | strongest available |
-| T2 Coder | `sonnet` | `<CONFIRM SLUG>` | Gemini Flash `<CONFIRM ID>` | mid-tier coder |
-| T3 Auditor | `opus` | `<CONFIRM SLUG>` | Gemini Pro `<CONFIRM ID>` | ≠ T2 model |
-| T4 Context-Ingest | `sonnet` | `<CONFIRM SLUG>` | Gemini Flash `<CONFIRM ID>` | long-context model |
-| T5 Fast-Cheap | `haiku` | `<CONFIRM SLUG>` | Gemini Flash `<CONFIRM ID>` | cheapest |
-| T6 Multimodal | `sonnet` | `<CONFIRM SLUG>` | Gemini Pro/Flash vision `<CONFIRM ID>` | vision-capable |
+| T1 Architect | `opus` | `<CONFIRM SLUG>` | `gemini-3.1-pro-high` | strongest available |
+| T2 Coder | `sonnet` | `<CONFIRM SLUG>` | `gemini-3.8-flash-high` | mid-tier coder |
+| T3 Auditor | `opus` | `<CONFIRM SLUG>` | `gemini-3.1-pro-high` | ≠ T2 model |
+| T4 Context-Ingest | `sonnet` | `<CONFIRM SLUG>` | `gemini-3.8-flash-medium` | long-context model |
+| T5 Fast-Cheap | `haiku` | `<CONFIRM SLUG>` | `gemini-3.8-flash-low` | cheapest |
+| T6 Multimodal | `sonnet` | `<CONFIRM SLUG>` | `gemini-3.1-pro-high` | vision-capable |
 
-**CLI invocations:** Cursor IDE · Claude Code `<CONFIRM>` · OpenCode `<CONFIRM>` · Antigravity `agy`.
+**CLI invocations:** Cursor IDE · Claude Code `claude` · OpenCode `<CONFIRM>` · Antigravity `agy` (verificado 2026-09-05, `~/.local/bin/agy`).
+
+**Antigravity skills (2026-09-05):** las 23 skills del repo están expuestas a Antigravity como plugin `akili-skills`. `agy plugin import claude` **no funciona** (busca extensiones empaquetadas, no `.claude/skills/`); el montaje es un `plugin.json` en `~/.akili/antigravity-plugins/akili-skills/` instalado con `agy plugin install`. Como `install` **copia** las skills, `~/.gemini/config/plugins/akili-skills/skills` se reemplazó por un **symlink a `.claude/skills/`** → sin deriva: editar una skill en el repo la actualiza al instante. Se exponen **solo skills**, nunca los comandos AKILI: el Implementer no orquesta. Reinstalar rompe el symlink — rehacerlo si se reinstala.
+
+**Delegated execution (HITL 2026-09-05):** en specs marcadas con *Execution ownership*, el Implementer/Tester corre en Antigravity — `agy -p "<brief>" --model gemini-3.8-flash-high --effort high --mode accept-edits` — y Claude Code conserva Leader (T1) y Reviewer (T3). El Leader no escribe código de producción en ese modo.
 
 **Cross-host dispatch:** T6 → Antigravity (Gemini vision) when needed. Preference only — no dispatcher pin.
 

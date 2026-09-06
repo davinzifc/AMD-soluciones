@@ -1,66 +1,43 @@
-import { Component } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  inject,
+  NgZone,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { WHATSAPP_NUMBER } from '../../../core/contact/contact.config';
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
+import { LocaleService } from '../../../core/i18n/locale.service';
+import { type ChapterPosition, resolveActiveChapter } from './active-chapter';
+import {
+  SERVICE_GROUPS,
+  SERVICE_VISIBLE_LIMIT,
+  type ServiceGroup,
+  type ServiceGroupId,
+} from './service-catalog.data';
+
+export {
+  SERVICE_GROUP_IDS,
+  SERVICE_VISIBLE_LIMIT,
+  SERVICE_GROUPS,
+  type ServiceGroupId,
+  type ServiceGroup,
+  type ServiceSub,
+} from './service-catalog.data';
 
 /**
- * Servicios group anchor ids (design §3 `ServiceGroupId`). Home's road
- * "Más info" links (T007) deep-link here as `/services#<id>` — a fragment,
- * never a child route. Order matches REQ-004 (Contabilidad, Gestión
- * Administrativa, Sistemas de Riesgo, Asesoría, Marca).
- */
-export const SERVICE_GROUP_IDS = ['contabilidad', 'administrativa', 'riesgo', 'asesoria', 'marca'] as const;
-
-interface ServiceSub {
-  readonly titleKey: string;
-  readonly descKey: string;
-}
-
-interface ServiceGroup {
-  readonly id: (typeof SERVICE_GROUP_IDS)[number];
-  readonly titleKey: string;
-  readonly leadKey: string;
-  readonly subs: readonly ServiceSub[];
-  /** Riesgo/Marca carry a placeholder note (REQ-005: MAY use validated placeholders). */
-  readonly noteKey?: string;
-}
-
-/**
- * Builds the `subXX(t|d)` key pairs seeded from mockup `i18n.js` (already
- * mirrored into `assets/i18n/{es,en}.json` by T003) for a given sub-service
- * prefix, e.g. `subKeys('C', 16)` → `subC01t`/`subC01d` … `subC16t`/`subC16d`.
- */
-function subKeys(prefix: string, count: number): ServiceSub[] {
-  return Array.from({ length: count }, (_, index) => {
-    const n = String(index + 1).padStart(2, '0');
-    return { titleKey: `sub${prefix}${n}t`, descKey: `sub${prefix}${n}d` };
-  });
-}
-
-const GROUPS: readonly ServiceGroup[] = [
-  { id: 'contabilidad', titleKey: 'g1Title', leadKey: 'g1Lead', subs: subKeys('C', 16) },
-  { id: 'administrativa', titleKey: 'g2Title', leadKey: 'g2Lead', subs: subKeys('A', 4) },
-  { id: 'riesgo', titleKey: 'g3Title', leadKey: 'g3Lead', subs: subKeys('R', 4), noteKey: 'g3Note' },
-  { id: 'asesoria', titleKey: 'g4Title', leadKey: 'g4Lead', subs: subKeys('As', 4) },
-  { id: 'marca', titleKey: 'g5Title', leadKey: 'g5Lead', subs: subKeys('M', 3), noteKey: 'g5Note' },
-];
-
-/**
- * Servicios deep page (T012 · REQ-005 · design.md §6 Deep pages). Page hero +
- * in-page TOC + the five `ServiceGroup` articles with sub-service catalogs,
- * seeded from mockup `servicios.html` / `i18n.js`. Every `article[id]` uses
- * the exact `SERVICE_GROUP_IDS` string so Home's road "Más info" fragment
- * links (`/services#<id>`, T007) always resolve to a real scroll target —
- * the two features share this same constant to prevent id drift.
+ * Servicios deep page (T005 / REQ-001…REQ-007 / design.md §5.3 / DD-017).
  *
- * TOC chips use `routerLink="/services" [fragment]` (not bare `href="#id"`):
- * with Angular `<base href="/">`, `#contabilidad` resolves to `/#contabilidad`
- * and navigates Home — a HITL defect caught 2026-08-05.
- *
- * Riesgo and Marca sub-service copy is flagged with a visible placeholder
- * note (`g3Note`/`g5Note`) per REQ-005 ("MAY use validated placeholders
- * until AMD finalizes copy") — the anchors and structure are still real,
- * only the copy is provisional.
+ * Connects scroll reading-position tracking to the persistent TOC rail.
+ * Listens to scroll/resize outside Angular zone, coalesced into single
+ * animation frames (NFR-001), re-entering the zone only when the active
+ * chapter id changes. Measured via pure resolveActiveChapter without
+ * IntersectionObserver (DD-017).
  */
 @Component({
   selector: 'app-services-page',
@@ -69,5 +46,157 @@ const GROUPS: readonly ServiceGroup[] = [
   styleUrl: './services-page.css',
 })
 export class ServicesPage {
-  protected readonly groups = GROUPS;
+  private readonly locale = inject(LocaleService);
+  private readonly whatsappNumber = inject(WHATSAPP_NUMBER);
+  private readonly zone = inject(NgZone);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  protected readonly groups = SERVICE_GROUPS;
+  protected readonly visibleLimit = SERVICE_VISIBLE_LIMIT;
+  protected readonly totalLines = this.groups.length;
+  protected readonly totalServices = this.groups.reduce((acc, g) => acc + g.subs.length, 0);
+
+  readonly activeGroup = signal<ServiceGroupId>('contabilidad');
+  readonly expanded = signal<ReadonlySet<ServiceGroupId>>(new Set());
+
+  private rafId: number | null = null;
+  private scrollCleanup: (() => void) | null = null;
+
+  constructor() {
+    afterNextRender(() => {
+      this.initScrollSpy();
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.destroyScrollSpy();
+    });
+  }
+
+  readonly moreLabel = computed(() => {
+    const showMoreTemplate = this.locale.translate('svcShowMore');
+    const showLessText = this.locale.translate('svcShowLess');
+    const expandedSet = this.expanded();
+
+    return (group: ServiceGroup): string => {
+      if (expandedSet.has(group.id)) {
+        return showLessText;
+      }
+      const hidden = group.subs.length - SERVICE_VISIBLE_LIMIT;
+      return showMoreTemplate.replace('{n}', String(hidden));
+    };
+  });
+
+  readonly quoteLine = computed(() => {
+    const quoteTemplate = this.locale.translate('svcQuoteLine');
+
+    return (group: ServiceGroup): string => {
+      const line = this.locale.translate(group.titleKey);
+      return quoteTemplate.replace('{line}', line);
+    };
+  });
+
+  readonly whatsappUrl = computed(
+    () => `https://wa.me/${this.whatsappNumber}`,
+  );
+
+  toggleGroup(groupId: ServiceGroupId): void {
+    this.expanded.update((current) => {
+      const next = new Set(current);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+
+    // Re-evaluate reading position outside zone as group expansion shifts subsequent chapters
+    this.zone.runOutsideAngular(() => {
+      this.scheduleUpdate();
+    });
+  }
+
+  isExpanded(groupId: ServiceGroupId): boolean {
+    return this.expanded().has(groupId);
+  }
+
+  formatOrdinal(index: number): string {
+    return String(index + 1).padStart(2, '0');
+  }
+
+  initScrollSpy(): void {
+    if (this.scrollCleanup || typeof window === 'undefined') {
+      return;
+    }
+
+    const onScrollOrResize = () => {
+      this.scheduleUpdate();
+    };
+
+    this.zone.runOutsideAngular(() => {
+      window.addEventListener('scroll', onScrollOrResize, { passive: true });
+      window.addEventListener('resize', onScrollOrResize, { passive: true });
+      this.scheduleUpdate();
+    });
+
+    this.scrollCleanup = () => {
+      window.removeEventListener('scroll', onScrollOrResize);
+      window.removeEventListener('resize', onScrollOrResize);
+    };
+  }
+
+  scheduleUpdate(): void {
+    if (this.rafId !== null || typeof window === 'undefined') {
+      return;
+    }
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = null;
+      this.checkActiveChapter();
+    });
+  }
+
+  checkActiveChapter(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const root = this.host.nativeElement;
+    const chapterElements = Array.from(root.querySelectorAll<HTMLElement>('article.chapter'));
+    // Mandatory guard: if chapter list is empty, exit without calling resolveActiveChapter
+    if (chapterElements.length === 0) {
+      return;
+    }
+
+    const chapterPositions: ChapterPosition<ServiceGroupId>[] = chapterElements.map((el) => ({
+      id: el.id as ServiceGroupId,
+      top: el.getBoundingClientRect().top,
+    }));
+
+    const readingLine = window.innerHeight * 0.3;
+    const scrollHeight = document.documentElement?.scrollHeight ?? document.body.scrollHeight;
+    const atBottom = window.innerHeight + window.scrollY >= scrollHeight - 2;
+
+    const nextId = resolveActiveChapter(
+      [chapterPositions[0], ...chapterPositions.slice(1)],
+      readingLine,
+      atBottom,
+    );
+
+    // Re-enter Angular zone ONLY when the active chapter id changes (NFR-001)
+    if (nextId !== this.activeGroup()) {
+      this.zone.run(() => {
+        this.activeGroup.set(nextId);
+      });
+    }
+  }
+
+  destroyScrollSpy(): void {
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+    this.scrollCleanup?.();
+    this.scrollCleanup = null;
+  }
 }
