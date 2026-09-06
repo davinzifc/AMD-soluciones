@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { ANALYTICS_PORT } from '../../../core/analytics/analytics-port';
+import { AmbientOrbsComponent } from '../../../core/ambient/ambient-orbs/ambient-orbs';
 import { buildMailtoUrl, buildWhatsAppUrl, openHandoff, type WhatsAppContext } from '../../../core/contact/contact-handoff';
 import { CONTACT_MAILTO_INBOX, WHATSAPP_NUMBER } from '../../../core/contact/contact.config';
 import type { ContactIntent } from '../../../core/contact/contact-intent.model';
@@ -30,21 +31,16 @@ const isServiceGroupId = (id: string | null): id is ServiceGroupId =>
   typeof id === 'string' && (SERVICE_GROUP_IDS as readonly string[]).includes(id);
 
 /**
- * Home Contact (T010 · REQ-008 · design.md §6 `ContactSection`). Reactive
- * Forms (DD-011) with client-side-only validation, then a WhatsApp handoff
- * (primary) plus a mailto link always visible as a fallback. Never calls a
- * Nest leads API or persists anything — phase 1 has neither
- * (`docs/trd/trd.md` "Fase actual").
- *
- * "Abrir WhatsApp" (mockup `#wa-btn` parity) intentionally skips the full
- * validation gate: it hands off whatever the visitor has typed so far (or
- * just the localized prefill) so the escape hatch to a human never blocks
- * on form completeness. Only the primary Submit path requires a valid
- * form, shows the success toast, and emits `contact_submit`.
+ * Home Contact (T010, T016 · REQ-008 · design.md §6 `ContactSection`). Reactive
+ * Forms with client-side-only validation, then a WhatsApp handoff (primary)
+ * plus a mailto link always visible in the contact meta list as a fallback.
+ * Parity with mockup `#contacto` (single validated submit button, dark ambient
+ * field, BEM classes). Never calls a Nest leads API or persists anything — phase 1
+ * has neither (`docs/trd/trd.md` "Fase actual").
  */
 @Component({
   selector: 'app-contact-section',
-  imports: [ReactiveFormsModule, LocalizePipe],
+  imports: [ReactiveFormsModule, LocalizePipe, AmbientOrbsComponent],
   templateUrl: './contact-section.html',
   styleUrl: './contact-section.css',
 })
@@ -114,13 +110,6 @@ export class ContactSection {
   /** Recomputed each render from the current (possibly empty/partial) form — the fallback stays accurate even before submit. */
   protected mailtoHref(): string {
     return buildMailtoUrl(this.rawContext(), this.inboxAddress);
-  }
-
-  /** "Abrir WhatsApp" — no validation gate (see class doc); still an analytics-tracked handoff. */
-  protected openWhatsApp(): void {
-    const url = buildWhatsAppUrl(this.rawContext(), this.number, this.locale.translate('waPrefill'));
-    openHandoff(url);
-    this.analytics.track('whatsapp_click', { source: 'form' });
   }
 
   protected submit(): void {

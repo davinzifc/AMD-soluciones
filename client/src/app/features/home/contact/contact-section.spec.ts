@@ -2,6 +2,8 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 
+import enJson from '../../../../assets/i18n/en.json';
+import esJson from '../../../../assets/i18n/es.json';
 import { ANALYTICS_PORT, type AnalyticsPort } from '../../../core/analytics/analytics-port';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { SERVICE_GROUP_IDS } from '../../services/services-page/services-page';
@@ -80,6 +82,105 @@ describe('ContactSection', () => {
   it('renders the #contacto fragment scroll target', () => {
     const { fixture } = setup();
     expect(fixture.nativeElement.querySelector('#contacto')).toBeTruthy();
+  });
+
+  describe('internal jargon gate (T016 · public copy hygiene)', () => {
+    it('ensures no value in es.json or en.json contains forbidden internal jargon', () => {
+      const FORBIDDEN_JARGON = ['backend', 'client-side', 'handoff', 'fase 1', 'phase 1', 'stub'];
+      const dicts: readonly [string, Record<string, unknown>][] = [
+        ['es', esJson as Record<string, unknown>],
+        ['en', enJson as Record<string, unknown>],
+      ];
+
+      for (const [locale, dict] of dicts) {
+        for (const [key, value] of Object.entries(dict)) {
+          if (typeof value === 'string') {
+            const lower = value.toLowerCase();
+            for (const forbidden of FORBIDDEN_JARGON) {
+              const containsJargon = lower.includes(forbidden.toLowerCase());
+              expect(
+                containsJargon,
+                `Forbidden jargon "${forbidden}" found in ${locale}.json under key "${key}": "${value}"`
+              ).toBe(false);
+            }
+          }
+        }
+      }
+    });
+  });
+
+  describe('mockup copy & structure fidelity (T016)', () => {
+    it('renders eyebrow and h2 with "Cuéntanos qué necesitas.", not "Hablemos"', () => {
+      const { fixture } = setup({
+        localeService: {
+          translate: (key: string) => (esJson as Record<string, string>)[key] ?? key,
+          locale: () => 'es' as const,
+        },
+      });
+      const root = fixture.nativeElement as HTMLElement;
+      const eyebrow = root.querySelector('.eyebrow');
+      expect(eyebrow).toBeTruthy();
+      expect(eyebrow?.textContent?.trim()).toBe('Hablemos');
+
+      const h2 = root.querySelector('h2');
+      expect(h2).toBeTruthy();
+      expect(h2?.textContent?.trim()).toBe('Cuéntanos qué necesitas.');
+      expect(h2?.textContent).not.toContain('Hablemos');
+    });
+
+    it('renders dl.contact__meta with three rows wrapped in divs, and the Correo row contains a functional mailto link', () => {
+      const { fixture } = setup();
+      const root = fixture.nativeElement as HTMLElement;
+      const dl = root.querySelector('dl.contact__meta');
+      expect(dl).toBeTruthy();
+
+      const rows = dl!.querySelectorAll(':scope > div');
+      expect(rows.length).toBe(3);
+
+      const emailRow = rows[2];
+      const mailtoLink = emailRow.querySelector('a');
+      expect(mailtoLink).toBeTruthy();
+      expect(mailtoLink?.getAttribute('href')).toMatch(/^mailto:/);
+    });
+
+    it('contains all required mockup classes in its class inventory', () => {
+      const { fixture } = setup();
+      const root = fixture.nativeElement as HTMLElement;
+      const allElements = [root, ...Array.from(root.querySelectorAll('*'))];
+      const classSet = new Set<string>();
+      for (const el of allElements) {
+        el.classList.forEach((cls) => classSet.add(cls));
+      }
+
+      const requiredClasses = [
+        'contact',
+        'contact__grid',
+        'contact__intro',
+        'contact__lead',
+        'contact__meta',
+        'eyebrow',
+        'field',
+        'form',
+        'wrap',
+      ];
+
+      for (const requiredClass of requiredClasses) {
+        expect(
+          classSet.has(requiredClass),
+          `Required class "${requiredClass}" is missing from ContactSection class inventory`
+        ).toBe(true);
+      }
+    });
+
+    it('ensures fNote is removed from both dictionaries and has no references in template', () => {
+      expect((esJson as Record<string, unknown>)['fNote']).toBeUndefined();
+      expect((enJson as Record<string, unknown>)['fNote']).toBeUndefined();
+
+      const { fixture } = setup();
+      const root = fixture.nativeElement as HTMLElement;
+      expect(root.querySelector('.form-note')).toBeNull();
+      expect(root.textContent).not.toContain('fNote');
+    });
   });
 
   describe('invalid submit (REQ-008)', () => {
@@ -187,22 +288,6 @@ describe('ContactSection', () => {
       form.dispatchEvent(new Event('submit'));
       fixture.detectChanges();
 
-      expect(fixture.nativeElement.querySelectorAll('.field-error').length).toBe(0);
-    });
-  });
-
-  describe('"Abrir WhatsApp" form button (mockup #wa-btn parity)', () => {
-    it('opens a WhatsApp handoff and emits whatsapp_click without requiring a valid form', () => {
-      const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
-      const { fixture, track } = setup();
-
-      const waBtn = fixture.nativeElement.querySelector('.form__actions .btn--ghost') as HTMLButtonElement;
-      waBtn.click();
-      fixture.detectChanges();
-
-      expect(openSpy).toHaveBeenCalledTimes(1);
-      expect(track).toHaveBeenCalledWith('whatsapp_click', expect.objectContaining({ source: 'form' }));
-      expect(fixture.nativeElement.querySelector('.toast')).toBeNull();
       expect(fixture.nativeElement.querySelectorAll('.field-error').length).toBe(0);
     });
   });

@@ -828,7 +828,7 @@ la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su
 
 ## T016 — Contacto: portar la sección del mockup y sacar la jerga interna
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** none
 - **Origen:** **KZ-007** — revisión HITL en navegador, 2026-09-06. `#contacto` **no lo toca ninguna
   tarea de esta spec** y §5.5 no lo lista, pero el mockup lo dibuja y es la Home aprobada.
@@ -885,10 +885,10 @@ la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su
 
 ### Done when
 
-- [ ] Cero jerga interna en los diccionarios, verificado en ES y EN
-- [ ] Eyebrow + titular + lead del mockup; `contact__meta` con las tres filas
-- [ ] Inventario de clases ⊇ el del mockup
-- [ ] Validación, errores accesibles, `mailto` y toast intactos y en verde
+- [x] Cero jerga en **todos** los valores de ambos diccionarios; `fNote` retirada por completo
+- [x] Eyebrow + titular + lead del mockup; `contact__meta` con tres filas y el correo como enlace
+- [x] **Inventario ⊇ el del mockup, verificado por diff**: falta nada; extras `field-error`, `mailto-fallback`, `toast` — las piezas que el mockup no tiene
+- [x] Validación, `aria-invalid`/`aria-describedby`, foco al primer inválido, `mailto`, toast y prefill por query param: **todos en verde**
 
 ---
 

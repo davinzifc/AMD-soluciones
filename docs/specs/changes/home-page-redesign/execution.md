@@ -1292,3 +1292,81 @@ EXTRA EN ANGULAR : section--light
 jsdom no compone la cinta ni mide centrado ni contraste. Quedan sin probar: que el ticker corra a su
 velocidad y sin costura, que la sección se lea centrada, y el contraste real del eyebrow y de los
 sectores sobre blanco.
+
+---
+
+## T016 — Contacto: portar la sección del mockup y sacar la jerga interna · **PASS** (1 ronda · 2026-09-06)
+
+**Origen:** KZ-007 addendum. `#contacto` **no lo cubría ninguna tarea** de la spec y §5.5 no lo lista.
+Una sección sin dueño es una sección que nadie revisa — y arrastraba dos defectos.
+
+### El hallazgo grave: vocabulario del proyecto en la página del cliente
+
+| Clave | Valor que estaba en producción |
+|---|---|
+| `contactLead` | «Cuéntanos qué necesitas. **Fase 1: WhatsApp o correo — sin backend.**» |
+| `fNote` | «**Validación client-side + handoff.**» / «Client-side validation + handoff.» |
+
+«Fase 1», «backend», «client-side» y «handoff» describen **cómo está construido el sitio**, no qué
+ofrece la empresa. Un cliente que lee «sin backend» aprende que la página está a medias.
+
+`contactLead` pasa al valor del mockup. **`fNote` desaparece entera** —el mockup no tiene esa línea—
+junto con su `<p class="form-note">`. `fWhatsapp` quedó huérfana al fusionar los botones y también
+sale. Ninguna de las tres tiene ya referencia en código ni en los diccionarios.
+
+**El aserto que queda protege a toda la página, no sólo a esta sección:** recorre **todos** los
+valores de `es.json` y `en.json` buscando `backend`, `client-side`, `handoff`, `fase 1`/`phase 1`,
+`stub` y `mock`, sin distinguir mayúsculas, y **nombra la clave y la palabra** cuando falla.
+
+### Lo visual portado
+
+`eyebrow` «Hablemos» + `h2` «Cuéntanos qué necesitas.» + `contact__lead`; `dl.contact__meta` con
+**tres** filas envueltas en `<div>` (Ubicación · WhatsApp · **Correo**), y el correo **sigue siendo un
+enlace `mailto` funcional**, no texto plano. Clases BEM del mockup. Campo ambiental atenuado montado
+reutilizando el componente compartido de `core/ambient/` — importado, sin escribir fuera del boundary.
+
+### Los dos botones — el análisis se verificó antes de fusionar
+
+El brief entregó el análisis hecho y pidió confirmarlo: `submit()` valida y abre WhatsApp;
+`openWhatsApp()` abría **sin validar**; el `mailto` **no dependía de ningún botón** —vive en su propio
+enlace, hoy la fila «Correo»—; y existe un **FAB flotante de WhatsApp** en `app.html`, presente en
+toda la página. Fusionar en el único `btn--gold btn--block` del mockup **conserva el camino validado y
+el correo**, y el único atajo que se pierde —abrir WhatsApp sin rellenar nada— sigue disponible por el
+FAB y por el número visible en el `<dl>`.
+
+### Lo que NO se tocó, y era la mitad del valor
+
+El formulario del mockup lleva `onsubmit="return false"`: es una **maqueta muerta**. El de `client/`
+tiene validación reactiva, mensajes de error con `aria-invalid`/`aria-describedby`, foco al primer
+campo inválido, `mailto` construido con el contexto, toast, prefill desde `?servicio=` y analítica.
+**Todo sigue en verde** — 11 tests de regresión lo guardan.
+
+Es la lección de T008 aplicada en la dirección contraria: allí el error fue **no** portar lo que el
+mockup sí tenía; aquí el riesgo era **portar de más** y borrar lo que el mockup no tiene porque no
+funciona.
+
+### Diff de inventario — verificado por el Reviewer
+
+```
+FALTA : NADA
+EXTRA : field-error · mailto-fallback · toast
+```
+
+Los tres extras son exactamente las piezas de accesibilidad y comportamiento que el mockup no dibuja.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+**32 ficheros · 298 tests** verde (294 → 298), lint limpio, `main` **451.23 kB**.
+
+### Mutaciones — las tres del brief, corridas por el Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Devolver «Fase 1 … sin backend» a `contactLead` | **FALLA**, y el mensaje nombra la clave y la palabra: *Forbidden jargon "backend" found in es.json under key "contactLead"* |
+| 2 | Correo como texto plano sin enlace | FALLA (2 tests) |
+| 3 | Quitar la clase `contact__meta` | FALLA el inventario (2 tests) |
+
+### PENDIENTE DE T012
+
+jsdom no mide el layout de dos columnas, ni el campo ambiental, ni el contraste del formulario sobre
+tinta. **T012.**

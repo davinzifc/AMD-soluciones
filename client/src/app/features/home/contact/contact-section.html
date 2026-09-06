@@ -1,19 +1,27 @@
-<section id="contacto" class="contact-section">
-  <div class="wrap contact-grid">
-    <div class="contact-intro">
-      <div class="section-head">
-        <h2>{{ 'contactTitle' | localize }}</h2>
-        <p>{{ 'contactLead' | localize }}</p>
-      </div>
+<section id="contacto" class="contact">
+  <app-ambient-orbs class="orbfield orbfield--dim" [count]="4" />
+  <div class="wrap contact__grid">
+    <div class="contact__intro">
+      <p class="eyebrow">{{ 'contactEyebrow' | localize }}</p>
+      <h2>{{ 'contactTitle' | localize }}</h2>
+      <p class="contact__lead">{{ 'contactLead' | localize }}</p>
 
-      <dl class="contact-meta">
-        <dt>{{ 'locLabel' | localize }}</dt>
-        <dd>Cali, Colombia</dd>
-        <dt>{{ 'waLabel' | localize }}</dt>
-        <dd>+57 324 880 5290</dd>
+      <dl class="contact__meta">
+        <div>
+          <dt>{{ 'locLabel' | localize }}</dt>
+          <dd>Cali, Colombia</dd>
+        </div>
+        <div>
+          <dt>{{ 'waLabel' | localize }}</dt>
+          <dd>+57 324 880 5290</dd>
+        </div>
+        <div>
+          <dt>{{ 'emailLabel' | localize }}</dt>
+          <dd>
+            <a class="mailto-fallback" [href]="mailtoHref()">{{ inboxAddress }}</a>
+          </dd>
+        </div>
       </dl>
-
-      <a class="mailto-fallback" [href]="mailtoHref()">{{ inboxAddress }}</a>
     </div>
 
     <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
@@ -61,6 +69,7 @@
         <textarea
           id="message"
           formControlName="message"
+          rows="4"
           [attr.aria-invalid]="fieldInvalid('message')"
           [attr.aria-describedby]="fieldInvalid('message') ? 'message-error' : null"
         ></textarea>
@@ -69,12 +78,7 @@
         }
       </div>
 
-      <div class="form__actions">
-        <button class="btn btn--gold" type="submit">{{ 'fSubmit' | localize }}</button>
-        <button class="btn btn--ghost" type="button" (click)="openWhatsApp()">{{ 'fWhatsapp' | localize }}</button>
-      </div>
-
-      <p class="form-note">{{ 'fNote' | localize }}</p>
+      <button class="btn btn--gold btn--block" type="submit">{{ 'fSubmit' | localize }}</button>
 
       @if (toastVisible()) {
         <div class="toast" role="status">{{ 'fToast' | localize }}</div>
