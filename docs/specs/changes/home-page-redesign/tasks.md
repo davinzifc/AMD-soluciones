@@ -894,7 +894,7 @@ la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su
 
 ## T017 — Hero: alineación a la izquierda y «Scroll» clicable
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** none
 - **Origen:** **KZ-007** — revisión HITL, 2026-09-06. El inventario de clases del hero **coincide con
   el mockup** y aun así diverge: la diferencia es CSS, no estructura. **Es la prueba de que el diff de
@@ -945,8 +945,8 @@ accesible del enlace.
 
 ### Done when
 
-- [ ] Contenido del hero alineado al margen izquierdo del `.wrap`; ancho restringido en el párrafo
-- [ ] «Scroll» clicable, con nombre accesible, línea del mockup y 44 px de objetivo táctil
+- [x] `max-width` fuera de `.hero__content`; la restricción vive en `.hero__promise { max-width: 34rem }`, como el mockup
+- [x] «Scroll» es `<a>` con `fragment="servicios"`, texto como nombre accesible, línea dorada `1×34 px` y `min-height: 44px`
 
 ---
 

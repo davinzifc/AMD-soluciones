@@ -72,7 +72,6 @@
 .hero__content {
   /* Balanced pad: clear Scroll below without recreating the empty upper band. */
   padding: 1.5rem 0 3.5rem;
-  max-width: 38rem;
   animation: hero-rise 900ms var(--amd-ease) both;
 }
 
@@ -119,7 +118,7 @@
   font-size: clamp(1.15rem, 2.4vw, 1.4rem);
   color: rgba(245, 246, 248, 0.78);
   margin: 0 0 2rem;
-  max-width: 32rem;
+  max-width: 34rem;
 }
 
 .hero__cta {
@@ -181,15 +180,33 @@
 .hero__scroll {
   position: absolute;
   left: 50%;
-  bottom: 1.25rem;
+  bottom: 2rem;
   z-index: 1;
   transform: translateX(-50%);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: rgba(245, 246, 248, 0.55);
-  pointer-events: none;
+  text-decoration: none;
+  min-height: 44px;
+  padding-top: 0.5rem;
+  box-sizing: border-box;
   animation: hero-scroll-bob 2.4s var(--amd-ease) infinite;
+}
+
+.hero__scroll:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 4px;
+}
+
+.hero__scroll i {
+  display: block;
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(180deg, var(--amd-gold), transparent);
 }
 
 @keyframes hero-scroll-bob {

@@ -1370,3 +1370,56 @@ Los tres extras son exactamente las piezas de accesibilidad y comportamiento que
 
 jsdom no mide el layout de dos columnas, ni el campo ambiental, ni el contraste del formulario sobre
 tinta. **T012.**
+
+---
+
+## T017 — Hero: alineación a la izquierda y «Scroll» clicable · **PASS** (1 ronda · 2026-09-06)
+
+**Origen:** KZ-007 addendum. El hero es el caso que demostró que **el diff de inventario de clases no
+basta**: su inventario coincide exactamente con el del mockup —por eso la revisión estructural lo dio
+por bueno— y aun así divergía. La diferencia era CSS, no estructura.
+
+### Defecto 1 — el contenido salía centrado. Causa raíz
+
+`hero-section.html` usa `<div class="wrap hero__content">`, y las dos clases se pisaban:
+
+```css
+.wrap          { width: min(100% - 2.5rem, 1160px); margin-inline: auto; }
+.hero__content { max-width: 38rem; }          /* el mockup NO tiene esto */
+```
+
+`max-width` gana a `width`, así que la caja se quedaba en **608 px**, y el `margin-inline: auto` que
+aporta `.wrap` **centraba esos 608 px en el viewport**. El mockup no pone `max-width` en el
+contenedor: la restricción vive en **`.hero__promise { max-width: 34rem }`**, de modo que el bloque
+arranca en el margen izquierdo del `.wrap` y **sólo el párrafo** es estrecho. Portado tal cual.
+
+### Defecto 2 — «Scroll» tenía tres cosas mal a la vez
+
+Era `<div class="hero__scroll" aria-hidden="true">` con `pointer-events: none`: **no era pulsable, no
+navegaba y no existía para un lector de pantalla**. Ahora es
+`<a routerLink="/" fragment="servicios">` con el texto en un `<span>` —que pasa a ser su **nombre
+accesible**— y la línea del mockup como `<i aria-hidden="true">`: `1px × 34px` con degradado dorado a
+transparente. Añadido `min-height: 44px` (REQ-013), que el `<div>` no declaraba. Sólo la línea
+decorativa conserva `aria-hidden`. La animación `hero-scroll-bob` y su anulación bajo reduced-motion
+siguen intactas.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+**32 ficheros · 303 tests** verde (298 → 303), lint limpio, `main` **451.23 kB**.
+
+### Mutaciones — dos del brief y una del Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Devolver `max-width: 38rem` a `.hero__content` | FALLA |
+| 2 | Devolver `pointer-events: none` a `.hero__scroll` | FALLA |
+| 3 | Quitar `min-height: 44px` del scroll | **FALLA** — el objetivo táctil de REQ-013 está guardado |
+
+Comprobado además que los dos `pointer-events: none` que quedan en la hoja pertenecen a `.hero__bg` y
+a `.parallax-layer`, que son decorativos y deben tenerlo.
+
+### PENDIENTE DE T012
+
+**jsdom no calcula posición.** Que `.hero__content` no declare `max-width` **no prueba** que el bloque
+quede a la izquierda: el aserto es sobre el texto del CSS. Lo mide T012, junto con el objetivo táctil
+real del enlace de scroll y que su destino haga scroll de verdad.
