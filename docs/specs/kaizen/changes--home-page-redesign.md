@@ -148,3 +148,33 @@ jerarquía de fuentes era la equivocada.
    caso. El diff de inventario del punto 3 es la versión barata que sí puede correr en cada tarea.
 
 **Estado:** Proposed · Severidad: **Crítica** · Origen: HITL 2026-09-06 (revisión en navegador del usuario)
+
+### KZ-007 · addendum — el diff de inventario es necesario, **no suficiente**
+
+**Medido (2026-09-06, segunda revisión HITL).** Tras cerrar T014 y T015 con el diff de inventario de
+clases en verde, el usuario encontró **dos secciones más** divergentes: `#contacto` y `#inicio`.
+
+El hero es el caso instructivo: **su inventario de clases coincide exactamente con el del mockup** —
+la primera revisión estructural lo dio por bueno por eso— y aun así el contenido sale **centrado**
+cuando el mockup lo pone a la izquierda. La causa es CSS puro: `.hero__content` lleva la clase `wrap`
+(que aporta `margin-inline: auto`) **y además** un `max-width: 38rem` propio que el mockup no tiene;
+`max-width` gana a `width`, la caja se encoge a 608 px y el `auto` la centra.
+
+**La lección:** el diff de inventario atrapa **elementos ausentes** (los pilares de T014, el ticker de
+T015) y es ciego a **divergencias de propiedad CSS** con estructura idéntica. Cubre una clase de
+defecto, no las dos.
+
+**Corolario para el punto 4 del KZ-007 original:** por eso la medición en navegador **no puede ser la
+última tarea del grafo**. Un gate visual por sección, corriendo cuando la sección se cierra, es lo
+único que atrapa la segunda clase. Hoy T012 acumula la deuda visual de quince tareas.
+
+**Hallazgo colateral, y el más grave de la revisión:** `#contacto` **no lo cubre ninguna tarea** de la
+spec —§5.5 no lo lista— y arrastra **jerga interna del proyecto en copy público**: `contactLead` dice
+«Fase 1: WhatsApp o correo — sin backend» y `fNote` dice «Validación client-side + handoff». Está en
+producción, a la vista de los clientes de AMD. **Una sección que ninguna tarea toca es una sección que
+nadie revisa**, y el alcance del spec se definió por deltas sobre lo existente en vez de por
+cobertura de la página.
+
+**Quinto punto propuesto:** al cerrar `/akili-specify`, **enumerar las secciones que el mockup dibuja
+y comprobar que cada una tiene dueño en `tasks.md`**. Una sección sin tarea debe justificarse por
+escrito, no quedar fuera por omisión.

@@ -826,10 +826,134 @@ la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su
 
 ---
 
+## T016 — Contacto: portar la sección del mockup y sacar la jerga interna
+
+- **Status:** [ ]
+- **Depends on:** none
+- **Origen:** **KZ-007** — revisión HITL en navegador, 2026-09-06. `#contacto` **no lo toca ninguna
+  tarea de esta spec** y §5.5 no lo lista, pero el mockup lo dibuja y es la Home aprobada.
+- **Directory boundary:** `client/src/app/features/home/contact/` y `client/src/assets/i18n/`
+- **Recommended skills:** `ui-ux-pro-max`, `frontend-design`
+- **Requirements:** REQ-001 (tono), **REQ-011**, REQ-013
+- **Design refs:** DD-028 · **Mockup: `index.html` `<section id="contacto">`**
+
+### Scope
+
+> 🔴 **Lo más urgente no es visual: hay jerga interna en la página del cliente.**
+>
+> | Clave | Valor hoy |
+> |---|---|
+> | `contactLead` | «Cuéntanos qué necesitas. **Fase 1: WhatsApp o correo — sin backend.**» |
+> | `fNote` | «**Validación client-side + handoff.**» / «Client-side validation + handoff.» |
+>
+> «Fase 1», «sin backend», «client-side» y «handoff» son vocabulario del proyecto, no del negocio.
+> Están hoy en producción a la vista de los clientes de AMD. **Salen sí o sí**, con independencia del
+> resto de la tarea.
+
+| Elemento del mockup | Hoy |
+|---|---|
+| `p.eyebrow` «Hablemos» + `h2` «Cuéntanos qué necesitas.» | `h2` «Hablemos», sin eyebrow |
+| `p.contact__lead` «Respondemos por WhatsApp o correo. Sin formularios eternos.» | la línea con «Fase 1 / sin backend» |
+| `dl.contact__meta` con **tres** filas (Ubicación · WhatsApp · **Correo**), separadas por hairline | dos `dt/dd` + un enlace `mailto` suelto fuera del `<dl>` |
+| Un solo botón `btn--gold btn--block` «Enviar por WhatsApp» | dos botones: «Enviar consulta» + «Abrir WhatsApp» |
+| `option` «Selecciona una línea» | «Selecciona (opcional)» |
+| `orbfield orbfield--dim` (campo ambiental atenuado) | ausente |
+| Clases BEM `contact__grid/intro/lead/meta` | `contact-grid/intro/meta`, más un `section-head` que el mockup no tiene |
+
+> ⚠ **El formulario de `client/` hace cosas que el mockup NO hace, y esas se conservan.** El mockup
+> lleva `onsubmit="return false"`: es una maqueta muerta. En `client/` hay formulario reactivo con
+> validación, mensajes de error accesibles (`aria-invalid`, `aria-describedby`), fallback `mailto` y
+> toast. **Nada de eso se borra.** Esta tarea porta **lo visual y el copy**, no el comportamiento.
+> Si el mockup y una regla de accesibilidad chocan, gana la accesibilidad y se reporta.
+
+**Sobre los dos botones:** el mockup deja uno. Antes de fusionarlos, comprueba qué hace hoy cada uno
+(`submit()` y `openWhatsApp()`): si «Enviar consulta» es la única vía al fallback `mailto`,
+**fusionarlos pierde un canal**. Repórtalo en vez de decidirlo solo.
+
+### Tests
+
+- Eyebrow presente y `h2` con el titular del mockup, no «Hablemos»
+- **Ni «Fase 1», ni «backend», ni «client-side», ni «handoff» en ningún valor de los diccionarios** —
+  aserto sobre el texto de `es.json` y `en.json`, en los dos idiomas
+- `dl.contact__meta` con **tres** filas, incluida Correo
+- Fidelidad de inventario contra la sección del mockup
+- **Regresión:** la validación, los mensajes de error, el `mailto` y el toast siguen verdes
+
+- **Verification:** `cd client && npm run test:agent && npm run lint -- --quiet && npm run build`
+- **Falsable con:** devolver «Fase 1» a `contactLead` → el aserto de jerga debe FALLAR.
+- **Evidence disqualifier:** jsdom no mide el layout de dos columnas ni el campo ambiental. **T012.**
+
+### Done when
+
+- [ ] Cero jerga interna en los diccionarios, verificado en ES y EN
+- [ ] Eyebrow + titular + lead del mockup; `contact__meta` con las tres filas
+- [ ] Inventario de clases ⊇ el del mockup
+- [ ] Validación, errores accesibles, `mailto` y toast intactos y en verde
+
+---
+
+## T017 — Hero: alineación a la izquierda y «Scroll» clicable
+
+- **Status:** [ ]
+- **Depends on:** none
+- **Origen:** **KZ-007** — revisión HITL, 2026-09-06. El inventario de clases del hero **coincide con
+  el mockup** y aun así diverge: la diferencia es CSS, no estructura. **Es la prueba de que el diff de
+  inventario es necesario pero no suficiente.**
+- **Directory boundary:** `client/src/app/features/home/hero/` y `client/src/assets/i18n/`
+- **Recommended skills:** `ui-ux-pro-max`
+- **Requirements:** REQ-001, REQ-013 (objetivo táctil)
+- **Design refs:** **Mockup: `index.html` `<section id="inicio">`; `home-redesign.css:318-336`**
+
+### Scope
+
+**1 · El contenido va a la izquierda, no centrado. Causa raíz localizada:**
+
+`hero-section.html` usa `<div class="wrap hero__content">`. `.wrap` aporta
+`width: min(100% - 2.5rem, 1160px)` **y `margin-inline: auto`**. Y `.hero__content` añade
+`max-width: 38rem`. Como `max-width` gana a `width`, la caja queda en 608 px **y el `margin-inline:
+auto` la centra en el viewport**. Por eso el bloque sale centrado.
+
+El mockup no pone `max-width` en `.hero__content`: la restricción de ancho vive en
+**`.hero__promise { max-width: 34rem }`**, así que el bloque arranca en el margen izquierdo del
+`.wrap` y sólo el párrafo es estrecho. **Portar eso.**
+
+**2 · «Scroll» debe ser un enlace clicable con su línea:**
+
+| Mockup | Hoy |
+|---|---|
+| `<a class="hero__scroll" href="#servicios">` con `<span>SCROLL</span>` + `<i>` | `<div class="hero__scroll" aria-hidden="true">` |
+| `i`: línea de 1×34 px con degradado dorado a transparente | ausente |
+| `min-height: 44px` (objetivo táctil, REQ-013) | `pointer-events: none` |
+
+Hoy **no se puede pulsar, no navega y está oculto a asistencia técnica**. Pasa a `<a>` con
+`routerLink="/" fragment="servicios"`, la línea `<i aria-hidden="true">`, y `min-height: 44px`.
+**Fuera el `pointer-events: none`.** El texto «SCROLL» deja de ser `aria-hidden`: es el nombre
+accesible del enlace.
+
+### Tests
+
+- El hero **no** centra su contenido: `.hero__content` sin `max-width` propio; el ancho lo pone
+  `.hero__promise`
+- «Scroll» es un `<a>` con destino `#servicios`, **no** `aria-hidden`, sin `pointer-events: none`, y
+  con objetivo táctil ≥ 44 px declarado
+
+- **Verification:** `cd client && npm run test:agent -- --include="src/app/features/home/hero/**/*.spec.ts" && npm run test:agent`
+- **Falsable con:** devolver `max-width: 38rem` a `.hero__content` → debe FALLAR. Devolver
+  `pointer-events: none` → debe FALLAR.
+- **Evidence disqualifier:** jsdom no calcula posición: que no haya `max-width` **no** prueba que el
+  bloque quede a la izquierda. **T012** lo mide.
+
+### Done when
+
+- [ ] Contenido del hero alineado al margen izquierdo del `.wrap`; ancho restringido en el párrafo
+- [ ] «Scroll» clicable, con nombre accesible, línea del mockup y 44 px de objetivo táctil
+
+---
+
 ## T012 — Gate de medición en navegador
 
 - **Status:** [ ]
-- **Depends on:** T007, T009, T011, **T014, T015**
+- **Depends on:** T007, T009, T011, **T014, T015, T016, T017**
 - **Directory boundary:** `client/` (devDependency + script)
 - **Recommended skills:** `angular-developer`
 - **Requirements:** REQ-001 (los dos escenarios), REQ-007 escenarios "el bucle no salta" y
