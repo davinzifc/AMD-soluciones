@@ -642,9 +642,11 @@ Fallback con `@supports` para navegadores sin `mask-image`: el nombre en texto.
 
 ## T011 — `TrustSection`: sin auto-rotación, puntos como control primario
 
-- **Status:** [ ]
+- **Status:** [x] PASS (2 rondas · 2026-09-06)
 - **Depends on:** T010
-- **Directory boundary:** `client/src/app/features/home/trust/`
+- **Directory boundary:** `client/src/app/features/home/trust/` y **`client/src/assets/i18n/`**
+  (ampliado 2026-09-06 — **séptima reincidencia de KZ-005**: la tarea reescribe `trustLead` y crea la
+  clave del nombre accesible de los puntos. Las dos son copy y viven en los diccionarios)
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Requirements:** REQ-006 (los tres escenarios), REQ-011
 - **Design refs:** DD-034, §5.5, §9 reversión 2
@@ -659,6 +661,14 @@ geometría de control aprobada salvo que la tarea lo nombre — aquí la nombra:
 
 Montar `ClientWall`. La sección pasa a blanco y conserva `.section--light`. Reescribir `trustLead`:
 su segunda mitad —"testimonios con pausa larga para leer"— queda falsa.
+
+> **Dónde va el muro (decisión del Leader, 2026-09-06).** El Scope decía «Montar `ClientWall`» sin
+> decir dónde. REQ-006 pide **tres grados de concreción: qué dicen → quiénes son → dónde operan**, y
+> el mockup los sirve en ese orden (`index.html:332-370`: cita y puntos → muro de clientes → ticker
+> de sectores). La plantilla actual los tiene al revés —sectores antes que testimonios—, así que el
+> montaje exige **mover el bloque `.logos` (sectores) detrás del muro**. Orden final:
+> cabecera → métricas → testimonios → puntos → `ClientWall` → sectores → CTA.
+> Ningún escenario de REQ-006 asevera el orden, así que esto es juicio del Leader, no letra del spec.
 
 ### Tests
 
@@ -677,11 +687,13 @@ su segunda mitad —"testimonios con pausa larga para leer"— queda falsa.
 
 ### Done when
 
-- [ ] Sin temporizador; regresión de 15 s en verde
-- [ ] Cuatro testimonios conservados; `q4`/`q4By` intactas
-- [ ] Nombre accesible de los puntos traducido en ES y EN
-- [ ] `ClientWall` montado con aserto de ancestría
-- [ ] `trustLead` reescrito; ningún test conservado sin sujeto
+- [x] Sin temporizador ni export `TESTIMONIAL_PAUSE_MS`; regresión de 15 s en verde y falsable
+- [x] Cuatro testimonios conservados; `q4`/`q4By` intactas
+- [x] `testimonialDotLabel` con `{n}` interpolado, en ES y EN
+- [x] `ClientWall` montado entre puntos y sectores, con aserto de ancestría (KZ-004) falsable
+- [x] `trustLead` reescrito en ES y EN; los dos tests del temporizador borrados con su sujeto. **`logosLabel` también** — quedó engañosa al aparecer un muro de clientes real encima (ver `execution.md`)
+- [x] Fondo a `--amd-surface`, conservando `.section--light`
+- [x] Geometría 44×44 de los puntos **intacta**
 
 ---
 

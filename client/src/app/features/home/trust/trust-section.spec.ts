@@ -3,13 +3,22 @@ import { provideRouter } from '@angular/router';
 
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { MotionService } from '../../../core/motion/motion.service';
-import { TESTIMONIAL_PAUSE_MS, TrustSection } from './trust-section';
+import { TrustSection } from './trust-section';
+
+const SENTINELS: Record<string, string> = {
+  testimonialDotLabel: '«TESTIMONIAL_{n}»',
+};
 
 function setup(reduce: boolean) {
   TestBed.configureTestingModule({
     providers: [
       provideRouter([]),
-      { provide: LocaleService, useValue: { translate: (key: string) => key } },
+      {
+        provide: LocaleService,
+        useValue: {
+          translate: (key: string) => SENTINELS[key] ?? key,
+        },
+      },
       { provide: MotionService, useValue: { reducedMotion: () => reduce } },
     ],
   });
@@ -84,45 +93,30 @@ describe('TrustSection', () => {
     expect(root.querySelector('.testimonials .logo-track')).toBeNull();
   });
 
-  it('exposes one dot per testimonial, aria-current on the active one', () => {
+  it('exposes one dot per testimonial with translated accessible name and programmatic active state (REQ-006 / REQ-011)', () => {
     const fixture = setup(false);
     const root = fixture.nativeElement as HTMLElement;
     const dots = root.querySelectorAll<HTMLButtonElement>('.testimonial-dots button');
     expect(dots.length).toBe(4);
     expect(dots[0].getAttribute('aria-current')).toBe('true');
     expect(dots[1].getAttribute('aria-current')).toBe('false');
+    expect(dots[0].getAttribute('aria-label')).toBe('«TESTIMONIAL_1»');
+    expect(dots[1].getAttribute('aria-label')).toBe('«TESTIMONIAL_2»');
+    expect(dots[2].getAttribute('aria-label')).toBe('«TESTIMONIAL_3»');
+    expect(dots[3].getAttribute('aria-label')).toBe('«TESTIMONIAL_4»');
+    // Anti-pattern guard: no hardcoded Spanish literal (REQ-011)
+    expect(dots[0].getAttribute('aria-label')).not.toBe('Testimonio 1');
   });
 
-  it(
-    'auto-advances the active testimonial after exactly the production pause ' +
-      `(${TESTIMONIAL_PAUSE_MS}ms — this test advances a *fake* clock by that exact ` +
-      'production constant; it does not shrink the interval to speed itself up)',
-    () => {
-      expect(TESTIMONIAL_PAUSE_MS).toBe(9000);
-
-      vi.useFakeTimers();
-      const fixture = setup(false);
-      const root = fixture.nativeElement as HTMLElement;
-
-      expect(root.querySelectorAll('.quote')[1].classList.contains('is-active')).toBe(false);
-
-      vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS - 1);
-      fixture.detectChanges();
-      expect(root.querySelectorAll('.quote')[1].classList.contains('is-active')).toBe(false);
-
-      vi.advanceTimersByTime(1);
-      fixture.detectChanges();
-      expect(root.querySelectorAll('.quote')[0].classList.contains('is-active')).toBe(false);
-      expect(root.querySelectorAll('.quote')[1].classList.contains('is-active')).toBe(true);
-    },
-  );
-
-  it('reduced-motion path never schedules the auto-advance timer (REQ-007/010 scenario)', () => {
+  it('does NOT auto-advance testimonials over time (REQ-006: 15s fake timers regression test)', () => {
     vi.useFakeTimers();
-    const fixture = setup(true);
+    const fixture = setup(false);
     const root = fixture.nativeElement as HTMLElement;
 
-    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS * 3);
+    expect(root.querySelectorAll('.quote')[0].classList.contains('is-active')).toBe(true);
+    expect(root.querySelectorAll('.quote')[1].classList.contains('is-active')).toBe(false);
+
+    vi.advanceTimersByTime(15_000);
     fixture.detectChanges();
 
     expect(root.querySelectorAll('.quote')[0].classList.contains('is-active')).toBe(true);
@@ -143,24 +137,13 @@ describe('TrustSection', () => {
     expect(dots[2].getAttribute('aria-current')).toBe('true');
   });
 
-  it('manual dot selection restarts the pause window instead of stacking timers (motion allowed)', () => {
-    vi.useFakeTimers();
+  it('contains ClientWall within the #confianza section (KZ-004 ancestry)', () => {
     const fixture = setup(false);
-    const root = fixture.nativeElement as HTMLElement;
-
-    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS - 100);
-    const dots = root.querySelectorAll<HTMLButtonElement>('.testimonial-dots button');
-    dots[3].click();
-    fixture.detectChanges();
-
-    // 100ms later the *old* window would have fired; the restarted one must not have.
-    vi.advanceTimersByTime(100);
-    fixture.detectChanges();
-    expect(root.querySelectorAll('.quote')[3].classList.contains('is-active')).toBe(true);
-
-    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS - 100);
-    fixture.detectChanges();
-    expect(root.querySelectorAll('.quote')[0].classList.contains('is-active')).toBe(true);
+    const section = fixture.nativeElement.querySelector('#confianza') as HTMLElement;
+    expect(section).toBeTruthy();
+    const clientWall = section.querySelector('app-client-wall');
+    expect(clientWall).toBeTruthy();
+    expect(section.contains(clientWall)).toBe(true);
   });
 
   it('Contactar CTA routes to the Home #contacto fragment', () => {

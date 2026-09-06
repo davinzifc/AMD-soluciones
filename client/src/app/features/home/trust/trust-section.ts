@@ -1,8 +1,10 @@
-import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
+import { LocaleService } from '../../../core/i18n/locale.service';
 import { MotionService } from '../../../core/motion/motion.service';
+import { ClientWall } from '../clients/client-wall';
 
 interface Metric {
   readonly value: string;
@@ -42,34 +44,23 @@ const TESTIMONIALS: readonly Testimonial[] = [
 ];
 
 /**
- * Production auto-advance pause (REQ-007 "~9s"; mockup `landing.js` `PAUSE_MS`).
- * Exported so the spec asserts against this single source instead of a
- * duplicated magic number, and so any future speed-up in tests documents
- * itself as a visible deviation from this constant rather than a silent one.
- */
-export const TESTIMONIAL_PAUSE_MS = 9000;
-
-/**
- * Home Trust (T009 · REQ-007 · design.md §6 `TrustSection` · DD-008).
+ * Home Trust (T011 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034).
  *
- * Two independent motion models on purpose (DD-008): the sector/logo strip
- * is a continuous CSS `logo-marquee` loop, edge-faded only on its own
- * `.logos__viewport` mask — the section title/lead sit outside that wrapper
- * and stay sharp. Testimonials are a timed crossfade (`~9000ms` pause, dots
- * for manual selection), never a horizontal marquee of quotes.
+ * Testimonials are read statically without an auto-advancing timer (REQ-006:
+ * content must not rotate while being read). The four dots serve as the primary
+ * control for navigating quotes manually, each with translated accessible name
+ * and programmatic active state (REQ-011).
  *
- * `MotionService` (T013; replaces the T009-era `TrustMotionQuery` stub)
- * gates both: under `prefers-reduced-motion: reduce` the marquee loses its
- * CSS animation (`.is-reduced-motion` class + defense-in-depth `@media`
- * rule in the stylesheet) and the testimonial timer is never scheduled at
- * all — content still reaches every quote via the dots (REQ-010 "keep all
- * content ... reachable"). Because `MotionService.reducedMotion` is a live
- * signal (not a one-time read), an `effect()` re-evaluates the timer any
- * time the OS preference changes mid-session, not just once at construction.
+ * MotionService gates the logo marquee ticker for decorative sectors under
+ * prefers-reduced-motion: reduce (.is-reduced-motion class + defense-in-depth
+ * media query).
+ *
+ * Section hierarchy follows three degrees of concreteness:
+ * what they say (testimonials) -> who they are (ClientWall) -> where they operate (sectors).
  */
 @Component({
   selector: 'app-trust-section',
-  imports: [RouterLink, LocalizePipe],
+  imports: [RouterLink, LocalizePipe, ClientWall],
   templateUrl: './trust-section.html',
   styleUrl: './trust-section.css',
 })
@@ -78,41 +69,23 @@ export class TrustSection {
   protected readonly logoTrack = [...SECTORS, ...SECTORS];
   protected readonly testimonials = TESTIMONIALS;
 
+  private readonly locale = inject(LocaleService);
   private readonly motion = inject(MotionService);
   protected readonly reducedMotion = this.motion.reducedMotion;
 
   private readonly activeIndexSignal = signal(0);
   protected readonly activeIndex = this.activeIndexSignal.asReadonly();
 
-  private timer: ReturnType<typeof setInterval> | undefined;
-
-  constructor() {
-    effect(() => this.restartTimer());
-    inject(DestroyRef).onDestroy(() => clearInterval(this.timer));
-  }
-
   protected isActive(index: number): boolean {
     return this.activeIndexSignal() === index;
   }
 
   protected testimonialLabel(index: number): string {
-    return `Testimonio ${index + 1}`;
+    return this.locale.translate('testimonialDotLabel').replace('{n}', String(index + 1));
   }
 
-  /** Dot click mirrors mockup `showQuote(idx); restartTestimonials();` — manual pick resets the pause window. */
+  /** Dot click: manual selection is the only way to navigate testimonials (REQ-006). */
   protected selectTestimonial(index: number): void {
     this.activeIndexSignal.set(index);
-    this.restartTimer();
-  }
-
-  private restartTimer(): void {
-    clearInterval(this.timer);
-    const reduce = this.reducedMotion();
-    this.timer =
-      reduce || this.testimonials.length < 2
-        ? undefined
-        : setInterval(() => {
-            this.activeIndexSignal.update((current) => (current + 1) % this.testimonials.length);
-          }, TESTIMONIAL_PAUSE_MS);
   }
 }

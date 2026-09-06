@@ -6,7 +6,6 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { MotionService } from '../../../core/motion/motion.service';
@@ -30,7 +29,7 @@ export function duracion(anchoMitad: number, pxPorSegundo: number = DEFAULT_SPEE
 }
 
 export interface PreparedClientLogo extends ClientLogo {
-  readonly logoSafe: SafeStyle;
+  readonly logoSafe: string;
 }
 
 @Component({
@@ -46,14 +45,15 @@ export class ClientWall implements AfterViewInit {
   @ViewChild('track') private readonly trackRef?: ElementRef<HTMLElement>;
 
   private readonly motion = inject(MotionService);
-  private readonly sanitizer = inject(DomSanitizer);
+  // DomSanitizer no es necesario: Angular no sanitiza bindings de custom properties (--*).
+  // Evitar DomSanitizer ahorra ~6.8 kB en el bundle inicial al permitir tree-shaking del sanitizador.
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly reducedMotion = this.motion.reducedMotion;
 
   protected readonly clients: readonly PreparedClientLogo[] = CLIENT_LOGOS.map((item) => ({
     ...item,
-    logoSafe: this.sanitizer.bypassSecurityTrustStyle(`url(media/logos/${item.slug}.webp)`),
+    logoSafe: `url(media/logos/${item.slug}.webp)`,
   }));
 
   ngAfterViewInit(): void {

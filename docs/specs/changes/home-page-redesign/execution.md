@@ -1061,3 +1061,104 @@ se vea. Quedan sin probar, y no pueden darse por cubiertas:
    cuando T012 confirme cuál basta.
 2. El muro **no está montado**: lo monta **T011**, con su aserto de ancestría (KZ-004). Hasta
    entonces el componente existe y no se ve.
+
+---
+
+## T011 — `TrustSection`: sin auto-rotación, puntos como control primario · **PASS** (2 rondas · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high`. **Leader/Reviewer:** Claude Code.
+
+### Dos correcciones de spec previas al despacho
+
+1. **Séptima reincidencia de KZ-005.** La tarea reescribe `trustLead` y crea la clave del nombre
+   accesible de los puntos; el boundary no incluía `client/src/assets/i18n/`.
+2. **El Scope decía «Montar `ClientWall`» sin decir dónde, y el sitio importa.** REQ-006 pide **tres
+   grados de concreción: qué dicen → quiénes son → dónde operan**, y el mockup los sirve en ese orden
+   (`index.html:332-370`). La plantilla los tenía **al revés**: el ticker de sectores iba antes que
+   los testimonios. Montar el muro correctamente exigía **mover el bloque `.logos` detrás de él**.
+   **Ningún escenario de REQ-006 asevera el orden: es juicio del Leader apoyado en el mockup**, y se
+   dejó escrito como tal en la tarea, no como letra del spec.
+
+### Qué se entregó
+
+- Fuera el `setInterval`, el `effect()` que lo reprogramaba, el `clearInterval` de destrucción y el
+  export **`TESTIMONIAL_PAUSE_MS`**. REQ-006 es tajante sobre el porqué: un carrusel automático
+  **sustituye texto que alguien está leyendo**.
+- `testimonialLabel()` devolvía `` `Testimonio ${i+1}` `` —español hardcodeado, REQ-011— y ahora
+  resuelve `testimonialDotLabel` con `{n}` interpolado, patrón de `LedgerSection.allCtaLabel`.
+- Los **cuatro** testimonios conservados; `q4`/`q4By` no quedan huérfanas.
+- `ClientWall` montado. Orden final: cabecera → métricas → testimonios → puntos → muro → sectores → CTA.
+- Fondo de `--amd-mist` a `--amd-surface` (§5.5), conservando `.section--light`.
+- `trustLead` reescrito en los dos idiomas: su segunda mitad —«testimonios con pausa larga para
+  leer»— **dejó de ser cierta** al retirar el temporizador. Ahora dice que los elige el visitante.
+
+### Lo que NO se tocó, y por qué se dijo explícitamente
+
+- **La geometría 44×44 de los puntos.** El CSS lleva un comentario explicando que con centros
+  separados ~15 px el clic en un punto caía en el siguiente. **KZ-001**: la tarea la nombra para
+  **conservarla**, no para cambiarla.
+- **`background: var(--amd-gold)` del punto activo.** Es **relleno, no texto**: REQ-009 sólo restringe
+  el dorado como `color:`. Con la sección pasando a blanco era justo el sitio donde alguien "corrige"
+  algo que no está roto.
+
+### Ronda 2 — un coste que sólo se podía medir con el muro montado
+
+**`DomSanitizer` costaba 6.80 kB en el bundle inicial.** Medido, no deducido: dos builds idénticos
+salvo por el sanitizador.
+
+| | `main` (inicial) | `home-page` (lazy) |
+|---|---|---|
+| Con `DomSanitizer` | **458.03 kB** | 105.37 kB |
+| Sin él, `--logo` como `string` | **451.23 kB** | 105.33 kB |
+
+Los 6.8 kB caen **enteros en el bundle inicial**, no en el chunk perezoso: se descargan en todas las
+rutas para una tira de logos que está bajo el pliegue y sólo existe en una página. `ClientWall` era el
+**único** consumidor de `DomSanitizer` en `src/app`; sin él la maquinaria de sanitización se elimina
+por tree-shaking.
+
+**Y la defensa no hacía falta.** Con `--logo` como `string` plano los 16 tests de `client-wall.spec.ts`
+pasan, incluido el que asevera que los 13 conservan `media/logos/<slug>.webp`: **Angular no sanitiza
+los bindings de custom properties (`--*`)**.
+
+> **La causa es del brief del Leader, no del Implementer.** El brief de T010 advirtió de la trampa del
+> sanitizador y exigió un aserto; con esa información, `bypassSecurityTrustStyle` era la elección
+> prudente. La advertencia era correcta para `[style.background-image]` y **falsa para una custom
+> property**, y sólo se pudo comprobar una vez montado el muro. En el código queda un comentario que
+> explica por qué no hace falta, para que nadie lo reintroduzca "por si acaso".
+
+**Mutación de cierre:** reintroducir `bypassSecurityTrustStyle` devuelve `main` a **458.03 kB**;
+revertir lo baja a **451.23 kB**. La causa queda demostrada, no inferida.
+
+### Segunda corrección de la ronda 2 — `logosLabel` quedó engañosa
+
+Mismo defecto que `trustLead`, descubierto por el Reviewer: valía «Algunos clientes / sectores» /
+«Some clients / sectors». Cuando rotulaba una tira de píldoras de sectores y no había nada más,
+pasaba. **Con un muro de clientes reales justo encima**, hace leer las píldoras como si fueran
+clientes — que es exactamente lo que ya no son. Pasa a «Sectores que acompañamos» / «Sectors we
+support», el valor del mockup.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+- `npm run test:agent` **sin filtro** —obligatorio: `trust-section.spec.ts` importaba
+  `TESTIMONIAL_PAUSE_MS`, así que al retirar el export **el fichero deja de compilar**—:
+  **32 ficheros · 291 tests** verde (292 → 291).
+- `npm run lint -- --quiet`: limpio · `npm run build`: **451.23 kB** inicial.
+
+### Mutaciones
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Reintroducir un `setInterval` que cambie el testimonio | FALLA la regresión de 15 s |
+| 2 | Montar el muro **fuera** de `#confianza` | FALLA la ancestría — el aserto comprueba `section.contains()`, no presencia global |
+| 3 | Reintroducir `bypassSecurityTrustStyle` | `main` sube a 458.03 kB |
+
+### ADVISORY (registrado, no bloquea)
+
+1. **`q2` y `q2By` están en inglés en `es.json`.** Los valores son idénticos a los de `en.json`:
+   «Needed bilingual support for our ops setup in Colombia…» / «Ops lead, SaaS». **Es preexistente**,
+   no lo introduce T011, y el gate de paridad ES/EN no puede detectarlo —compara claves, no valores—.
+   Un visitante hispanohablante ve un testimonio en inglés entre tres en español. Necesita traducción
+   o una decisión explícita de dejarlo verbatim.
+2. La advertencia sobre el sanitizador **sigue siendo válida para bindings de estilo normales**
+   (`[style.background-image]`, `[style]`); lo que no aplica es a custom properties. Conviene no
+   generalizar la lección al revés.
