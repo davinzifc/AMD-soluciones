@@ -1,39 +1,29 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { MotionService } from '../../../core/motion/motion.service';
 import { ClientWall } from '../clients/client-wall';
 
-interface Metric {
-  readonly value: string;
-  readonly labelKey: string;
-}
-
 interface Testimonial {
   readonly textKey: string;
   readonly byKey: string;
 }
 
-/** Values are locale-independent (mockup parity); only the labels are i18n keys. */
-const METRICS: readonly Metric[] = [
-  { value: '10+', labelKey: 'm1' },
-  { value: '98%', labelKey: 'm2' },
-  { value: 'ES/EN', labelKey: 'm3' },
-  { value: 'Cali', labelKey: 'm4' },
-];
-
-/** Decorative sector pills (mockup `index.html` `.logo-pill`, `aria-hidden`) — not i18n'd. */
-const SECTORS: readonly string[] = [
-  'Cripto',
-  'Moda',
-  'Oro',
-  'Educación',
-  'Fundaciones',
-  'Minimarket',
-  'Ploteo',
-  'Turismo',
+/**
+ * 9 sectors from mockup (home-redesign.js:268-276) localized via i18n keys (REQ-011).
+ * Duplicated once for the 50% seamless marquee loop -> 18 elements.
+ */
+const SECTOR_KEYS: readonly string[] = [
+  'sectorCommerce',
+  'sectorServices',
+  'sectorHealthcare',
+  'sectorConstruction',
+  'sectorTransport',
+  'sectorEducation',
+  'sectorManufacturing',
+  'sectorTechnology',
+  'sectorAgribusiness',
 ];
 
 const TESTIMONIALS: readonly Testimonial[] = [
@@ -44,29 +34,21 @@ const TESTIMONIALS: readonly Testimonial[] = [
 ];
 
 /**
- * Home Trust (T011 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034).
+ * Home Trust (T015 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034 · mockup index.html#confianza).
  *
- * Testimonials are read statically without an auto-advancing timer (REQ-006:
- * content must not rotate while being read). The four dots serve as the primary
- * control for navigating quotes manually, each with translated accessible name
- * and programmatic active state (REQ-011).
+ * Centered layout with eyebrow, large centered quote with 4 dots (manual navigation only,
+ * REQ-006 regression guard), ClientWall, and flat-text ticker of 9 localized sectors (18 items).
  *
- * MotionService gates the logo marquee ticker for decorative sectors under
- * prefers-reduced-motion: reduce (.is-reduced-motion class + defense-in-depth
- * media query).
- *
- * Section hierarchy follows three degrees of concreteness:
- * what they say (testimonials) -> who they are (ClientWall) -> where they operate (sectors).
+ * Metrics cards and CTA button removed per mockup parity (HITL 2026-09-06).
  */
 @Component({
   selector: 'app-trust-section',
-  imports: [RouterLink, LocalizePipe, ClientWall],
+  imports: [LocalizePipe, ClientWall],
   templateUrl: './trust-section.html',
   styleUrl: './trust-section.css',
 })
 export class TrustSection {
-  protected readonly metrics = METRICS;
-  protected readonly logoTrack = [...SECTORS, ...SECTORS];
+  protected readonly sectors = [...SECTOR_KEYS, ...SECTOR_KEYS];
   protected readonly testimonials = TESTIMONIALS;
 
   private readonly locale = inject(LocaleService);

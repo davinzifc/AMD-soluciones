@@ -759,7 +759,7 @@ REQ-004, ahora en el layout correcto.
 
 ## T015 — Confianza: portar la sección del mockup
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** T011
 - **Origen:** **KZ-007** — revisión HITL en navegador, 2026-09-06. T011 estaba redactada como *delta*
   («retirar `setInterval`, montar `ClientWall`») y dejó el Confianza antiguo con el muro pegado.
@@ -816,13 +816,13 @@ la ausencia de temporizador, los 44×44 de los puntos, `ClientWall` montado y su
 
 ### Done when
 
-- [ ] Eyebrow en vez de título + lead; sección centrada
-- [ ] Métricas fuera del DOM y `m1…m4` fuera de los diccionarios, sin referencias
-- [ ] Cita grande centrada con sus cuatro puntos; cuatro testimonios intactos
-- [ ] Ticker de **texto plano** con los 9 sectores del mockup y el rótulo debajo
-- [ ] CTA final retirado
-- [x] **Inventario de clases ⊇ el del mockup, verificado por diff**: falta **nada**; único extra `section--light`, que es del proyecto
-- [ ] Regresión de 15 s y ancestría de `ClientWall` siguen en verde
+- [x] Eyebrow en vez de título + lead; sección centrada
+- [x] Métricas fuera del DOM; `m1…m4`, `trustTitle`, `trustLead`, `trustCta` y `logosLabel` fuera de ambos diccionarios, sin referencias
+- [x] Cita grande centrada con sus cuatro puntos; cuatro testimonios intactos
+- [x] Ticker de **texto plano**: 9 sectores por clave `sector*`, duplicados a 18, rótulo debajo
+- [x] CTA final retirado
+- [x] **Inventario ⊇ el del mockup, verificado por diff** contando la plantilla de `ClientWall`: falta **nada**; único extra `section--light`
+- [x] Regresión de 15 s, ancestría de `ClientWall` y 44×44 siguen en verde
 
 ---
 

@@ -1231,3 +1231,64 @@ nada renderizado**, así que el test hace bien en no fallar. Repetida sobre la r
 1. **`.eyebrow` base declara un `color` muerto.** Es redundante con `.eyebrow--ink` y nunca gana.
    Misma clase de defecto que el `height: auto` de T006: una declaración que parece hacer trabajo y no
    lo hace. Inocua, pero candidata a limpieza.
+
+---
+
+## T015 — Confianza: portar la sección del mockup · **PASS** (1 ronda · 2026-09-06)
+
+**Origen:** KZ-007. T011 retiró el temporizador y montó el muro, pero dejó la sección antigua con el
+muro pegado: métricas en tarjetas, `h2` + lead, cita en tarjeta alineada a la izquierda y sectores
+como píldoras. Nada de eso está en el mockup.
+
+### Qué se entregó
+
+Estructura del mockup: `eyebrow--ink` «Confianza que se nota» → `figure.quote` centrada
+(`max-width: 44rem`, `clamp(1.2rem, 2.6vw, 1.7rem)`) con `figcaption` → `quote__dots` con los cuatro
+puntos → `ClientWall` → `.ticker` de texto plano → `.ticker__label` **debajo**. `text-align: center`
+en toda la sección.
+
+**Tres retiradas (HITL 2026-09-06):** las cuatro tarjetas de métricas, el `h2` + párrafo lead, y el
+CTA «Contactar» final. Con ellas salieron de ambos diccionarios `m1…m4`, `trustTitle`, `trustLead`,
+`trustCta` y `logosLabel` — todas huérfanas, comprobado por grep antes de borrar.
+
+**El ticker pasa de tarjetas a texto plano** y de 8 sectores propios a los **9 del mockup**, por clave
+`sector*` en ES y EN: el mockup los lleva sueltos en el JS sin traducir, pero aquí son copy visible y
+REQ-011 aplica. Duplicados una vez → 18 elementos para el bucle del 50 %.
+
+> **`gap` es correcto aquí, y no lo era en `ClientWall`.** El ticker es texto y su ancho lo fija el
+> contenido, así que las dos mitades salen idénticas y el 50 % cae en el mismo punto del patrón. En el
+> muro de logos el aire tiene que ir como `margin-inline` porque ahí `gap` sí rompe la costura. Son
+> dos cintas con reglas opuestas: la lección de una **no** se generaliza a la otra.
+
+### Lo que se conservó, con sus tests
+
+Los **cuatro** testimonios (DD-034: el mockup dibuja tres como ilustración), la ausencia de
+temporizador con su regresión de 15 s, los 44×44 de los puntos (KZ-001) y `ClientWall` montado dentro
+de `#confianza` con su aserto de ancestría (KZ-004).
+
+### Diff de inventario — verificado por el Reviewer
+
+Contando la plantilla de `ClientWall`, que aporta `clients*`:
+
+```
+FALTA EN ANGULAR : NADA
+EXTRA EN ANGULAR : section--light
+```
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+**32 ficheros · 294 tests** verde (292 → 294), lint limpio, `main` **451.23 kB**.
+
+### Mutaciones — las tres del brief, corridas por el Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Reintroducir una tarjeta de métrica | FALLA |
+| 2 | Rótulo del ticker **antes** de la cinta | FALLA — el aserto compara posición real, no presencia |
+| 3 | Quitar la clase `ticker__track` | FALLA el inventario (3 tests) |
+
+### PENDIENTE DE T012
+
+jsdom no compone la cinta ni mide centrado ni contraste. Quedan sin probar: que el ticker corra a su
+velocidad y sin costura, que la sección se lea centrada, y el contraste real del eyebrow y de los
+sectores sobre blanco.

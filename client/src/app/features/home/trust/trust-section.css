@@ -1,265 +1,168 @@
-/* Home Trust (REQ-007 · design.md §6 · DD-008). Mirrors mockup
-   `landing.css` `.metrics/.logos/.testimonials` rules on AMD tokens (no
-   template purple, REQ-011). Mist/light background per mockup
-   `index.html#confianza` `.section--light`; the same marker class is added
-   to the host `<section>` in the template so `HomeSideNav` (T013) can
-   detect it for the sidenav's light/dark contrast scroll-spy. */
+/* Home Trust (T015 · REQ-006 · REQ-009 · REQ-011 · design.md §5.5, §6 · DD-034).
+   Ported directly from mockup/home-redesign.css:630-668, 751-756.
+   Centered layout on var(--amd-surface); zero images, pure typography and air. */
 
 :host {
   display: block;
 }
 
-.trust-section {
-  padding: 5.5rem 0;
+.trust {
   background: var(--amd-surface);
-  color: var(--amd-ink);
+  padding: 8rem 0 7rem;
+  text-align: center;
 }
 
 .wrap {
-  width: min(100% - 2.5rem, 1160px);
+  width: min(100% - 2.5rem, 1180px);
   margin-inline: auto;
 }
 
-.section-head {
-  max-width: 36rem;
-  margin-bottom: 2.75rem;
-}
-
-.section-head h2 {
-  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
-  margin: 0 0 0.6rem;
-}
-
-.section-head p {
-  margin: 0;
-  color: var(--amd-slate);
-}
-
-/* Metrics */
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-@media (min-width: 768px) {
-  .metrics {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.metric {
-  padding: 1.25rem 1rem;
-  border-radius: var(--radius-md);
-  background: var(--amd-surface);
-  box-shadow: var(--shadow-soft);
-}
-
-.metric strong {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  color: #8a7630;
-  letter-spacing: -0.02em;
-}
-
-.metric span {
-  font-size: 0.88rem;
-  color: var(--amd-slate);
-}
-
-/* Logo marquee — its own motion model (DD-008), independent of testimonials. */
-.logos {
-  margin: 0 0 2.75rem;
-}
-
-.logos__label {
-  font-size: 0.78rem;
+/* ── Eyebrow (REQ-009: 12px text uses --amd-gold-ink-deep) ───────────── */
+.eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  color: var(--amd-gold-ink-deep);
+  text-align: center;
+}
+
+.eyebrow--ink {
+  color: var(--amd-gold-ink-deep);
+}
+
+/* ── Quote (large, centered display typography) ─────────────────────── */
+.quote {
+  margin: 3rem auto 0;
+  max-width: 44rem;
+}
+
+.quote:not(.is-active) {
+  display: none;
+}
+
+.quote blockquote {
+  margin: 0;
+}
+
+.quote p {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--amd-ink);
+  margin: 0;
+  transition: opacity var(--amd-motion-slow) var(--amd-ease);
+}
+
+.quote figcaption {
+  margin-top: 1.25rem;
+  font-size: 0.85rem;
   color: var(--amd-slate);
-  margin: 0 0 1rem;
 }
 
-/* Fade only on the card strip viewport — the section title/lead above live
-   outside this element entirely, so the mask can never dim them (REQ-007
-   scenario + constraint: "title not faded by logo mask"). */
-.logos__viewport {
-  overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-
-.logo-track {
+/* ── Dots (KZ-001: 44x44 touch targets, 8px visual pip) ──────────────── */
+.quote__dots {
   display: flex;
-  gap: 1.25rem;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.quote__dots button {
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.quote__dots button::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(13, 20, 26, 0.35);
+  transition: background var(--amd-motion-fast) var(--amd-ease);
+}
+
+.quote__dots button[aria-selected='true']::after,
+.quote__dots button[aria-current='true']::after {
+  background: var(--amd-gold-ink);
+  border-color: var(--amd-gold-ink);
+}
+
+.quote__dots button:focus-visible {
+  outline: 2px solid var(--amd-gold-ink);
+  outline-offset: 2px;
+}
+
+/* ── Ticker: flat text continuous ribbon ─────────────────────────────── */
+.ticker {
+  margin-top: 5rem;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  border-block: 1px solid var(--amd-border);
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
+}
+
+.ticker__track {
+  display: flex;
+  gap: 3.5rem;
   width: max-content;
-  animation: logo-marquee 42s linear infinite;
+  animation: ticker 38s linear infinite;
 }
 
-/* JS-driven gate (MotionService, live-updating) plus a defense-in-depth
-   `@media` rule below — either one alone is enough to stop the loop under
-   prefers-reduced-motion: reduce (REQ-007 / REQ-010). */
-.logos__viewport.is-reduced-motion .logo-track {
-  animation: none;
+.ticker__track span {
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(86, 88, 94, 0.62);
+  white-space: nowrap;
 }
 
-@keyframes logo-marquee {
-  from {
-    transform: translateX(0);
-  }
+@keyframes ticker {
   to {
     transform: translateX(-50%);
   }
 }
 
-.logo-pill {
-  flex: 0 0 auto;
-  min-width: 140px;
-  height: 64px;
-  padding: 0 1.25rem;
-  border-radius: var(--radius-md);
-  background: var(--amd-surface);
-  border: 1px solid var(--amd-border);
-  box-shadow: var(--shadow-soft);
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--amd-slate);
-  letter-spacing: 0.02em;
+.ticker__label {
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(86, 88, 94, 0.7);
 }
 
-/* Testimonials — crossfade + dots, never a horizontal marquee of quotes. */
-.testimonials {
-  position: relative;
-  min-height: 11rem;
-}
-
-.quote {
-  background: var(--amd-surface);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-soft);
-  margin: 0;
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition: opacity 500ms var(--amd-ease), transform 500ms var(--amd-ease);
-}
-
-.quote.is-active {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  position: relative;
-}
-
-.quote p {
-  margin: 0 0 1rem;
-  font-size: 1.05rem;
-  color: var(--amd-ink);
-}
-
-.quote footer {
-  font-size: 0.88rem;
-  color: var(--amd-slate);
-}
-
-.testimonial-dots {
-  display: flex;
-  gap: 0.35rem;
-  margin-top: 1rem;
-  justify-content: center;
-}
-
-/*
- * HITL 2026-08-05: previous `::after { inset: -18px }` hit bulbs overlapped
- * (centers ~15px apart, 44×44 bulbs) so clicks on the first visual dot hit the
- * next sibling. Use non-overlapping 44×44 button boxes with an 8px visual
- * pip via ::before — click target matches the circle you see.
- */
-.testimonial-dots button {
-  box-sizing: border-box;
-  width: 44px;
-  height: 44px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  position: relative;
-}
-
-.testimonial-dots button::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(13, 20, 26, 0.2);
-}
-
-.testimonial-dots button[aria-current='true']::before {
-  background: var(--amd-gold);
-}
-
-.testimonial-dots button:focus-visible {
-  outline: 2px solid var(--amd-gold);
-  outline-offset: 2px;
-}
-
-.trust-cta {
-  margin-top: 2rem;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0.7rem 1.25rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  font-weight: 600;
-  font-size: 0.95rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: transform var(--amd-motion-fast) var(--amd-ease), background var(--amd-motion-fast) var(--amd-ease);
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn:focus-visible {
-  outline: 2px solid var(--amd-gold);
-  outline-offset: 3px;
-}
-
-.btn--ink {
-  background: var(--amd-ink);
-  color: #f5f6f8;
+/* ── Responsive & Motion overrides ───────────────────────────────────── */
+@media (max-width: 760px) {
+  .trust {
+    padding: 5rem 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-track {
-    animation: none;
+  .ticker__track {
+    animation: none !important;
   }
 
-  .quote {
+  .quote p {
     transition: none;
   }
 
-  .btn {
+  .quote__dots button::after {
     transition: none;
   }
+}
+
+.ticker__track.is-reduced-motion {
+  animation: none !important;
 }

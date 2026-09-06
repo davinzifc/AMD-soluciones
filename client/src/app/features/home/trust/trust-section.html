@@ -1,33 +1,23 @@
-<section id="confianza" class="trust-section section--light">
+<section id="confianza" class="trust section--light">
   <div class="wrap">
-    <div class="section-head">
-      <h2>{{ 'trustTitle' | localize }}</h2>
-      <p>{{ 'trustLead' | localize }}</p>
-    </div>
+    <p class="eyebrow eyebrow--ink">{{ 'trustEyebrow' | localize }}</p>
 
-    <div class="metrics">
-      @for (metric of metrics; track metric.labelKey) {
-        <div class="metric">
-          <strong>{{ metric.value }}</strong>
-          <span>{{ metric.labelKey | localize }}</span>
-        </div>
-      }
-    </div>
-
-    <div class="testimonials" aria-live="polite">
-      @for (quote of testimonials; track quote.textKey; let i = $index) {
-        <blockquote class="quote" [class.is-active]="isActive(i)">
+    @for (quote of testimonials; track quote.textKey; let i = $index) {
+      <figure class="quote" [class.is-active]="isActive(i)" [attr.hidden]="isActive(i) ? null : ''">
+        <blockquote data-quote>
           <p>{{ quote.textKey | localize }}</p>
-          <footer>— <span>{{ quote.byKey | localize }}</span></footer>
         </blockquote>
-      }
-    </div>
+        <figcaption>— {{ quote.byKey | localize }}</figcaption>
+      </figure>
+    }
 
-    <div class="testimonial-dots" [attr.aria-label]="'testimonialDotsAria' | localize">
+    <div class="quote__dots" role="tablist" [attr.aria-label]="'testimonialDotsAria' | localize">
       @for (quote of testimonials; track quote.textKey; let i = $index) {
         <button
           type="button"
+          role="tab"
           [attr.aria-label]="testimonialLabel(i)"
+          [attr.aria-selected]="isActive(i)"
           [attr.aria-current]="isActive(i)"
           (click)="selectTestimonial(i)"
         ></button>
@@ -36,19 +26,14 @@
 
     <app-client-wall />
 
-    <div class="logos">
-      <p class="logos__label">{{ 'logosLabel' | localize }}</p>
-      <div class="logos__viewport" [class.is-reduced-motion]="reducedMotion()">
-        <div class="logo-track" aria-hidden="true">
-          @for (sector of logoTrack; track $index) {
-            <div class="logo-pill">{{ sector }}</div>
-          }
-        </div>
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track" data-ticker [class.is-reduced-motion]="reducedMotion()">
+        @for (sectorKey of sectors; track $index) {
+          <span>{{ sectorKey | localize }}</span>
+        }
       </div>
     </div>
 
-    <div class="trust-cta">
-      <a class="btn btn--ink" routerLink="/" fragment="contacto">{{ 'trustCta' | localize }}</a>
-    </div>
+    <p class="ticker__label">{{ 'tickerLabel' | localize }}</p>
   </div>
 </section>
