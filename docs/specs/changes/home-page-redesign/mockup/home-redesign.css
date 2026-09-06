@@ -1,0 +1,937 @@
+/*
+ * AMD Soluciones — Home redesign mockup
+ * Tokens: espejo exacto de client/src/styles/tokens.css (no se inventa paleta nueva).
+ * Lenguaje visual: continuidad con features/services/services-page.css (editorial oscuro,
+ * ordinales sobredimensionados, hairlines, dorado de acento).
+ */
+
+/* ── Tokens (copiados de tokens.css — Source of Truth) ─────────── */
+:root {
+  --amd-gold: #cfbb66;
+  --amd-gold-soft: #e5d59a;
+
+  --amd-ink: #0d141a;
+  --amd-ink-soft: #1d1e20;
+  --amd-slate: #56585e;
+  --amd-mist: #f2f3f6;
+  --amd-surface: #ffffff;
+  --amd-border: rgba(13, 20, 26, 0.08);
+
+  --amd-glass: rgba(255, 255, 255, 0.08);
+  --amd-glass-border: rgba(255, 255, 255, 0.18);
+  --amd-glass-blur: blur(16px) saturate(140%);
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  --shadow-soft: 8px 8px 20px rgba(13, 20, 26, 0.08), -6px -6px 16px rgba(255, 255, 255, 0.7);
+
+  --amd-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --amd-motion-fast: 200ms;
+  --amd-motion-slow: 400ms;
+
+  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Derivados de sección oscura — mismos nombres que services-page.css (DD-024) */
+  --ink-text: #f5f6f8;
+  --ink-text-2: rgba(245, 246, 248, 0.72);
+  --ink-text-3: rgba(245, 246, 248, 0.5);
+  --hairline: rgba(245, 246, 248, 0.1);
+  --nav-h: 72px;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--amd-ink);
+  background: var(--amd-ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+p { margin: 0; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+button { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--amd-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap { width: min(100% - 2.5rem, 1180px); margin-inline: auto; }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--amd-gold); color: var(--amd-ink);
+  padding: 0.75rem 1.25rem; border-radius: 0 0 var(--radius-sm) 0; font-weight: 700;
+}
+.skip:focus { left: 0; }
+
+.eyebrow {
+  margin: 0 0 0.9rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amd-gold);
+}
+.eyebrow--ink { color: #8a7a2e; }
+
+/* ── Botones ───────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 1.5rem;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  transition: background var(--amd-motion-fast) var(--amd-ease),
+              border-color var(--amd-motion-fast) var(--amd-ease),
+              color var(--amd-motion-fast) var(--amd-ease);
+}
+.btn--sm { min-height: 42px; padding: 0 1.15rem; font-size: 0.88rem; }
+.btn--block { width: 100%; }
+
+.btn--gold { background: var(--amd-gold); color: var(--amd-ink); }
+.btn--gold:hover { background: var(--amd-gold-soft); }
+
+.btn--ink { background: var(--amd-ink); color: #fff; }
+.btn--ink:hover { background: #1a242c; }
+
+.btn--ghost { background: transparent; color: var(--ink-text); border-color: rgba(245, 246, 248, 0.28); }
+.btn--ghost:hover { border-color: var(--amd-gold); color: var(--amd-gold); }
+.btn--ghost-ink { color: var(--amd-ink); border-color: rgba(13, 20, 26, 0.24); }
+.btn--ghost-ink:hover { border-color: var(--amd-ink); color: var(--amd-ink); background: rgba(13, 20, 26, 0.04); }
+
+.linkarrow {
+  display: inline-flex; align-items: center; gap: 0.55rem;
+  min-height: 44px;
+  font-weight: 700; color: var(--amd-gold);
+  border-bottom: 1px solid transparent;
+}
+.linkarrow i { transition: transform var(--amd-motion-fast) var(--amd-ease); font-style: normal; }
+.linkarrow:hover i { transform: translateX(4px); }
+.linkarrow:hover { border-bottom-color: var(--amd-gold); }
+.linkarrow--sm { font-size: 0.9rem; }
+
+/* ── Topnav ────────────────────────────────────────────────────── */
+.topnav {
+  position: fixed; inset: 0 0 auto; z-index: 40;
+  height: var(--nav-h);
+  background: rgba(13, 20, 26, 0.72);
+  backdrop-filter: var(--amd-glass-blur);
+  -webkit-backdrop-filter: var(--amd-glass-blur);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink-text);
+}
+.topnav__inner { height: 100%; display: flex; align-items: center; gap: 1.5rem; }
+
+.brand { display: flex; align-items: center; gap: 0.75rem; margin-right: auto; }
+.brand__mark {
+  width: 38px; height: 38px; border-radius: 50%; flex: none;
+  background: radial-gradient(circle at 34% 30%, var(--amd-gold-soft), #b39c48 72%);
+}
+.brand__text b { display: block; font-family: var(--font-display); font-size: 1rem; line-height: 1.15; }
+.brand__text em { display: block; font-style: normal; font-size: 0.62rem; letter-spacing: 0.13em; color: var(--ink-text-3); }
+
+.topnav__links { display: flex; gap: 0.35rem; }
+.topnav__links a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.85rem;
+  color: var(--ink-text-2); font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+}
+.topnav__links a:hover { color: var(--ink-text); }
+.topnav__links a.is-current { color: var(--ink-text); border-bottom-color: var(--amd-gold); }
+
+.topnav__right { display: flex; align-items: center; gap: 0.9rem; }
+.lang { display: flex; border: 1px solid var(--hairline); border-radius: 999px; overflow: hidden; }
+.lang button {
+  min-width: 44px; min-height: 40px; padding: 0 0.5rem;
+  background: transparent; border: 0; cursor: pointer;
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; color: var(--ink-text-3);
+}
+.lang button.is-on { background: rgba(207, 187, 102, 0.16); color: var(--amd-gold); }
+
+/* Sobre secciones claras el nav invierte: cristal blanco + tinta.
+   Evita el gris turbio de un nav oscuro translúcido sobre fondo claro. */
+.topnav.on-light {
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom-color: var(--amd-border);
+  color: var(--amd-ink);
+}
+.topnav.on-light .brand__text em { color: var(--amd-slate); }
+.topnav.on-light .topnav__links a { color: var(--amd-slate); }
+.topnav.on-light .topnav__links a:hover,
+.topnav.on-light .topnav__links a.is-current { color: var(--amd-ink); }
+.topnav.on-light .topnav__links a.is-current { border-bottom-color: #8a7a2e; }
+.topnav.on-light .lang { border-color: var(--amd-border); }
+.topnav.on-light .lang button { color: var(--amd-slate); }
+.topnav.on-light .lang button.is-on { background: rgba(207, 187, 102, 0.24); color: #6f6224; }
+
+/* Hamburguesa: sólo <900px, donde no caben los enlaces de páginas */
+.burger {
+  display: none;
+  width: 44px; height: 44px; padding: 0; cursor: pointer;
+  background: transparent; border: 1px solid var(--hairline); border-radius: var(--radius-sm);
+  position: relative;
+}
+.burger span,
+.burger span::before,
+.burger span::after {
+  position: absolute; left: 50%; width: 18px; height: 1.5px;
+  background: currentColor; border-radius: 1px;
+  transition: transform var(--amd-motion-fast) var(--amd-ease), opacity var(--amd-motion-fast) var(--amd-ease);
+}
+.burger span { top: 50%; transform: translate(-50%, -50%); }
+.burger span::before,
+.burger span::after { content: ''; left: 0; }
+.burger span::before { transform: translateY(-6px); }
+.burger span::after { transform: translateY(6px); }
+.burger[aria-expanded='true'] span { background: transparent; }
+.burger[aria-expanded='true'] span::before { transform: rotate(45deg); }
+.burger[aria-expanded='true'] span::after { transform: rotate(-45deg); }
+.topnav.on-light .burger { border-color: var(--amd-border); }
+
+/* Panel móvil: una sola lista con páginas Y secciones, agrupadas */
+.sheet {
+  position: fixed; inset: var(--nav-h) 0 auto; z-index: 39;
+  max-height: calc(100dvh - var(--nav-h)); overflow-y: auto;
+  padding: 1.25rem 0 2rem;
+  background: rgba(13, 20, 26, 0.97);
+  backdrop-filter: var(--amd-glass-blur); -webkit-backdrop-filter: var(--amd-glass-blur);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink-text);
+}
+.sheet a {
+  display: flex; align-items: center; min-height: 52px;
+  font-size: 1.05rem; color: var(--ink-text);
+  border-bottom: 1px solid var(--hairline);
+}
+.sheet__label {
+  margin: 1.25rem 0 0.35rem;
+  font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-text-3);
+}
+.sheet__label:first-child { margin-top: 0; }
+
+/* ── Sub-header de secciones (≥900px) ─────────────────────────────────
+   Una línea fina, no una segunda barra maciza: sin fondo propio más que el
+   cristal, altura 44px y aparición sólo al salir del hero, para no restarle
+   impacto. Por debajo de 900px lo releva el panel de hamburguesa, así que
+   nunca coexiste con otro índice. */
+.subnav {
+  position: fixed; inset: var(--nav-h) 0 auto; z-index: 38;
+  display: none;
+  background: rgba(13, 20, 26, 0.82);
+  backdrop-filter: var(--amd-glass-blur); -webkit-backdrop-filter: var(--amd-glass-blur);
+  border-bottom: 1px solid var(--hairline);
+  opacity: 0; transform: translateY(-100%);
+  transition: opacity var(--amd-motion-fast) var(--amd-ease),
+              transform var(--amd-motion-slow) var(--amd-ease);
+}
+.subnav.is-on { opacity: 1; transform: none; }
+.subnav__inner {
+  display: flex; gap: 0.35rem; align-items: center;
+  height: 44px; overflow-x: auto; scrollbar-width: none;
+}
+.subnav__inner::-webkit-scrollbar { display: none; }
+.subnav a {
+  display: inline-flex; align-items: center; height: 100%;
+  padding: 0 0.7rem; white-space: nowrap;
+  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-text-3);
+  border-bottom: 2px solid transparent;
+  transition: color var(--amd-motion-fast) var(--amd-ease);
+}
+.subnav a:hover { color: var(--ink-text); }
+.subnav a.is-active { color: var(--amd-gold); border-bottom-color: var(--amd-gold); }
+
+.subnav.on-light {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--amd-border);
+}
+.subnav.on-light a { color: var(--amd-slate); }
+.subnav.on-light a:hover { color: var(--amd-ink); }
+.subnav.on-light a.is-active { color: #6f6224; border-bottom-color: #8a7a2e; }
+
+/* ══════════════════════════════════════════════════════════════
+   01 · HERO — preservado. Campo de orbes difuminados intacto.
+   ══════════════════════════════════════════════════════════════ */
+.hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: 100svh;
+  display: grid; align-items: center;
+  color: var(--ink-text);
+  padding: calc(var(--nav-h) + 4rem) 0 6rem;
+}
+.hero__bg {
+  position: absolute; inset: 0; z-index: -2;
+  background:
+    radial-gradient(120% 90% at 50% 15%, #16202a 0%, #0d141a 58%, #080d11 100%);
+}
+.hero::after {
+  /* trama sutil, misma familia que .page-hero::after de services */
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(245, 246, 248, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 246, 248, 0.022) 1px, transparent 1px);
+  background-size: 84px 84px;
+  mask-image: radial-gradient(70% 60% at 50% 45%, #000, transparent 78%);
+}
+
+.orbfield { position: absolute; inset: -15%; z-index: -1; pointer-events: none; }
+.orbfield--dim { opacity: 0.45; }
+.orb {
+  position: absolute; border-radius: 50%;
+  backface-visibility: hidden; pointer-events: none;
+  will-change: transform;
+  animation-name: ambient-orbit;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes ambient-orbit { to { transform: translate3d(0, 0, 1px) rotate(360deg); } }
+
+.hero__content { position: relative; z-index: 1; }
+.hero__brand {
+  font-size: clamp(2.9rem, 8.2vw, 6rem);
+  font-weight: 700; letter-spacing: -0.035em;
+}
+.hero__brand em { font-style: normal; color: var(--amd-gold); }
+.hero__legal {
+  margin-top: 0.5rem;
+  font-weight: 700; font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--amd-gold-soft);
+}
+.hero__promise {
+  margin-top: 1.75rem; max-width: 34rem;
+  font-size: clamp(1.02rem, 1.5vw, 1.2rem); color: var(--ink-text-2);
+}
+.hero__cta { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-top: 2.5rem; }
+
+.hero__scroll {
+  position: absolute; left: 50%; bottom: 2rem; transform: translateX(-50%);
+  display: grid; justify-items: center; gap: 0.6rem;
+  font-size: 0.65rem; letter-spacing: 0.28em; color: var(--ink-text-3);
+  min-height: 44px; padding-top: 0.5rem;
+}
+.hero__scroll i {
+  display: block; width: 1px; height: 34px;
+  background: linear-gradient(180deg, var(--amd-gold), transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   02 · LEDGER — el rediseño fuerte del "path de servicios"
+   Sustituye el zig-zag de tarjetas por un índice editorial:
+   5 filas con hairline, ordinal grande, revelado de imagen y
+   divulgación progresiva. Misma gramática que /services.
+   ══════════════════════════════════════════════════════════════ */
+.ledger {
+  position: relative;
+  overflow: hidden;   /* recorta el halo dorado y el sangrado de las fotos (sin scroll horizontal) */
+  background: var(--amd-ink);
+  color: var(--ink-text);
+  padding: 6.5rem 0 7.5rem;
+  border-top: 1px solid var(--hairline);
+}
+.ledger::before {
+  /* halo dorado — hereda de .page-hero::after en services-page.css */
+  content: ''; position: absolute; inset: -18% -12% auto auto;
+  width: 44rem; height: 44rem; pointer-events: none;
+  background: radial-gradient(circle, rgba(207, 187, 102, 0.1), transparent 62%);
+}
+
+.ledger__head {
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 3rem; align-items: end;
+  padding-bottom: 3.5rem;
+}
+.ledger__head h2 { font-size: clamp(2.3rem, 5.4vw, 4rem); letter-spacing: -0.035em; }
+.ledger__aside p { color: var(--ink-text-2); max-width: 30ch; margin-bottom: 0.75rem; }
+
+.ledger__body { position: relative; padding-left: 3rem; }
+
+/* Spine: conserva la metáfora de "camino" del diseño actual, comprimida a una línea */
+.spine {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--hairline); border-radius: 2px; overflow: hidden;
+}
+.spine i {
+  display: block; width: 100%; height: 0;
+  background: linear-gradient(180deg, var(--amd-gold), var(--amd-gold-soft));
+  box-shadow: 0 0 14px rgba(207, 187, 102, 0.55);
+}
+
+.lines { border-top: 1px solid var(--hairline); }
+
+.line { position: relative; border-bottom: 1px solid var(--hairline); isolation: isolate; }
+
+/* Revelado editorial: la foto nace de la tinta por la derecha y se disuelve
+   en ella por los cuatro lados. Dos invariantes que costaron un bug cada una:
+
+   1. `overflow: hidden` es OBLIGATORIO. El <img> se anima con scale(1.06) y
+      sin recorte se desborda del contenedor, por fuera de donde alcanza la
+      viñeta — que es exactamente el "se sale" que se veía en el hover.
+   2. La foto TERMINA en el borde del contenido (`right: 0`), nunca en el
+      borde de la ventana: el margen del layout se respeta como en el resto
+      de la página. */
+.line__media {
+  position: absolute; z-index: -1;
+  top: 0.5rem; bottom: 0.5rem;   /* nunca alcanza los hairlines de la fila */
+  right: 0;
+  width: min(52%, 34rem);
+  overflow: hidden;              /* invariante 1 — no quitar */
+  isolation: isolate;            /* contiene el mix-blend-mode del tinte */
+  pointer-events: none;
+}
+.line__media img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(1) brightness(0.6) contrast(1.12);
+  opacity: 0; transform: scale(1.06);
+  transition:
+    opacity var(--amd-motion-slow) var(--amd-ease),
+    transform 900ms var(--amd-ease);
+}
+.line__tint {
+  position: absolute; inset: 0;
+  background: var(--amd-gold);
+  mix-blend-mode: color;
+  opacity: 0;
+  transition: opacity var(--amd-motion-slow) var(--amd-ease);
+}
+
+/* Viñeta de tinta: fuera de la transición de opacidad, para que el borde
+   nunca aparezca como un corte mientras la foto entra o sale. */
+.line__media::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    /* izquierda: la foto nace de la tinta */
+    linear-gradient(90deg, var(--amd-ink) 0%, rgba(13, 20, 26, 0) 60%),
+    /* derecha: vuelve a tinta bajo el contador y el botón — no es una caja,
+       es la foto disolviéndose en el margen, y protege el contraste */
+    linear-gradient(270deg, var(--amd-ink) 0%, rgba(13, 20, 26, 0) 34%),
+    /* arriba y abajo: se apaga mucho antes de tocar los hairlines */
+    linear-gradient(180deg, var(--amd-ink) 0%, rgba(13, 20, 26, 0) 34%, rgba(13, 20, 26, 0) 66%, var(--amd-ink) 100%);
+}
+
+.line.is-hot .line__media img,
+.line.is-open .line__media img { opacity: 0.38; transform: scale(1); }
+.line.is-hot .line__tint,
+.line.is-open .line__tint { opacity: 0.5; }
+
+.line h3 { margin: 0; font-weight: inherit; }
+
+.line__btn {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) auto 2.5rem;
+  align-items: center; gap: 1.5rem;
+  width: 100%; min-height: 124px; padding: 1.5rem 0;
+  background: none; border: 0; text-align: left; cursor: pointer;
+}
+
+.line__ord {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+  font-variant-numeric: tabular-nums;
+  color: rgba(245, 246, 248, 0.16);
+  transition: color var(--amd-motion-slow) var(--amd-ease);
+}
+.line.is-hot .line__ord,
+.line.is-open .line__ord { color: var(--amd-gold); }
+
+.line__text { display: grid; gap: 0.4rem; min-width: 0; }
+.line__title {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.35rem, 2.6vw, 2.05rem);
+  letter-spacing: -0.02em; line-height: 1.12;
+}
+.line__sum { font-size: 0.98rem; color: var(--ink-text-2); max-width: 44ch; }
+
+.line__count {
+  font-size: 0.78rem; letter-spacing: 0.06em; color: var(--ink-text-3);
+  white-space: nowrap;
+}
+.line__count b {
+  font-family: var(--font-display); font-size: 1.15rem;
+  color: var(--amd-gold); margin-right: 0.3rem;
+}
+
+/* Plus dibujado en CSS (regla no-emoji-icons) */
+.line__plus {
+  position: relative; width: 2.5rem; height: 2.5rem; justify-self: end;
+  border: 1px solid var(--hairline); border-radius: 50%;
+  transition: border-color var(--amd-motion-fast) var(--amd-ease),
+              transform var(--amd-motion-slow) var(--amd-ease);
+}
+.line__plus::before,
+.line__plus::after {
+  content: ''; position: absolute; left: 50%; top: 50%;
+  background: var(--ink-text-2);
+  transition: background var(--amd-motion-fast) var(--amd-ease), opacity var(--amd-motion-fast) var(--amd-ease);
+}
+.line__plus::before { width: 13px; height: 1.5px; transform: translate(-50%, -50%); }
+.line__plus::after { width: 1.5px; height: 13px; transform: translate(-50%, -50%); }
+.line.is-hot .line__plus { border-color: var(--amd-gold); }
+.line.is-hot .line__plus::before,
+.line.is-hot .line__plus::after { background: var(--amd-gold); }
+.line.is-open .line__plus { transform: rotate(135deg); }
+
+/* Acordeón sin JS de alturas (grid 0fr → 1fr) */
+.line__detail {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows var(--amd-motion-slow) var(--amd-ease);
+}
+.line.is-open .line__detail { grid-template-rows: 1fr; }
+.line__detail > div { overflow: hidden; }
+.line__detail p {
+  max-width: 58ch; color: var(--ink-text-2);
+  padding-left: 6.5rem; padding-bottom: 0.5rem;
+}
+.line__detail .linkarrow { margin-left: 6.5rem; margin-bottom: 1.5rem; }
+
+.ledger__hint {
+  margin-top: 2rem; font-size: 0.85rem; color: var(--ink-text-3);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   03 · NOSOTROS — el respiro. Claro, sin una sola imagen.
+   ══════════════════════════════════════════════════════════════ */
+.about { background: var(--amd-surface); padding: 8rem 0 7rem; }
+.about__quote {
+  font-size: clamp(1.85rem, 4.4vw, 3.2rem);
+  letter-spacing: -0.03em; max-width: 18ch;
+}
+.about__lead {
+  /* Imagen sola a la izquierda (compensa los revelados del ledger, que salen
+     todos por la derecha); eyebrow, titular y párrafo juntos a la derecha.
+
+     La ALTURA no se fija: la marca el bloque de texto, y la foto se estira a
+     esa altura con un pequeño desborde arriba y abajo para que la acompañe
+     sin dominarla. Así el encuadre se adapta solo a un titular de 2 o 3
+     líneas, o a la traducción al inglés, sin tocar el CSS. */
+  display: grid; grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+  gap: 4rem; align-items: stretch;
+  margin-top: 1rem;
+}
+.about__copy { align-self: center; max-width: 34rem; }
+.about__body {
+  margin-top: 1.5rem;
+  font-size: 1.06rem; color: var(--amd-slate);
+}
+
+.about__figure {
+  position: relative; margin: 0;
+  align-self: stretch;
+  margin-block: -1.75rem;   /* el "poco más alto" que el texto */
+  min-height: 17rem;        /* suelo por si el copy se acorta al traducir */
+  border-radius: var(--radius-lg); overflow: hidden;
+}
+.about__figure img {
+  /* Sin `aspect-ratio`: la altura viene del grid, y `object-fit: cover`
+     reencuadra sola. `height: 100%` gana al atributo height del <img>. */
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 38%;
+}
+.about__figure::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 52%, rgba(13, 20, 26, 0.92) 100%);
+}
+.about__figure figcaption {
+  position: absolute; left: 1.25rem; bottom: 1rem;
+  font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #fff; text-shadow: 0 1px 6px rgba(13, 20, 26, 0.8);
+}
+
+.pillars {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.5rem; margin: 3.5rem 0 3rem;
+}
+.pillars li { padding-top: 1.5rem; border-top: 1px solid var(--amd-border); }
+.pillars__ord {
+  display: block; margin-bottom: 0.85rem;
+  font-family: var(--font-display); font-weight: 600; font-size: 0.95rem;
+  font-variant-numeric: tabular-nums; color: #8a7a2e;
+}
+.pillars h3 { font-size: 1.22rem; }
+.pillars p { margin-top: 0.5rem; color: var(--amd-slate); font-size: 0.97rem; max-width: 30ch; }
+
+.about__cta { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* ══════════════════════════════════════════════════════════════
+   04 · CIFRAS — banda full-bleed. El video es FONDO de información
+   real: no reclama espacio propio y la banda existiría igual.
+   ══════════════════════════════════════════════════════════════ */
+.band {
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: clamp(20rem, 46vh, 32rem);
+  display: grid; align-items: center;
+  padding: 4.5rem 0;
+  color: var(--ink-text);
+  background: var(--amd-ink);
+}
+.band__video {
+  position: absolute; inset: 0; z-index: -2;
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(0.85) contrast(1.05);
+}
+.band__scrim {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(13, 20, 26, 0.95) 0%, rgba(13, 20, 26, 0.84) 48%, rgba(13, 20, 26, 0.7) 100%),
+    linear-gradient(180deg, var(--amd-ink) 0%, rgba(13, 20, 26, 0) 22%, rgba(13, 20, 26, 0) 78%, var(--amd-ink) 100%);
+}
+
+.band__line {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem); letter-spacing: -0.025em;
+  max-width: 20ch;
+}
+
+.band__metrics {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem; margin-top: 3rem;
+  padding-top: 2rem; border-top: 1px solid var(--hairline);
+  max-width: 52rem;
+}
+.band__metrics b {
+  display: block;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(2.1rem, 5vw, 3.4rem); line-height: 1;
+  letter-spacing: -0.04em; color: var(--amd-gold);
+  font-variant-numeric: tabular-nums;
+}
+.band__metrics span {
+  display: block; margin-top: 0.6rem; max-width: 20ch;
+  font-size: 0.85rem; color: var(--ink-text-2);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   05 · CONFIANZA — la sección de descanso. Cero imágenes.
+   ══════════════════════════════════════════════════════════════ */
+.trust { background: var(--amd-surface); padding: 8rem 0 7rem; text-align: center; }
+.trust .eyebrow { text-align: center; }
+
+.ticker {
+  margin-top: 5rem;
+  overflow: hidden; padding: 1.5rem 0;
+  border-block: 1px solid var(--amd-border);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.ticker__track { display: flex; gap: 3.5rem; width: max-content; animation: ticker 38s linear infinite; }
+.ticker__track span {
+  font-size: 0.82rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(86, 88, 94, 0.62); white-space: nowrap;
+}
+@keyframes ticker { to { transform: translateX(-50%); } }
+
+.quote { margin: 3rem auto 0; max-width: 44rem; }
+.quote blockquote { margin: 0; }
+.quote p {
+  font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem); line-height: 1.4;
+  letter-spacing: -0.015em;
+  transition: opacity var(--amd-motion-slow) var(--amd-ease);
+}
+.quote figcaption { margin-top: 1.25rem; font-size: 0.85rem; color: var(--amd-slate); }
+
+.quote__dots { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
+.quote__dots button {
+  width: 44px; height: 44px; padding: 0; background: none; border: 0; cursor: pointer;
+  display: grid; place-items: center;
+}
+.quote__dots button::after {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  border: 1px solid rgba(13, 20, 26, 0.35);
+  transition: background var(--amd-motion-fast) var(--amd-ease);
+}
+.quote__dots button[aria-selected='true']::after { background: #8a7a2e; border-color: #8a7a2e; }
+
+/* ── Muro de clientes ──────────────────────────────────────────────────
+   Los 13 logos llegaron como los envían las empresas: ratios de 0.82 a 4.18,
+   un JPG con fondo negro incrustado, uno rosa pálido invisible sobre papel y
+   líneas de recorte pegadas al arte. En color, uno al lado del otro, parecen
+   un mercadillo — y eso resta credibilidad justo donde hay que sumarla.
+
+   La pieza que se sirve NO es el logo: es una MÁSCARA monocroma de un canal.
+   El color lo pone `currentColor` vía `mask-image`, así que la misma pieza
+   sirve en la variante clara y en la oscura sin duplicar assets, y el estado
+   hover es un cambio de color, no otro archivo. Normalización y políticas de
+   máscara: assets/logos/prepare-logos.py. */
+.clients__label {
+  margin: 4.5rem 0 2rem; text-align: center;
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(86, 88, 94, 0.7);
+}
+/* El carril: recorta, difumina los bordes y pausa al acercarse. */
+.clients {
+  overflow: hidden;
+  padding: 0.5rem 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.clients__track {
+  display: flex; align-items: center;
+  width: max-content;
+  /* SIN `gap`: el aire va como margen de cada logo. Con `gap` el desplazamiento
+     del 50 % no cae en el mismo punto del patrón —queda desfasado medio hueco—
+     y el bucle da un salto visible en cada vuelta. Con margen por elemento las
+     dos mitades son idénticas y la costura no existe. */
+  animation: clients-marquee var(--marquee-dur, 46s) linear infinite;
+  /* sentido contrario al ticker de sectores: dos cintas en la misma dirección
+     se leen como una repetición, no como un ritmo */
+  animation-direction: reverse;
+}
+.clients__track > li { margin-inline: 1.75rem; }
+
+/* Pausa al pasar el cursor o al tabular dentro: es lo que permite que alguien
+   señale su logo, que era la única objeción real al carrusel. */
+.clients:hover .clients__track,
+.clients:focus-within .clients__track { animation-play-state: paused; }
+
+@keyframes clients-marquee { to { transform: translateX(-50%); } }
+.clients__logo {
+  display: block;
+  /* --w/--h vienen del pipeline: son el tamaño ÓPTICO ya equilibrado de cada
+     logo, no su caja recortada. Por eso se respetan en vez de forzar una caja
+     común: dos logos con el mismo alto no pesan lo mismo si uno es un wordmark
+     fino y el otro un símbolo macizo. */
+  width: calc(var(--w) * 1px * var(--logo-scale, 1));
+  height: calc(var(--h) * 1px * var(--logo-scale, 1));
+  background: currentColor;
+  color: rgba(13, 20, 26, 0.62);
+  -webkit-mask-image: var(--logo);
+          mask-image: var(--logo);
+  -webkit-mask-size: contain; mask-size: contain;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  transition: color var(--amd-motion-slow) var(--amd-ease);
+}
+.clients li:hover .clients__logo { color: var(--amd-ink); }
+
+/* Escala por ancho. Con el carrusel el reparto en filas dejó de importar —el
+   muro es una sola cinta—, pero el tamaño sí: a 375 px un logo sin escalar se
+   come media pantalla. Estos valores siguen gobernando además la retícula de
+   respaldo bajo prefers-reduced-motion. */
+@media (max-width: 900px) { .clients { --logo-scale: 0.9; } .clients__track > li { margin-inline: 1.4rem; } }
+@media (max-width: 620px) { .clients { --logo-scale: 0.82; } .clients__track > li { margin-inline: 1.1rem; } }
+
+/* Sin soporte de mask no se ve NADA — no hay degradado elegante posible con
+   una máscara. El fallback es el nombre de la empresa en texto, que es la
+   información real; la retícula pierde el logo, no al cliente. */
+@supports not ((-webkit-mask-image: none) or (mask-image: none)) {
+  .clients__logo { -webkit-mask-image: none; mask-image: none; background: none; }
+  .clients__logo::after {
+    content: attr(aria-label);
+    font-size: 0.85rem; letter-spacing: 0.02em; color: var(--amd-slate);
+    white-space: nowrap;
+  }
+  .clients__logo { width: auto; height: auto; }
+}
+
+.ticker__label {
+  margin-top: 0.9rem; text-align: center;
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(86, 88, 94, 0.7);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   06 · CONTACTO — cierre oscuro, eco del hero
+   ══════════════════════════════════════════════════════════════ */
+.contact {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: radial-gradient(120% 100% at 20% 0%, #16202a, #0d141a 62%);
+  color: var(--ink-text);
+  padding: 7rem 0;
+}
+.contact__grid {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4rem;
+}
+.contact__intro h2 { font-size: clamp(1.9rem, 4vw, 2.9rem); }
+.contact__lead { margin-top: 1rem; color: var(--ink-text-2); max-width: 34ch; }
+
+.contact__meta { margin: 2.5rem 0 0; display: grid; gap: 1.1rem; }
+.contact__meta div { display: grid; gap: 0.15rem; padding-top: 1.1rem; border-top: 1px solid var(--hairline); }
+.contact__meta dt { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-text-3); }
+.contact__meta dd { margin: 0; font-size: 1.02rem; }
+
+.form {
+  display: grid; gap: 1.1rem; align-content: start;
+  padding: 2rem; border-radius: var(--radius-lg);
+  background: var(--amd-glass); border: 1px solid var(--amd-glass-border);
+  backdrop-filter: var(--amd-glass-blur); -webkit-backdrop-filter: var(--amd-glass-blur);
+}
+.field { display: grid; gap: 0.4rem; }
+.field label { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-text-3); }
+.field input,
+.field select,
+.field textarea {
+  font: inherit; color: var(--ink-text);
+  min-height: 48px; padding: 0.7rem 0.9rem;
+  background: rgba(13, 20, 26, 0.45);
+  border: 1px solid var(--hairline); border-radius: var(--radius-sm);
+}
+.field textarea { min-height: 110px; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--amd-gold); }
+
+/* ── Footer + FAB ──────────────────────────────────────────────── */
+.foot { background: #080d11; color: var(--ink-text-3); padding: 2rem 0; border-top: 1px solid var(--hairline); }
+.foot__inner { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: 0.8rem; }
+
+.fab {
+  position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 45;
+  width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: #25d366; color: #fff;
+  box-shadow: 0 10px 24px rgba(13, 20, 26, 0.35);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Reveal on scroll
+   ══════════════════════════════════════════════════════════════ */
+[data-reveal] {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 700ms var(--amd-ease), transform 700ms var(--amd-ease);
+}
+[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* ══════════════════════════════════════════════════════════════
+   Responsive
+   ══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════
+   Navegación: UN SOLO sistema por ancho, nunca dos a la vez.
+
+     ≥ 900px   → sub-header de secciones
+     < 900px   → hamburguesa con páginas + secciones
+
+   HITL 2026-09-06: el rail lateral queda DESCARTADO en todos los anchos.
+   No es que no quepa — es que el sub-header ya resolvía el trabajo y dos
+   índices para la misma función es una decisión de más. Con el rail se van
+   también sus tres problemas propios: el tema medido a media altura de
+   viewport, el revelado de etiquetas al acercar el puntero, y el umbral de
+   1540 px que existía sólo para que el rail no se montara sobre el texto.
+   ══════════════════════════════════════════════════════════════ */
+@media (min-width: 900px) {
+  .subnav { display: block; }
+  /* el contenido arranca bajo las dos barras */
+  .hero { padding-top: calc(var(--nav-h) + 44px + 4rem); }
+  .ledger, .about, .band, .trust, .contact { scroll-margin-top: calc(var(--nav-h) + 44px); }
+}
+@media (max-width: 899px) {
+  .burger { display: grid; place-items: center; }
+  .topnav__cta { display: none; }
+}
+
+@media (max-width: 1100px) {
+  .about__lead { grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); gap: 2.5rem; }
+}
+
+@media (max-width: 960px) {
+  .ledger__head { grid-template-columns: 1fr; gap: 1.75rem; align-items: start; }
+  .pillars { grid-template-columns: 1fr; gap: 1.75rem; }
+  /* Apilado: texto primero, foto después — se lee antes de mirar. */
+  .about__lead { grid-template-columns: 1fr; gap: 2rem; }
+  .about__copy { order: 1; max-width: none; }
+  /* Apilado no hay fila que estirar: se recupera una relación fija */
+  .about__figure {
+    order: 2; max-width: 30rem;
+    align-self: auto; margin-block: 0; min-height: 0;
+  }
+  .about__figure img { height: auto; aspect-ratio: 4 / 3; }
+  .band__metrics { grid-template-columns: 1fr; gap: 1.75rem; }
+  .contact__grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .topnav__links { display: none; }
+}
+
+@media (max-width: 760px) {
+  .ledger { padding: 4.5rem 0 5rem; }
+  .about, .trust { padding: 5rem 0; }
+
+  .band { padding: 3.5rem 0; min-height: 0; }
+  .band__scrim { background: linear-gradient(180deg, rgba(13, 20, 26, 0.92), rgba(13, 20, 26, 0.8)); }
+  .contact { padding: 5rem 0; }
+
+  /* La fila se reordena: ordinal + contador arriba, título abajo, sin columna de plus */
+  .line__btn {
+    grid-template-columns: auto minmax(0, 1fr) 2.25rem;
+    grid-template-areas:
+      'ord   count plus'
+      'text  text  text';
+    gap: 0.75rem 1rem;
+    min-height: 0; padding: 1.5rem 0;
+  }
+  .line__ord { grid-area: ord; font-size: 1.15rem; }
+  .line__count { grid-area: count; justify-self: start; align-self: center; }
+  .line__plus { grid-area: plus; width: 2.25rem; height: 2.25rem; align-self: center; }
+  .line__text { grid-area: text; }
+  .line__title { font-size: 1.35rem; }
+  .line__sum { font-size: 0.94rem; }
+
+  .line__detail p, .line__detail .linkarrow { padding-left: 0; margin-left: 0; }
+  .ledger__body { padding-left: 1.35rem; }
+
+  /* En táctil no hay hover: la foto pasa a ser una miniatura a ancho completo
+     dentro de la fila abierta. `position: relative` (nunca static) para que
+     .line__tint no tome .line como bloque contenedor e inunde la fila. */
+  .line__media {
+    position: relative; z-index: 0;
+    top: auto; bottom: auto; right: auto;
+    width: 100%; height: 0;
+    border-radius: var(--radius-md); overflow: hidden;
+    transition: height var(--amd-motion-slow) var(--amd-ease);
+    order: 2;
+  }
+  .line__media::after { display: none; }
+  .line.is-open .line__media { height: 9.5rem; margin-bottom: 1.25rem; }
+  .line__media img { transform: none; }
+  .line.is-open .line__media img { opacity: 0.62; transform: none; }
+  .line.is-open .line__tint { opacity: 0.42; }
+  .line { display: flex; flex-direction: column; }
+  .line h3 { order: 1; }
+  .line__detail { order: 3; }
+
+  .fab { right: 1rem; bottom: 1rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   prefers-reduced-motion — paridad con MotionService
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .orb { animation: none !important; }
+  .ticker__track { animation: none !important; }
+  /* El muro vuelve a ser retícula: parar la cinta sin más dejaría fuera de
+     pantalla a la mayoría de los clientes. La copia duplicada se oculta —ya
+     iba aria-hidden, así que no se pierde nada. */
+  .clients { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+  .clients__track {
+    animation: none !important;
+    flex-wrap: wrap; justify-content: center;
+    width: auto; max-width: 52rem; margin: 0 auto;
+    row-gap: 2.75rem;
+  }
+  .clients__track > li[aria-hidden='true'] { display: none; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .line__media { transition: none !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

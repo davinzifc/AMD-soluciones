@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AMD Soluciones — Home redesign (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="home-redesign.css" />
+<!-- Capa clara: el ledger sobre papel. Es la versión APROBADA por el cliente
+     (HITL 2026-09-06) y por eso es la que sirve index.html. Para volver a ver
+     la v1 oscura basta con quitar esta línea: la capa no toca el layout, sólo
+     el ritmo claro/oscuro. -->
+<link rel="stylesheet" href="home-redesign-claro.css" />
+</head>
+<body>
+
+<a class="skip" href="#servicios">Saltar al contenido</a>
+
+<!-- ══ Topnav (sin cambios respecto a producción — sólo replicado para evaluar en contexto) ══ -->
+<header class="topnav">
+  <div class="wrap topnav__inner">
+    <a class="brand" href="#inicio">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__text">
+        <b>AMD Soluciones</b>
+        <em>INTEGRALES S.A.S.</em>
+      </span>
+    </a>
+    <!-- Navegación entre PÁGINAS (routerLink en producción): / · /about-us ·
+         /services. No son anclas del home — de eso se encarga el sub-header. -->
+    <nav class="topnav__links" aria-label="Principal">
+      <a href="./" class="is-current" aria-current="page">Inicio</a>
+      <a href="#" data-page="/about-us">Nosotros</a>
+      <a href="#" data-page="/services">Servicios</a>
+    </nav>
+    <div class="topnav__right">
+      <div class="lang" role="group" aria-label="Idioma">
+        <button type="button" class="is-on">ES</button><button type="button">EN</button>
+      </div>
+      <a class="btn btn--gold btn--sm topnav__cta" href="#contacto">Contacto</a>
+
+      <button
+        type="button" class="burger" data-burger
+        aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil"
+      ><span aria-hidden="true"></span></button>
+    </div>
+  </div>
+
+  <!-- Panel móvil (<900px): páginas Y secciones del home en un solo sitio -->
+  <div class="sheet" id="menu-movil" data-sheet hidden>
+    <div class="wrap">
+      <p class="sheet__label">Páginas</p>
+      <a href="./">Inicio</a>
+      <a href="#" data-page="/about-us">Nosotros</a>
+      <a href="#" data-page="/services">Servicios</a>
+
+      <p class="sheet__label">En esta página</p>
+      <a href="#servicios" data-sheet-close>Líneas de servicio</a>
+      <a href="#sobre-amd" data-sheet-close>Manifiesto</a>
+      <a href="#cifras" data-sheet-close>Cifras</a>
+      <a href="#confianza" data-sheet-close>Confianza</a>
+      <a href="#contacto" data-sheet-close>Contacto</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══ Sub-header de secciones — ÚNICO índice del home de 900 px para arriba
+     (HITL 2026-09-06: el rail lateral queda descartado). Navegación DENTRO
+     del home; ninguna etiqueta repite las del menú de páginas: "Líneas" (no
+     "Servicios", que es /services) y "Manifiesto" (no "Nosotros", que es
+     /about-us). Por debajo de 900 px lo releva el panel de hamburguesa, así
+     que nunca hay dos índices a la vez. Aparece al salir del hero. ══ -->
+<nav class="subnav" data-subnav aria-label="Secciones de esta página">
+  <div class="wrap subnav__inner">
+    <a href="#inicio" data-spy2="inicio">Inicio</a>
+    <a href="#servicios" data-spy2="servicios">Líneas</a>
+    <a href="#sobre-amd" data-spy2="sobre-amd">Manifiesto</a>
+    <a href="#cifras" data-spy2="cifras">Cifras</a>
+    <a href="#confianza" data-spy2="confianza">Confianza</a>
+    <a href="#contacto" data-spy2="contacto">Contacto</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══ 01 · HERO — SIN CAMBIOS (campo de orbes difuminados preservado 1:1) ══ -->
+<section id="inicio" class="hero">
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="orbfield" data-orbs aria-hidden="true"></div>
+
+  <div class="wrap hero__content">
+    <h1 class="hero__brand">AMD <em>Soluciones</em></h1>
+    <p class="hero__legal">Integrales S.A.S.</p>
+    <p class="hero__promise">Formaliza y profesionaliza tu operación con contabilidad, gestión y asesoría de confianza — desde Cali, para tu negocio.</p>
+    <div class="hero__cta">
+      <a class="btn btn--gold" href="#contacto">Hablar con un asesor</a>
+      <a class="btn btn--ghost" href="#servicios">Ver servicios</a>
+    </div>
+  </div>
+
+  <a class="hero__scroll" href="#servicios">
+    <span>SCROLL</span>
+    <i aria-hidden="true"></i>
+  </a>
+</section>
+
+<!-- ══ 02 · EL LEDGER — rediseño fuerte del "path de servicios" ══ -->
+<section id="servicios" class="ledger">
+  <div class="wrap">
+
+    <header class="ledger__head">
+      <div>
+        <p class="eyebrow">Lo que hacemos</p>
+        <h2>Cinco líneas.<br />Una sola operación.</h2>
+      </div>
+      <div class="ledger__aside">
+        <p>En el landing ves el mapa. El detalle completo — los 31 servicios — vive en la página Servicios.</p>
+        <a class="linkarrow" href="#">Ver los 31 servicios <i aria-hidden="true">&rarr;</i></a>
+      </div>
+    </header>
+
+    <div class="ledger__body">
+      <div class="spine" aria-hidden="true"><i data-spine></i></div>
+
+      <ol class="lines" data-lines>
+
+        <li class="line" data-line="contabilidad">
+          <div class="line__media" aria-hidden="true">
+            <img src="assets/img/line-01-contabilidad.webp" alt="" loading="lazy" decoding="async" width="900" height="600" />
+            <span class="line__tint"></span>
+          </div>
+          <h3>
+            <button type="button" class="line__btn" aria-expanded="false" aria-controls="d-contabilidad">
+              <span class="line__ord">01</span>
+              <span class="line__text">
+                <span class="line__title">Contabilidad</span>
+                <span class="line__sum">Estados financieros, sistema contable, declaraciones y más.</span>
+              </span>
+              <span class="line__count"><b>16</b> servicios</span>
+              <span class="line__plus" aria-hidden="true"></span>
+            </button>
+          </h3>
+          <div class="line__detail" id="d-contabilidad" role="region">
+            <div>
+              <p>Portafolio contable para persona natural y jurídica: EEFF, inventarios, costos, exógena, revisoría, facturación electrónica…</p>
+              <a class="linkarrow linkarrow--sm" href="#">Más info <i aria-hidden="true">&rarr;</i></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="line" data-line="administrativa">
+          <div class="line__media" aria-hidden="true">
+            <img src="assets/img/line-02-administrativa.webp" alt="" loading="lazy" decoding="async" width="900" height="600" />
+            <span class="line__tint"></span>
+          </div>
+          <h3>
+            <button type="button" class="line__btn" aria-expanded="false" aria-controls="d-administrativa">
+              <span class="line__ord">02</span>
+              <span class="line__text">
+                <span class="line__title">Gestión Administrativa</span>
+                <span class="line__sum">Nómina, seguridad social, cartera y proveedores.</span>
+              </span>
+              <span class="line__count"><b>4</b> servicios</span>
+              <span class="line__plus" aria-hidden="true"></span>
+            </button>
+          </h3>
+          <div class="line__detail" id="d-administrativa" role="region">
+            <div>
+              <p>Operación administrativa con cumplimiento: afiliaciones, liquidación de nómina, seguimiento de clientes y proveedores.</p>
+              <a class="linkarrow linkarrow--sm" href="#">Más info <i aria-hidden="true">&rarr;</i></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="line" data-line="riesgo">
+          <div class="line__media" aria-hidden="true">
+            <img src="assets/img/line-03-riesgo.webp" alt="" loading="lazy" decoding="async" width="900" height="600" />
+            <span class="line__tint"></span>
+          </div>
+          <h3>
+            <button type="button" class="line__btn" aria-expanded="false" aria-controls="d-riesgo">
+              <span class="line__ord">03</span>
+              <span class="line__text">
+                <span class="line__title">Sistemas de Riesgo</span>
+                <span class="line__sum">Cumplimiento, control y protección reputacional.</span>
+              </span>
+              <span class="line__count"><b>4</b> servicios</span>
+              <span class="line__plus" aria-hidden="true"></span>
+            </button>
+          </h3>
+          <div class="line__detail" id="d-riesgo" role="region">
+            <div>
+              <p>Diseño y acompañamiento en sistemas de riesgo y cumplimiento normativo para operar con seguridad.</p>
+              <a class="linkarrow linkarrow--sm" href="#">Más info <i aria-hidden="true">&rarr;</i></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="line" data-line="asesoria">
+          <div class="line__media" aria-hidden="true">
+            <img src="assets/img/line-04-asesoria.webp" alt="" loading="lazy" decoding="async" width="900" height="600" />
+            <span class="line__tint"></span>
+          </div>
+          <h3>
+            <button type="button" class="line__btn" aria-expanded="false" aria-controls="d-asesoria">
+              <span class="line__ord">04</span>
+              <span class="line__text">
+                <span class="line__title">Asesoría</span>
+                <span class="line__sum">Legal, financiera y de formalización.</span>
+              </span>
+              <span class="line__count"><b>4</b> servicios</span>
+              <span class="line__plus" aria-hidden="true"></span>
+            </button>
+          </h3>
+          <div class="line__detail" id="d-asesoria" role="region">
+            <div>
+              <p>Asesoría para constituir, formalizar y crecer con criterio legal y financiero.</p>
+              <a class="linkarrow linkarrow--sm" href="#">Más info <i aria-hidden="true">&rarr;</i></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="line" data-line="marca">
+          <div class="line__media" aria-hidden="true">
+            <img src="assets/img/line-05-marca.webp" alt="" loading="lazy" decoding="async" width="900" height="600" />
+            <span class="line__tint"></span>
+          </div>
+          <h3>
+            <button type="button" class="line__btn" aria-expanded="false" aria-controls="d-marca">
+              <span class="line__ord">05</span>
+              <span class="line__text">
+                <span class="line__title">Marca</span>
+                <span class="line__sum">Identidad y posicionamiento de tu negocio.</span>
+              </span>
+              <span class="line__count"><b>3</b> servicios</span>
+              <span class="line__plus" aria-hidden="true"></span>
+            </button>
+          </h3>
+          <div class="line__detail" id="d-marca" role="region">
+            <div>
+              <p>Acompañamiento en marca e imagen para reforzar la propuesta de valor frente al mercado.</p>
+              <a class="linkarrow linkarrow--sm" href="#">Más info <i aria-hidden="true">&rarr;</i></a>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+    </div>
+
+    <p class="ledger__hint">Clic en una línea para ver el resumen. “Más info” abre el catálogo completo.</p>
+  </div>
+</section>
+
+<!-- ══ 03 · NOSOTROS — el respiro. Claro, tipografía y aire. CERO media. ══ -->
+<section id="sobre-amd" class="about">
+  <div class="wrap">
+    <div class="about__lead">
+      <figure class="about__figure">
+        <img
+          src="assets/img/about-asesoria.webp"
+          alt="Dos asesores explican cifras sobre documentos y un portátil a un cliente sentado frente a ellos"
+          loading="lazy" decoding="async" width="1600" height="1067"
+        />
+        <figcaption>Una asesoría, no un ticket</figcaption>
+      </figure>
+
+      <div class="about__copy">
+        <p class="eyebrow eyebrow--ink">Por qué existimos</p>
+        <h2 class="about__quote">Tu contabilidad no debería ser una caja negra.</h2>
+        <p class="about__body">
+          Somos una PYME colombiana enfocada en finanzas, administración y cumplimiento, con más de una
+          década acompañando empresas de distintas industrias. Formalizar no es llenar formatos — es
+          poder tomar decisiones con números en los que confías.
+        </p>
+      </div>
+    </div>
+
+    <ol class="pillars">
+      <li>
+        <span class="pillars__ord">01</span>
+        <h3>Cercanía</h3>
+        <p>Un interlocutor que conoce tu operación, no un ticket en una cola.</p>
+      </li>
+      <li>
+        <span class="pillars__ord">02</span>
+        <h3>Cumplimiento</h3>
+        <p>Calendario tributario y laboral al día, sin sobresaltos de última hora.</p>
+      </li>
+      <li>
+        <span class="pillars__ord">03</span>
+        <h3>Claridad</h3>
+        <p>Cifras que puedes explicar frente a un banco, un socio o la DIAN.</p>
+      </li>
+    </ol>
+
+    <div class="about__cta">
+      <a class="btn btn--ink" href="#" data-page="/about-us">Conocer al equipo</a>
+      <a class="btn btn--ghost btn--ghost-ink" href="#contacto">Contactar</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 · CIFRAS — banda full-bleed. El video es el FONDO de información
+        real, no una pieza con espacio propio. Altura compacta (46vh). ══ -->
+<section id="cifras" class="band" data-band>
+  <video
+    data-video
+    class="band__video"
+    src="assets/video/manifiesto.mp4"
+    poster="assets/img/manifiesto-poster.webp"
+    muted loop playsinline preload="none"
+    aria-hidden="true"
+    tabindex="-1"
+  ></video>
+  <div class="band__scrim" aria-hidden="true"></div>
+
+  <div class="wrap band__inner">
+    <p class="eyebrow">Cali · Colombia</p>
+    <p class="band__line">Diez años cerrando libros a tiempo.</p>
+
+    <ul class="band__metrics">
+      <li><b data-count="10" data-prefix="+">+10</b><span>años acompañando empresas</span></li>
+      <li><b data-count="31">31</b><span>servicios en catálogo</span></li>
+      <li><b data-count="100" data-suffix="%">100%</b><span>cumplimiento en calendario tributario</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 05 · CONFIANZA — claro y aireado. Sin imágenes, a propósito. ══ -->
+<section id="confianza" class="trust">
+  <div class="wrap">
+    <p class="eyebrow eyebrow--ink">Confianza que se nota</p>
+
+    <figure class="quote">
+      <blockquote data-quote>
+        <p>“Pasamos de improvisar cada cierre a tener un calendario y cifras que el banco acepta sin preguntas.”</p>
+      </blockquote>
+      <figcaption>— Gerente, comercio · Cali</figcaption>
+    </figure>
+
+    <div class="quote__dots" role="tablist" aria-label="Testimonios">
+      <button type="button" role="tab" aria-selected="true" aria-label="Testimonio 1"></button>
+      <button type="button" role="tab" aria-selected="false" aria-label="Testimonio 2"></button>
+      <button type="button" role="tab" aria-selected="false" aria-label="Testimonio 3"></button>
+    </div>
+
+
+    <!-- ══ Muro de clientes — carrusel infinito ══════════════════════════
+         El cliente lo pidió en movimiento, como el ticker de sectores. Tres
+         cosas lo hacen viable en vez de un problema: se PAUSA al pasar el
+         cursor o al tabular (para poder señalar un logo), la copia duplicada
+         va aria-hidden (el lector de pantalla oye 13 nombres, no 26), y bajo
+         prefers-reduced-motion vuelve a ser retícula estática.
+         Corre en sentido contrario al ticker de sectores: dos cintas en la
+         misma dirección se leen como una repetición, no como un ritmo.
+         Cada logo es una MÁSCARA monocroma; el color lo pone el CSS con
+         `mask-image`, así la misma pieza sirve en la variante clara y en la
+         oscura. El porqué del monocromo y de las tres políticas de máscara
+         está en assets/logos/prepare-logos.py.
+         El nombre accesible va en aria-label: la máscara no lleva texto. -->
+    <p class="clients__label">Empresas que ya operan con AMD</p>
+    <div class="clients" data-clients>
+      <ul class="clients__track">
+      <li><span class="clients__logo" role="img" aria-label="Fundación Ballet Capital"
+                style="--logo: url(assets/logos/ballet-capital.webp); --w: 91; --h: 78"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Caval Compliance Corporation"
+                style="--logo: url(assets/logos/caval-compliance.webp); --w: 61; --h: 69"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Digicort"
+                style="--logo: url(assets/logos/digicort.webp); --w: 114; --h: 53"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="D&P Capital Inversiones"
+                style="--logo: url(assets/logos/dyp-capital.webp); --w: 115; --h: 68"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Gesap ERP"
+                style="--logo: url(assets/logos/gesap-erp.webp); --w: 144; --h: 54"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Glowing Digital Cloud"
+                style="--logo: url(assets/logos/glowing-digital-cloud.webp); --w: 85; --h: 66"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="KAES"
+                style="--logo: url(assets/logos/kaes.webp); --w: 123; --h: 53"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Loto Group"
+                style="--logo: url(assets/logos/loto-group.webp); --w: 139; --h: 44"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="NFES Solutions"
+                style="--logo: url(assets/logos/nfes-solutions.webp); --w: 60; --h: 74"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Obed Services"
+                style="--logo: url(assets/logos/obed-services.webp); --w: 98; --h: 78"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Siddhi Autotech"
+                style="--logo: url(assets/logos/siddhi-autotech.webp); --w: 88; --h: 68"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="SK Glam"
+                style="--logo: url(assets/logos/sk-glam.webp); --w: 100; --h: 57"></span></li>
+      <li><span class="clients__logo" role="img" aria-label="Virtual Cloud World"
+                style="--logo: url(assets/logos/virtual-cloud-world.webp); --w: 193; --h: 46"></span></li>
+      </ul>
+    </div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track" data-ticker></div>
+    </div>
+    <p class="ticker__label">Sectores que acompañamos</p>
+  </div>
+</section>
+
+<!-- ══ 06 · CONTACTO — cierre oscuro, eco del hero (orbes al 40%) ══ -->
+<section id="contacto" class="contact">
+  <div class="orbfield orbfield--dim" data-orbs data-orbs-count="4" aria-hidden="true"></div>
+  <div class="wrap contact__grid">
+    <div class="contact__intro">
+      <p class="eyebrow">Hablemos</p>
+      <h2>Cuéntanos qué necesitas.</h2>
+      <p class="contact__lead">Respondemos por WhatsApp o correo. Sin formularios eternos.</p>
+
+      <dl class="contact__meta">
+        <div><dt>Ubicación</dt><dd>Cali, Colombia</dd></div>
+        <div><dt>WhatsApp</dt><dd>+57 324 880 5290</dd></div>
+        <div><dt>Correo</dt><dd>contacto@amdsoluciones.com</dd></div>
+      </dl>
+    </div>
+
+    <form class="form" onsubmit="return false">
+      <div class="field">
+        <label for="f-name">Nombre completo</label>
+        <input id="f-name" name="name" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="f-email">Correo</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="f-svc">Servicio de interés</label>
+        <select id="f-svc" name="service">
+          <option value="">Selecciona una línea</option>
+          <option>Contabilidad</option>
+          <option>Gestión Administrativa</option>
+          <option>Sistemas de Riesgo</option>
+          <option>Asesoría</option>
+          <option>Marca</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-msg">Mensaje</label>
+        <textarea id="f-msg" name="message" rows="4"></textarea>
+      </div>
+      <button class="btn btn--gold btn--block" type="submit">Enviar por WhatsApp</button>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <span>© 2026 AMD Soluciones Integrales S.A.S.</span>
+    <span>Cali · Colombia</span>
+  </div>
+</footer>
+
+<a class="fab" href="#contacto" aria-label="Escribir por WhatsApp">
+  <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="currentColor">
+    <path d="M12.04 2A9.9 9.9 0 0 0 2.1 11.9c0 1.75.46 3.46 1.34 4.97L2 22l5.27-1.38a9.9 9.9 0 0 0 4.77 1.22h.01A9.9 9.9 0 0 0 22 11.94 9.9 9.9 0 0 0 12.04 2Zm0 18.05h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.13.82.83-3.05-.2-.31a8.2 8.2 0 1 1 6.99 3.87Zm4.5-6.15c-.25-.13-1.46-.72-1.68-.8-.23-.08-.39-.13-.56.12-.16.25-.64.8-.79.97-.14.16-.29.19-.54.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.71-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.16.04-.31-.02-.44-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.43.06-.65.31-.23.25-.86.84-.86 2.05s.88 2.38 1 2.54c.13.17 1.74 2.65 4.2 3.72.59.25 1.05.4 1.4.52.59.19 1.13.16 1.55.1.47-.07 1.46-.6 1.66-1.17.21-.58.21-1.07.15-1.17-.06-.11-.23-.17-.48-.29Z"/>
+  </svg>
+</a>
+
+<!-- El ledger ahora es claro: el nav y el sub-header se invierten desde #servicios. -->
+<script>window.AMD_LIGHT_RANGES = [['servicios', 'cifras'], ['confianza', 'contacto']];</script>
+<script src="home-redesign.js"></script>
+</body>
+</html>
