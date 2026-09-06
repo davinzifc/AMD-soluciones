@@ -530,3 +530,80 @@ existencia de claves hay que anclar el patrón (`"clave":`), no buscar el nombre
 6. `--nav-h: 72px` sobrevive en `services-page.css:21`, **fuera del boundary de T003** — el worker
    hizo bien en no tocarlo. Sobre-libera 3 px en página profunda (inocuo), pero la deriva 68-vs-72
    sigue ahí. Tarea de seguimiento.
+
+---
+
+## T004 — Etiquetas de sección, `MobileDrawer` y claves huérfanas · **PASS** (2 rondas · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high` (`term_eaef2a67`), bajo orquestación Orca.
+**Leader/Reviewer:** Claude Code (autor ≠ auditor). No se commiteó desde el worker.
+
+### Corrección de spec previa al despacho (HITL)
+
+`tasks.md` T004 decía **«pasa de 7 a 8 enlaces»**, contando sólo el alta de `#cifras`. La cuenta era
+incorrecta: REQ-008 (`requirements.md:407`) exige que el panel incluya **las SEIS anclas**, y el
+panel de entonces sólo llevaba cuatro — faltaban `#cifras` **y `#inicio`**. El drawer es el
+sustituto del sub-header por debajo de 900 px (DD-029, «un solo índice de secciones por ancho»), así
+que debe cargar el mismo índice de seis que `SECTION_NAV_ANCHORS`. **Cuenta correcta: 9** = 3 de
+página + 6 de sección. Aprobado por HITL antes de despachar; el porqué quedó escrito en la propia
+tarea, no como un número cambiado a secas.
+
+### Qué se entregó
+
+- **Diccionarios** (`es.json`/`en.json`): `navServices` → "Líneas"/"Lines"; `navAbout` →
+  "Manifiesto"/"Manifesto"; `navSectionInicio` EN → **"Top"** (ES sigue "Inicio"). `sideHome` y
+  `sideNavAria` borrados de ambos. `navSectionsAria` —la clave viva— intacta.
+- **`mobile-drawer.html`**: alta de `#inicio` y `#cifras`, en el orden de scroll de
+  `SECTION_NAV_ANCHORS`. Cero literales de copy.
+- **`mobile-drawer.spec.ts`**: `toBe(7)` → `toBe(9)` **actualizado, no borrado**; aserto de identidad
+  y orden de los seis fragments derivado de `SECTION_NAV_ANCHORS`; test de no-repetición **por
+  valor** y por idioma; aserto propio de huerfanía.
+
+### Ronda 1 — FAIL del Reviewer: el test de anclas contaba, no comprobaba
+
+El test aseveraba sólo `expect(anchors.length).toBe(9)`. Mutación del Reviewer: borrar
+`fragment="cifras"` y duplicar `fragment="inicio"` — nueve enlaces igual, y **la suite pasó 12/12 en
+verde** con `#cifras` ausente del panel. Una cuenta de nueve no prueba *cuáles* son las nueve, así
+que REQ-008 quedaba sin guardar.
+
+Agrava el riesgo que la plantilla añadió una **tercera copia** de los seis ids de ancla, junto a
+`top-nav.ts:10` y `section-nav.ts:16` (ADVISORY 2 de T003). El arreglo deriva la lista esperada de
+`SECTION_NAV_ANCHORS` en vez de teclear los ids, que es lo único que guarda la deriva.
+
+### Ronda 2 — PASS
+
+Cuatro mutaciones corridas **por el Reviewer**, no leídas del reporte del worker:
+
+| # | Mutación | Resultado exigido | Observado |
+|---|---|---|---|
+| 1 | `navServices` es → `"Servicios"` | FALLA | FALLA **en `es`** |
+| 2 | `navSectionInicio` en → `"Home"` | FALLA en la comprobación inglesa | FALLA **sólo en `en`** |
+| 3 | `#cifras` fuera, `#inicio` duplicado (cuenta intacta) | FALLA | FALLA — ronda 1 pasaba |
+| 4 | `#cifras` y `#sobre-amd` intercambiados de orden | FALLA | FALLA |
+
+Las 3 y la 4 son del Reviewer, fuera del brief original. Árbol revertido tras cada una.
+
+### Verificación (Node pineado del `.nvmrc`, v24.20.0 — no el del shell)
+
+- `npm run test:agent` (suite completa, sin filtro): **31 ficheros · 273 tests** en verde
+- `npm run lint -- --quiet`: limpio
+- `npm run build`: **452.25 kB** inicial, dentro de budget
+
+### Comprobación de blast radius (Reviewer)
+
+Renombrar `navServices`/`navAbout` era seguro: los tres consumidores de etiquetas de página
+—`top-nav.html`, `site-footer.html`, `mobile-drawer.html`— usan `navHome`/`navAboutPage`/
+`navServicesPage`. `navServices` y `navAbout` sólo viven como etiquetas de sección, así que el
+renombrado no filtra "Líneas" al menú de páginas.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **`#cifras` aún no existe en el DOM** — lo crea T009. El enlace se entregó igual, por contrato con
+   `SECTION_NAV_ANCHORS`; crear la sección caía fuera del boundary de T004. **T009 aterriza el
+   destino**: hasta entonces el enlace no navega a ningún sitio.
+2. **`PAGE_NAV_KEYS` está escrito a mano** en el test (`navHome`, `navAboutPage`, `navServicesPage`).
+   Hoy coincide con los tres consumidores reales, pero un cuarto enlace de página no quedaría
+   guardado por el test de no-repetición. El lado de sección sí deriva de `SECTION_NAV_ANCHORS`.
+3. **La tercera copia de los ids de ancla ya está en producción** (`mobile-drawer.html`). El nuevo
+   aserto guarda al drawer contra la deriva, pero `top-nav.ts` y `section-nav.ts` siguen sin un test
+   que las case entre sí — la ADVISORY 2 de T003 sigue viva y ahora tiene un consumidor más.

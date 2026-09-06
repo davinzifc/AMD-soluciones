@@ -209,7 +209,7 @@ ese 1099 era el umbral del rail que DD-029 acaba de retirar.
 
 ## T004 — Etiquetas de sección, `MobileDrawer` y claves huérfanas
 
-- **Status:** [ ]
+- **Status:** [x] PASS (2 rondas · 2026-09-06)
 - **Depends on:** T003
 - **Directory boundary:** `client/src/app/core/layout/mobile-drawer/`, `client/src/assets/i18n/`
 - **Recommended skills:** `angular-developer`
@@ -238,16 +238,29 @@ el panel de hamburguesa muestra la misma etiqueta dos veces, lo que ya viola REQ
 > no claves: con claves distintas y valores iguales, un test de claves pasa y el usuario ve dos
 > "Home" en el mismo menú.
 
-Añadir `#cifras` al panel (pasa de 7 a 8 enlaces — `mobile-drawer.spec.ts:50` tiene una cuenta
-rígida `toBe(7)` que hay que actualizar, no eliminar). Retirar `sideHome` y `sideNavAria` de ambos
-diccionarios: mueren con el rail.
+> ⚠ **Corrección de cuenta (HITL 2026-09-06).** Este párrafo decía «pasa de 7 a 8 enlaces»,
+> contando sólo el alta de `#cifras`. La cuenta era **incorrecta**: REQ-008 (`requirements.md:407`)
+> exige que el panel incluya **las SEIS anclas** de la Home, y el panel de hoy sólo lleva cuatro
+> (`#servicios`, `#sobre-amd`, `#confianza`, `#contacto`) — le faltan **dos**, `#cifras` y
+> **`#inicio`**. El drawer es el sustituto del sub-header por debajo de 900 px (DD-029: «un solo
+> índice de secciones por ancho»), así que debe cargar el mismo índice de seis que `SECTION_NAV_ANCHORS`.
+> **La cuenta correcta es 9** = 3 enlaces de página + 6 anclas de sección.
+
+Añadir `#inicio` y `#cifras` al panel, en el orden de scroll de `SECTION_NAV_ANCHORS`
+(`inicio · servicios · sobre-amd · cifras · confianza · contacto`), de modo que el panel pase de
+**7 a 9 enlaces** — `mobile-drawer.spec.ts:50` tiene una cuenta rígida `toBe(7)` que hay que
+**actualizar a `toBe(9)`, no eliminar**. Retirar `sideHome` y `sideNavAria` de ambos diccionarios:
+mueren con el rail.
+
+`#cifras` **todavía no existe** en el DOM — lo crea T009. El enlace se añade igualmente: esta tarea
+entrega el índice completo y T009 aterriza su destino. No es un defecto de esta tarea.
 
 ### Tests
 
 - Test de **no repetición**: el conjunto de etiquetas de página y el de sección son disjuntos, en
   ES y en EN. **Compara valores traducidos, nunca nombres de clave** — ver el aviso del Scope: hoy
   hay dos pares con clave distinta y valor idéntico.
-- El panel lista las **seis** anclas de la Home, `#cifras` incluida
+- El panel lista las **seis** anclas de la Home, `#inicio` y `#cifras` incluidas — nueve enlaces en total
 - Paridad de claves ES/EN (el test existente debe seguir en verde tras añadir y quitar claves)
 - Ninguna clave retirada queda referenciada en plantilla ni en código
 
@@ -261,10 +274,10 @@ diccionarios: mueren con el rail.
 
 ### Done when
 
-- [ ] Etiquetas de sección y de página disjuntas en los dos idiomas, **verificado por valor**
-- [ ] `navSectionInicio` con un valor EN distinto de "Home"
-- [ ] Ocho enlaces en el panel; cuenta del spec actualizada
-- [ ] `sideHome` y `sideNavAria` fuera de ambos diccionarios y sin referencias
+- [x] Etiquetas de sección y de página disjuntas en los dos idiomas, **verificado por valor**
+- [x] `navSectionInicio` con un valor EN distinto de "Home" — `"Top"`
+- [x] **Nueve** enlaces en el panel (3 de página + 6 de sección); `toBe(7)` → `toBe(9)`, más aserto de identidad y orden de los seis fragments
+- [x] `sideHome` y `sideNavAria` fuera de ambos diccionarios y sin referencias
 
 ---
 
