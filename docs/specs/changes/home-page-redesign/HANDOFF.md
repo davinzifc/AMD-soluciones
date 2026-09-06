@@ -1,35 +1,103 @@
 # Handoff — Rediseño de la Home
 
-Estado al cierre de la sesión del **2026-09-06**. Punto de retoma para la siguiente sesión.
+Estado al cierre de la sesión del **2026-09-06 (tarde)**. Punto de retoma.
 
 ## Dónde estamos
 
-Fase **Specify cerrada**. Propuesta, mockup y los tres documentos de spec están completos y
-aprobados. **No se ha tocado una sola línea de `client/`.**
+Fase **Execute en curso**. **3 de 13 tareas cerradas** con PASS del Reviewer independiente,
+commiteadas en `dd09488`. Rama `first-iteration-dev`.
 
-| Artefacto | Estado |
-|---|---|
-| `proposal.md` | Approved — diagnóstico, concepto, plan de medios, decisiones cerradas, riesgos |
-| `mockup/` | Navegable y verificado en navegador real a 375 / 768 / 1200 / 1600 px |
-| `mockup/shots/` | 13 capturas regeneradas contra el mockup final (clara, sin rail, con muro) |
-| `requirements.md` | Approved — 14 REQ, 35 escenarios, mapa de clases de defecto a su gate |
-| `design.md` | Approved — DD-028…DD-041, reto a reversiones, presupuesto |
-| `tasks.md` | 13 tareas, cierre de cobertura verificado escenario a escenario |
+| Tarea | Estado | Rondas |
+|---|---|---|
+| T001 — tokens de dorado + assets | **[x] PASS** | 3 (una fue una Pivot) |
+| T002 — `probeSectionThemeAt` | **[x] PASS** | 1 |
+| T003 — `SectionNav` ← `HomeSideNav` | **[x] PASS** | 3 |
+| T005 — `LedgerSection` datos/plantilla | **[x] PASS** | 3 |
+| T004, T006–T013 | `[ ]` pendientes | — |
+
+Verificado con el Node pineado del `.nvmrc` (**v24.20.0**, no el del shell):
+**31 archivos · 270 tests · lint limpio · build 451.84 kB** inicial.
 
 ## Siguiente paso
 
 ```
-/clear                                                   ← sesión limpia
-/akili-execute docs/specs/changes/home-page-redesign/
+/clear
+/akili-resume            ← reconstruye estado desde execution.md
 ```
 
-**Primera tarea: T002.** No es la que desbloquea más, pero su orden es el único irreversible: si
-`HomeSideNav` se borra antes de extraer su algoritmo de tema, se pierde la única implementación del
-repo de algo que dos barras van a necesitar.
+**Siguiente tarea: T004** (etiquetas de sección, `MobileDrawer`, claves huérfanas).
+Su alcance **ya fue ampliado** con un hallazgo del cierre de T003 — leerlo antes de despachar.
 
-**PR recomendados: 3** — Navegación (T001–T004, ~450 LOC) · Ledger (T005–T007, ~700) · Secciones
-nuevas y gate (T008–T013, ~750). PR 1 y 2 se mergean **sin** el gate visual automático: T012 mide la
-página ensamblada y no puede correr antes, así que hasta PR 3 dependen de revisión en navegador.
+**Cadencia acordada (HITL): una tarea a la vez.** Se probaron 3 workers de Antigravity en
+paralelo: el trabajo salió bien y sin colisiones, pero la coordinación no compensó.
+
+## Cómo se está ejecutando
+
+**Implementer delegado a Antigravity** bajo orquestación **Orca**; Claude Code conserva **Leader**
+y **Reviewer** (autor ≠ auditor). Run `run_ae0ab4caa1a3`.
+
+Terminales de Orca en este worktree, con `agy --dangerously-skip-permissions` vivo:
+`term_eaef2a67` · `term_0c9fa4ff` · `term_a13c44dd`. Coordinador: `term_d8fc0b20`.
+
+### Trampas de esta vía, ya pagadas
+
+- **`worker-start` devuelve siempre `agent_prompt_stalled`** a los 8 s y marca el dispatch `failed`.
+  Es un **falso negativo**: Orca no reconoce el TUI de Antigravity. El prompt llega, el worker
+  trabaja, pero su `worker_done` **rebota** por capability revocada. Orca igual entrega el mensaje
+  rechazado a la bandeja del Run, con el reporte íntegro: se recupera de ahí y se cierra la Task a
+  mano con `task-update`. **No hay bandera que lo arregle** — Antigravity no tiene modo `--no-tui`
+  ni equivalente, y el único modo no interactivo (`-p`) elimina la orquestación entera.
+- **`run-use` mata la escucha en curso** (`consumer_fenced`). Despachar todo antes de reabrirla.
+- El buzón de Orca es casi todo ruido. **Esperar por `terminal wait --for tui-idle`** de los workers
+  resultó más fiable que `check --wait`.
+- **`agy --effort` aborta** si el slug del modelo ya lleva el nivel (`gemini-3.8-flash-high`).
+
+### Reglas de brief que costaron un FAIL entero cada una
+
+1. **El trabajo primero, la lista de "esto ya está bien" al final y corta.** Un brief que abre
+   validando el intento anterior hace que el worker trate la tarea como ya hecha: en T003 intento 2
+   **reportó éxito sin modificar ni un fichero**.
+2. **Exigir `git diff --stat` antes y después, pegado verbatim en el reporte**, con instrucción de
+   reportar `--outcome failed` si son iguales. Es lo que destapó el punto 1.
+3. **Si la tarea produce texto visible, i18n es parte del entregable** y el boundary debe incluir
+   `client/src/assets/i18n/`. Ver **KZ-005** en `docs/specs/kaizen/`.
+4. **Medir sólo con TODOS los workers en idle.** Una medición tomada con un worker aún escribiendo
+   quedó caduca y hubo que corregir el dato a dos Reviewers en vuelo.
+5. **Para comprobar existencia de claves i18n, anclar el patrón (`"clave":`)**, no buscar el nombre
+   suelto: `grep navSectionCifras` casa con `navSectionCifras_TEMP` y pasa en medio de una mutación.
+
+## Correcciones de spec aplicadas durante la ejecución
+
+Están todas en `execution.md`, pero conviene tenerlas presentes porque cambian el texto aprobado:
+
+- **Pivot T001 — dos tokens de dorado, no uno.** `#8a7a2e` da 3.86:1 sobre mist: sólo alcanza el
+  piso de texto grande, y tres de los cuatro usos del acento son texto pequeño. Se añadió
+  `--amd-gold-ink-deep: #6f6224` (5.49:1). **D-8 no se revierte: se le añadió el caso que no
+  cubría.** El reparto uso-por-uso está en REQ-009.
+- **T006 y T008 recibieron REQ-009 y DD-031.** Ordenaban portar el CSS del mockup, donde los cuatro
+  usos son `var(--amd-gold-ink)`: un port fiel **satisfacía la tarea e incumplía el requisito**, y
+  sólo habría aflorado en T012, la última del grafo.
+- **La prohibición de REQ-009 se amplió a `--amd-gold-soft`** (1.32:1, peor que el color que motivó
+  la pivot; se usa hoy como texto en secciones que T003/T008/T011 vuelven claras).
+- **T012 gana una novena medición**, y barre **por familia de tokens**: un gate que sólo mira los
+  tokens correctos no puede detectar el uso del token equivocado.
+- **El filtro de verificación de siete tareas no filtraba nada.** `ng test` quiere
+  `--include=<glob>`; el argumento posicional se ignoraba en silencio.
+- **T004 lleva la colisión `navHome` / `navSectionInicio`**, que en EN valen las dos "Home". Sin eso,
+  el test de no-repetición que la propia tarea exige **no puede pasar**.
+- **T005 y T003 tienen el boundary ampliado a `client/src/assets/i18n/`** (y T003 también a
+  `app.config.ts`). T004 también toca los diccionarios: **serializar**.
+
+## Pendiente de decidir (no bloquea)
+
+- **`prepare-logos.py` acaba publicado** en `/media/logos/prepare-logos.py`. Inocuo (Pages sirve
+  estático, no cuenta contra el budget), pero su docstring comenta el estado de los logos de
+  clientes concretos. La tarea lo ordena explícitamente; moverlo a `client/scripts/` exige editar
+  el spec.
+- **`--nav-h: 72px` sobrevive en `services-page.css:21`**, fuera del boundary de T003. Sobre-libera
+  3 px en página profunda. Tarea de seguimiento.
+- **Dos copias de los seis ids de ancla** (`top-nav.ts` y `section-nav.ts`), sin test que las guarde
+  contra deriva. T004 y T009 tocan ambas `#cifras`.
 
 ## Para retomar
 
