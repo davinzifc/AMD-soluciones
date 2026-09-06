@@ -10,7 +10,7 @@ import { LocalizePipe } from '../../../core/i18n/localize.pipe';
  * which alone carries the full misión/visión/leaders content (T011). This
  * teaser deliberately stops at one lead paragraph; "Contactar" reuses the
  * Home fragment contract (`routerLink="/" fragment="contacto"`) already
- * proven by `HeroSection`/`ServicesRoadSection`.
+ * proven by `HeroSection`/`LedgerSection`.
  */
 @Component({
   selector: 'app-about-teaser-section',

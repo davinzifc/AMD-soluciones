@@ -703,3 +703,78 @@ prueba ninguna de estas cinco**, y ninguna puede darse por cubierta aquí:
 2. El aserto de "ningún dorado como `color:`" recorre el CSS **línea a línea**. Una declaración
    partida en dos líneas (`color:\n  var(--amd-gold)`) se le escaparía. No ocurre hoy; si el fichero
    se reformatea con un printer que parta declaraciones, hay que revisarlo.
+
+---
+
+## T007 — Cortar: montar el ledger y retirar `ServicesRoadSection` · **PASS** (1 ronda · 2026-09-06)
+
+**Implementer:** Antigravity `gemini-3.8-flash-high` (`term_eaef2a67`). **Leader/Reviewer:** Claude Code.
+Primera tarea de la spec que cierra **a la primera**.
+
+### Dos correcciones de spec previas al despacho
+
+1. **El boundary no cubría lo que la propia tarea ordena.** El Scope manda retirar `roadHint` de los
+   diccionarios, pero el boundary era sólo `client/src/app/features/home/`. Ampliado a
+   **`client/src/assets/i18n/`**. Es la **tercera reincidencia** del defecto que **KZ-005** ya
+   registró en T003 y T005: *si la tarea toca texto visible, i18n es parte del entregable*. Tres
+   veces en una sola spec dice que la lección no está entrando por revisión caso a caso — debería
+   ser una comprobación al escribir `tasks.md`, no un hallazgo del Leader al despachar.
+2. **La sexta ancla no cabía en esta tarea.** El Scope pedía añadir `cifras` a la lista de
+   `home-page.spec.ts`. **No puede hacerse aquí:** la sección `#cifras` la crea **T009**, que no
+   depende de T007. Añadirla ahora deja la suite **en rojo**, y el Evidence disqualifier de T007
+   exige justo lo contrario. El aserto se movió a T009 — y de paso se amplió **el boundary de T009**,
+   que ordenaba montar la banda en `home-page.html` teniendo el boundary limitado a `figures/`.
+
+### Qué se entregó
+
+- `home-page.html` monta `<app-ledger-section />` donde estaba el camino; `home-page.ts` cambia
+  import y array. El docblock citaba `HomeSideNav (T013)`, **borrado por T003**, y numeraba tareas de
+  otra spec: reescrito para describir lo que hay.
+- **`features/home/services-road/` borrado entero**: 4 ficheros, 1 042 líneas, incluidos el `.spec.ts`
+  de 389 líneas y el export `ROAD_DECO_FACTORS`.
+- `roadHint` fuera de `es.json` y `en.json`. Las 15 claves `g*Title`/`g*Sum`/`g*Body` intactas en los
+  dos idiomas: `g*Title` las comparte `SERVICE_GROUPS` con `/services`, y `g*Sum`/`g*Body` las
+  reutiliza `buildLedgerLines()`.
+- `about-teaser-section.ts:13` citaba `HeroSection`/`ServicesRoadSection` → ahora `LedgerSection`.
+- Test nuevo: la Home monta el ledger y **no** monta el camino.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+- `npm run test:agent` **sin filtro** — deliberado: un run filtrado no ve los specs cuyos imports
+  rompe el borrado y pasaría en verde con la suite rota. **31→30 ficheros, 285→259 tests**, verde.
+  Los 26 que faltan son los del camino: murieron con su sujeto, no se conservaron sin él.
+- `npm run lint -- --quiet`: limpio · `npm run build`: 452.22 kB inicial, sin avisos.
+- Barrido posterior: no queda ni un `services-road`/`ServicesRoadSection`/`ROAD_DECO_FACTORS` fuera
+  de comentarios. `onPassiveScroll` conserva dos consumidores, `hero-section` y `ledger-section`.
+
+### Mutaciones
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Reimportar `ROAD_DECO_FACTORS` (del brief) | **FALLA** — `TS2307: Cannot find module '../services-road/services-road-section'` |
+| 2 | Desmontar `<app-ledger-section />` de la Home (del Reviewer) | **FALLA** — y caen *dos* tests: el de montaje y el de las cinco anclas, porque `#servicios` ahora lo sirve el ledger |
+
+### Incidente del Reviewer, registrado por honestidad
+
+Al revertir la mutación 1 usé `git checkout -- home-page.ts`, que devuelve el fichero al **último
+commit**, no al estado previo a la mutación: eso borró el trabajo del worker en ese fichero. Se
+restauró verbatim desde el diff capturado antes de mutar (+8/−9, idéntico al entregado) y se
+reverificó todo en verde. **Para revertir una mutación hay que restaurar desde una copia previa
+(`cp`), nunca desde `git checkout`,** cuando el árbol tiene cambios sin commitear — que es siempre,
+durante una ronda de revisión.
+
+### Premisa falsa cerrada, no corregida
+
+El Done-when pedía cerrar «el aviso de `anyComponentStyle` que causaba `services-road-section.css`».
+**Ese aviso nunca existió:** el fichero pesaba **6 868 bytes**, muy por debajo del umbral de 16 kB.
+Ningún CSS de componente del proyecto lo supera hoy — el mayor es `ledger-section.css` con 11 677.
+El ítem se marca **N/A con la medición**, no como corregido: dar por cerrado un aviso inexistente
+habría convertido una afirmación no verificada del spec en evidencia.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **`core/motion/motion.service.ts:8`** conserva un comentario que cita «services-road deco parallax
+   + progress fill», ya inexistente. Está **fuera del boundary** de T007 y el worker hizo bien en no
+   tocarlo. Dueña natural: T013 (docs) o una tarea de seguimiento.
+2. `ledger-section.ts:57` («Replaces `ServicesRoadSection`») y `:215` (paridad de patrón) se
+   conservan a propósito: describen correctamente el origen del componente y siguen siendo ciertos.

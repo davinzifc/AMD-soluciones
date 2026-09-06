@@ -433,9 +433,11 @@ el contenedor de la foto, la foto termina en el borde del contenido, y `height: 
 
 ## T007 — Cortar: montar el ledger y retirar `ServicesRoadSection`
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** T006
-- **Directory boundary:** `client/src/app/features/home/`
+- **Directory boundary:** `client/src/app/features/home/` y **`client/src/assets/i18n/`**
+  (ampliado 2026-09-06: el Scope ordena retirar `roadHint` de los diccionarios, que viven fuera del
+  boundary original — mismo defecto que **KZ-005** ya registró en T003 y T005)
 - **Recommended skills:** `angular-developer`
 - **Requirements:** REQ-003 (regresión completa), REQ-002
 - **Design refs:** §9 reversión 3
@@ -449,7 +451,14 @@ Cambiar `home-page.html` para montar `LedgerSection` en lugar de `ServicesRoadSe
 **No tocar `g*Title`** — las comparte `SERVICE_GROUPS` con `/services` y borrarlas rompe esa página
 y sus tests de contenido. `g*Sum` y `g*Body` **se conservan**: el ledger las reutiliza.
 
-Actualizar la lista de anclas de `home-page.spec.ts`, a la que le falta `cifras`.
+> ⚠ **Corregido 2026-09-06.** Esta línea decía «Actualizar la lista de anclas de `home-page.spec.ts`,
+> a la que le falta `cifras`». **No puede hacerse aquí:** la sección `#cifras` la crea **T009**, que
+> no depende de T007 y puede llegar después. Añadir `cifras` a la lista en esta tarea deja la suite
+> **en rojo** hasta que T009 aterrice — y el Evidence disqualifier de T007 exige justo lo contrario,
+> que la suite completa compile y pase.
+>
+> **T007 deja la lista en las cinco anclas actuales.** La sexta la añade **T009**, que es la tarea
+> que crea la sección y la monta. Ver la corrección equivalente en el Scope de T009.
 
 ### Tests
 
@@ -465,10 +474,10 @@ Actualizar la lista de anclas de `home-page.spec.ts`, a la que le falta `cifras`
 
 ### Done when
 
-- [ ] `services-road/` borrado por completo; ningún import huérfano
-- [ ] Suite completa verde; ningún test conservado sin sujeto
-- [ ] `roadHint` fuera; `g*Title`, `g*Sum` y `g*Body` intactas
-- [ ] Aviso de `anyComponentStyle` que causaba `services-road-section.css` cerrado
+- [x] `services-road/` borrado por completo (4 ficheros, 1 042 líneas); ningún import huérfano
+- [x] Suite completa verde: 31→**30** ficheros, 285→**259** tests. Los 26 que se van son los del camino, que murieron con su sujeto
+- [x] `roadHint` fuera de ambos diccionarios; las 15 claves `g*Title`/`g*Sum`/`g*Body` intactas en ES y EN
+- [x] **N/A — premisa falsa, medida 2026-09-06.** `services-road-section.css` pesaba **6 868 bytes**, muy por debajo del aviso de 16 kB: ese aviso **nunca existió**. Ningún CSS de componente del proyecto supera hoy los 16 kB (el mayor es `ledger-section.css`, 11 677 bytes). El ítem se cierra por inaplicable, no por corregido
 
 ---
 
@@ -524,7 +533,9 @@ El alto de la imagen deriva del texto (`align-self: stretch` + `height: 100%`). 
 
 - **Status:** [ ]
 - **Depends on:** T001
-- **Directory boundary:** `client/src/app/features/home/figures/`
+- **Directory boundary:** `client/src/app/features/home/figures/` y
+  **`client/src/app/features/home/home-page/`** (ampliado 2026-09-06: el Scope ordena montar la banda
+  en `home-page.html`, que vive fuera del boundary original)
 - **Recommended skills:** `angular-developer`, `ui-ux-pro-max`
 - **Requirements:** REQ-005, REQ-003 (ancla `#cifras`), REQ-013
 - **Design refs:** DD-039, §5.2
@@ -540,6 +551,9 @@ entre Manifiesto y Confianza.
 - El `<video>` lleva `muted`, `loop`, `playsinline` y `poster`, y **no** lleva `controls`
 - Bajo reduced-motion el video no se reproduce y las métricas muestran el valor final
 - La sección tiene `id="cifras"` y **no** lleva `.section--light`
+- **Heredado de T007 (2026-09-06):** la lista de anclas de `home-page.spec.ts` pasa de cinco a
+  **seis**, con `cifras` incluida. Es esta tarea la que crea la sección, así que es aquí donde el
+  aserto puede pasar. T007 no podía añadirlo sin dejar la suite en rojo.
 
 - **Verification:** `cd client && npm run test:agent -- --include="src/app/features/home/figures/**/*.spec.ts" && npm run build`
 - **Falsable con:** añadir `controls` al `<video>` → el test debe FALLAR.
@@ -548,7 +562,7 @@ entre Manifiesto y Confianza.
 
 ### Done when
 
-- [ ] Banda montada con el ancla `#cifras`
+- [ ] Banda montada con el ancla `#cifras`; `home-page.spec.ts` barre las **seis** anclas
 - [ ] Rama de reduced-motion probada
 - [ ] `npm run build` sin el video en el bundle inicial
 

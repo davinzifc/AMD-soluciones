@@ -25,6 +25,13 @@ describe('HomePage', () => {
     }
   });
 
+  it('mounts the ledger section and does not mount the services road', () => {
+    const fixture = setup();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('app-ledger-section')).toBeTruthy();
+    expect(root.querySelector('app-services-road-section')).toBeNull();
+  });
+
   it('replaces the old #contacto stub with the real Contact form (T010)', () => {
     const fixture = setup();
     const root = fixture.nativeElement as HTMLElement;
