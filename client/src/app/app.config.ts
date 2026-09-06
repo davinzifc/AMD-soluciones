@@ -4,6 +4,7 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
+import { ViewportScroller } from '@angular/common';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
@@ -32,6 +33,24 @@ export const appConfig: ApplicationConfig = {
           darkModeSelector: false
         }
       }
+    }),
+    // ViewportScroller anchor offset function (REQ-002 / T008):
+    // Offsets anchor scrolling dynamically so sticky chrome does not cover headings.
+    // Adapts to breakpoint matching CSS scroll-margin-top: calc(var(--nav-h) + 1.5rem)
+    // on desktop (>1099px) and calc(var(--nav-h) + 4.5rem) on mobile/tablet (<=1099px)
+    // under the sticky chip rail.
+    provideAppInitializer(() => {
+      const scroller = inject(ViewportScroller);
+      scroller.setOffset(() => {
+        if (typeof window === 'undefined') {
+          return [0, 0];
+        }
+        const navH = 72;
+        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        const isMobileOrTablet = window.innerWidth <= 1099;
+        const yOffset = isMobileOrTablet ? navH + 4.5 * rootFontSize : navH + 1.5 * rootFontSize;
+        return [0, yOffset];
+      });
     }),
     // Gate first paint on the active locale's dictionary (REQ-009 / T003 review fix):
     // without this, LocalizePipe bindings render raw keys until the async fetch resolves.

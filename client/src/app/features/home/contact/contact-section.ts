@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { ANALYTICS_PORT } from '../../../core/analytics/analytics-port';
 import { buildMailtoUrl, buildWhatsAppUrl, openHandoff, type WhatsAppContext } from '../../../core/contact/contact-handoff';
@@ -7,7 +8,7 @@ import { CONTACT_MAILTO_INBOX, WHATSAPP_NUMBER } from '../../../core/contact/con
 import type { ContactIntent } from '../../../core/contact/contact-intent.model';
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { LocaleService } from '../../../core/i18n/locale.service';
-import { SERVICE_GROUP_IDS } from '../../services/services-page/services-page';
+import { SERVICE_GROUP_IDS, type ServiceGroupId } from '../../services/services-page/services-page';
 
 interface ServiceOption {
   readonly id: (typeof SERVICE_GROUP_IDS)[number];
@@ -24,6 +25,9 @@ const SERVICE_OPTIONS: readonly ServiceOption[] = [
 ];
 
 type RequiredFieldName = 'fullName' | 'email' | 'message';
+
+const isServiceGroupId = (id: string | null): id is ServiceGroupId =>
+  typeof id === 'string' && (SERVICE_GROUP_IDS as readonly string[]).includes(id);
 
 /**
  * Home Contact (T010 · REQ-008 · design.md §6 `ContactSection`). Reactive
@@ -52,16 +56,50 @@ export class ContactSection {
   private readonly analytics = inject(ANALYTICS_PORT);
   private readonly number = inject(WHATSAPP_NUMBER);
   protected readonly inboxAddress = inject(CONTACT_MAILTO_INBOX);
+  private readonly route = inject(ActivatedRoute, { optional: true });
+
+  private readonly initialServicio: string = (() => {
+    try {
+      const raw = this.route?.snapshot?.queryParamMap?.get('servicio') ?? null;
+      return isServiceGroupId(raw) ? raw : '';
+    } catch {
+      return '';
+    }
+  })();
+
+  private readonly initialDetalle: string | null = (() => {
+    try {
+      return this.route?.snapshot?.queryParamMap?.get('detalle')?.trim() || null;
+    } catch {
+      return null;
+    }
+  })();
 
   protected readonly form = this.fb.nonNullable.group({
     fullName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    serviceInterest: [''],
-    message: ['', Validators.required],
+    serviceInterest: [this.initialServicio],
+    message: [this.initialDetalle ? this.locale.translate(this.initialDetalle) : '', Validators.required],
   });
 
   private readonly toastVisibleSignal = signal(false);
   protected readonly toastVisible = this.toastVisibleSignal.asReadonly();
+
+  constructor() {
+    if (this.initialDetalle) {
+      effect(() => {
+        // Track locale/dictionary signal updates (REQ-005, KZ-003)
+        const dict = typeof this.locale.dictionary === 'function' ? this.locale.dictionary() : null;
+        const loc = typeof this.locale.locale === 'function' ? this.locale.locale() : null;
+        void dict;
+        void loc;
+        const translated = this.locale.translate(this.initialDetalle!);
+        if (this.form.controls.message.pristine) {
+          this.form.controls.message.setValue(translated);
+        }
+      });
+    }
+  }
 
   protected fieldInvalid(name: RequiredFieldName): boolean {
     const control = this.form.controls[name];

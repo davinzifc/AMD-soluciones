@@ -1,41 +1,127 @@
 <header class="page-hero">
   <div class="wrap">
+    <p class="eyebrow">{{ 'svcHeroEyebrow' | localize }}</p>
     <h1>{{ 'svcPageTitle' | localize }}</h1>
-    <p>{{ 'svcPageLead' | localize }}</p>
-
-    <nav class="toc" [attr.aria-label]="'tocAria' | localize">
-      @for (group of groups; track group.id) {
-        <a routerLink="/services" [fragment]="group.id">{{ group.titleKey | localize }}</a>
-      }
-    </nav>
+    <p class="lead">{{ 'svcPageLead' | localize }}</p>
+    <ul class="hero-meta">
+      <li><b>{{ totalLines }}</b> {{ 'svcMetaLines' | localize }}</li>
+      <li><b>{{ totalServices }}</b> {{ 'svcMetaServices' | localize }}</li>
+      <li><b>2</b> {{ 'svcMetaModes' | localize }}</li>
+    </ul>
   </div>
 </header>
 
-<section class="svc-groups">
-  <div class="wrap">
-    @for (group of groups; track group.id) {
-      <article [id]="group.id" class="svc-group">
-        <h2>{{ group.titleKey | localize }}</h2>
-        <p class="svc-lead">{{ group.leadKey | localize }}</p>
+<div class="catalog wrap">
+  <aside class="rail" [attr.aria-label]="'svcIndexAria' | localize">
+    <p class="rail__title">{{ 'svcIndexTitle' | localize }}</p>
+    <ol class="rail__list">
+      @for (group of groups; track group.id; let i = $index) {
+        <li>
+          <a
+            class="rail__link"
+            routerLink="/services"
+            [fragment]="group.id"
+            [attr.data-rail]="group.id"
+            [attr.aria-current]="activeGroup() === group.id ? 'true' : null"
+          >
+            <span class="rail__num">{{ formatOrdinal(i) }}</span>
+            <span class="rail__label">{{ group.titleKey | localize }}</span>
+            <span class="rail__count">{{ group.subs.length }}</span>
+          </a>
+        </li>
+      }
+    </ol>
+    <a class="btn btn--gold rail__cta" routerLink="/" fragment="contacto">{{ 'talkAdvisor' | localize }}</a>
+  </aside>
 
-        <ul class="svc-subs">
-          @for (sub of group.subs; track sub.titleKey) {
-            <li>
-              <strong>{{ sub.titleKey | localize }}</strong>
-              <span>{{ sub.descKey | localize }}</span>
+  <div class="chapters">
+    @for (group of groups; track group.id; let i = $index) {
+      <article class="chapter" [id]="group.id" tabindex="-1">
+        <header class="chapter__head">
+          <span class="chapter__ordinal" aria-hidden="true">{{ formatOrdinal(i) }}</span>
+          <div class="chapter__rule"></div>
+          <h2>{{ group.titleKey | localize }}</h2>
+          <p class="chapter__lead">{{ group.leadKey | localize }}</p>
+          @if (group.noteKey) {
+            <p class="chapter__note">{{ group.noteKey | localize }}</p>
+          }
+        </header>
+
+        <ul
+          class="subs"
+          [attr.data-collapsed]="group.subs.length > visibleLimit && !isExpanded(group.id) ? 'true' : null"
+        >
+          @for (sub of group.subs; track sub.titleKey; let subIndex = $index) {
+            <li
+              class="sub"
+              [attr.data-overflow]="group.subs.length > visibleLimit && subIndex >= visibleLimit ? 'true' : null"
+            >
+              <a
+                class="sub__link"
+                routerLink="/"
+                fragment="contacto"
+                [queryParams]="{ servicio: group.id, detalle: sub.titleKey }"
+              >
+                <span class="sub__title"><strong>{{ sub.titleKey | localize }}</strong></span>
+                <span class="sub__cue">{{ 'svcRowCue' | localize }} &rarr;</span>
+                <span class="sub__desc">{{ sub.descKey | localize }}</span>
+              </a>
             </li>
           }
         </ul>
 
-        @if (group.noteKey) {
-          <p class="svc-note">{{ group.noteKey | localize }}</p>
+        @if (group.subs.length > visibleLimit) {
+          <button
+            class="more"
+            type="button"
+            [attr.aria-expanded]="isExpanded(group.id)"
+            [attr.data-more]="group.id"
+            (click)="toggleGroup(group.id)"
+          >
+            {{ moreLabel()(group) }}
+          </button>
         }
+
+        <div class="chapter__cta">
+          <a
+            class="btn btn--gold"
+            routerLink="/"
+            fragment="contacto"
+            [queryParams]="{ servicio: group.id }"
+          >
+            {{ quoteLine()(group) }}
+          </a>
+          <a
+            class="btn btn--ghost"
+            [href]="whatsappUrl()"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp
+          </a>
+        </div>
       </article>
     }
+  </div>
+</div>
 
-    <div class="svc-actions">
-      <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'talkAdvisor' | localize }}</a>
-      <a class="btn btn--ghost" routerLink="/" fragment="servicios">{{ 'backRoad' | localize }}</a>
+<section class="closer">
+  <div class="wrap">
+    <div class="closer__panel">
+      <p class="eyebrow">{{ 'svcCloserEyebrow' | localize }}</p>
+      <h2>{{ 'svcCloserTitle' | localize }}</h2>
+      <p>{{ 'svcCloserLead' | localize }}</p>
+      <div class="closer__cta">
+        <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'talkAdvisor' | localize }}</a>
+        <a
+          class="btn btn--ghost"
+          [href]="whatsappUrl()"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ 'svcCloserWhatsapp' | localize }}
+        </a>
+      </div>
     </div>
   </div>
 </section>

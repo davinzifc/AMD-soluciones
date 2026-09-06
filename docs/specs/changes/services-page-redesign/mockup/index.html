@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mockup — Servicios redesign v0.1 · AMD Soluciones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="services-redesign.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar__inner">
+        <a class="brand" href="#">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span>AMD Soluciones<span class="brand__sub">INTEGRALES S.A.S.</span></span>
+        </a>
+        <nav class="topbar__links" aria-label="Principal">
+          <a href="#">Home</a>
+          <a href="#">Quiénes somos</a>
+          <a href="#" aria-current="page">Servicios</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="wrap">
+          <p class="eyebrow">Portafolio AMD</p>
+          <h1>Nuestros servicios</h1>
+          <p class="lead">
+            Soluciones para formalizar, ordenar y hacer crecer tu negocio. Elige una línea en el
+            índice y contáctanos desde el servicio exacto que necesitas.
+          </p>
+          <ul class="hero-meta">
+            <li><b>5</b> líneas de servicio</li>
+            <li><b data-slot="total">31</b> servicios</li>
+            <li><b>2</b> modalidades: individual o paquete</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="catalog wrap">
+        <aside class="rail" aria-label="Índice de líneas de servicio">
+          <p class="rail__title">Líneas</p>
+          <ol class="rail__list" data-slot="rail"></ol>
+          <a class="btn btn--gold rail__cta" href="/#contacto">Hablar con un asesor</a>
+        </aside>
+
+        <div class="chapters" data-slot="chapters"></div>
+      </div>
+
+      <section class="closer">
+        <div class="wrap">
+          <div class="closer__panel">
+            <p class="eyebrow">Siguiente paso</p>
+            <h2>¿No sabes por dónde empezar?</h2>
+            <p>
+              Cuéntanos en qué está tu negocio hoy y armamos el paquete: contabilidad al día,
+              nómina, riesgo y marca en un solo acompañamiento.
+            </p>
+            <div class="closer__cta">
+              <a class="btn btn--gold" href="/#contacto">Hablar con un asesor</a>
+              <a class="btn btn--ghost" href="https://wa.me/">Escribir por WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="services-redesign.js"></script>
+  </body>
+</html>
