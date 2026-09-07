@@ -1153,10 +1153,22 @@ tanto cambia de umbral.
   salida 0. Una captura JPEG **no es evidencia** para estas clases: durante el mockup inventaron una
   costura que la medición de píxeles demostró inexistente.
 
+### Mediciones añadidas por KZ-007 (2026-09-06)
+
+Las cuatro divergencias que el cliente encontró **a mano** en su revisión son exactamente la clase que
+este gate debía cubrir. Se añaden como mediciones 10-13, todas lecturas de posición:
+
+| # | Qué | Umbral |
+|---|---|---|
+| 10 | Borde izquierdo de `.hero__content` frente al `.wrap` de otra sección | ± 2 px — **no centrado** |
+| 11 | Enlaces de `.topnav__links` agrupados a la derecha | hueco izquierdo ≫ derecho |
+| 12 | Pulsar `a.hero__scroll` deja `nav.subnav` con `is-on` y visible | verdadero — **mide si la tolerancia de 2 px de T018 basta** |
+| 13 | `animation-direction` de `.clients__track` vs `.ticker__track` | opuestos |
+
 ### Done when
 
-- [ ] `verify:visual` reporta las **nueve** mediciones con su número
-- [ ] Las nueve dentro de umbral, o reportadas como INCONCLUSO con su dispersión
+- [ ] `verify:visual` reporta las **trece** mediciones con su número
+- [ ] Las trece dentro de umbral, o reportadas como INCONCLUSO con su dispersión
 - [ ] El contraste se mide a 375 y 1200 px, y el umbral lo elige el tamaño computado, no una constante
 - [ ] Playwright sólo como devDependency; el bundle no cambia
 
