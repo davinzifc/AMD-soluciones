@@ -1033,10 +1033,75 @@ separarse.
 
 ---
 
+## T019 — Ajustes HITL: alineación del top-nav y ritmo de los testimonios
+
+- **Status:** [ ]
+- **Depends on:** T018
+- **Origen:** Revisión HITL en navegador, 2026-09-06 (cuarta pasada).
+- **Directory boundary:** `client/src/app/core/layout/top-nav/` y `client/src/app/features/home/trust/`
+- **Recommended skills:** `ui-ux-pro-max`
+- **Requirements:** REQ-006 (ritmo de lectura), REQ-008
+- **Design refs:** **Mockup: `home-redesign.css` `.topnav__inner` / `.brand` / `.topnav__links`**
+
+### 1 · El menú del top-nav va a la derecha, no centrado
+
+**Causa raíz medida.** Es una sola declaración:
+
+| | Mockup | Hoy |
+|---|---|---|
+| `.topnav__inner` | `display: flex; gap: 1.5rem` | `display: flex; gap: 1rem;` **`justify-content: space-between`** |
+| `.brand` | **`margin-right: auto`** | — |
+
+Con `space-between` y tres hijos —marca, nav, acciones— el navegador reparte el hueco sobrante
+**entre** ellos y el nav queda **centrado**. El mockup no reparte: empuja sólo la marca con
+`margin-right: auto`, así que enlaces y acciones quedan **pegados a la derecha** como un solo grupo.
+
+Portar también el espaciado del mockup, que cambia con la alineación:
+`.topnav__links { gap: 0.35rem }` y `padding: 0 0.85rem` en cada enlace — hoy es `gap: 1.5rem` sin
+padding, que a la derecha se lee suelto.
+
+**No toques** el `min-height: 44px` de los enlaces (KZ-001, objetivo táctil), ni la inversión
+`on-light`, ni el comportamiento del `SectionNav`.
+
+### 2 · La pausa de 9 s es demasiado larga
+
+**Medido sobre el copy real** (`es.json`, `q1`–`q4`):
+
+| Testimonio | Palabras | ~200 ppm | ~160 ppm |
+|---|---|---|---|
+| q1 (el más largo) | 16 | 4.8 s | 6.0 s |
+| q2 | 12 | 3.6 s | 4.5 s |
+| q3 | 14 | 4.2 s | 5.2 s |
+| q4 | 10 | 3.0 s | 3.8 s |
+
+`TESTIMONIAL_PAUSE_MS` pasa de **9000** a **6000**: cubre el peor caso incluso leyendo despacio, y no
+deja el carrusel parado. Cambiar **sólo la constante** — los tests aseveran contra ella, así que no
+hay literales que perseguir. Si alguno compara con `9000` a mano, es un defecto: repórtalo.
+
+### Tests
+
+- `.topnav__inner` **no** declara `justify-content: space-between`; `.brand` **sí** declara
+  `margin-right: auto`
+- `TESTIMONIAL_PAUSE_MS === 6000`, y ningún test compara contra un literal distinto
+- Los tests de rotación, pausa por cursor/foco y reduced-motion siguen verdes **sin tocarlos**
+
+- **Verification:** `cd client && npm run test:agent && npm run lint -- --quiet && npm run build`
+- **Falsable con:** devolver `space-between` → debe FALLAR. Poner la pausa en 9000 → debe FALLAR.
+- **Evidence disqualifier:** jsdom no calcula layout: que no haya `space-between` **no** prueba que el
+  menú quede a la derecha. **T012.** Y si 6 s es cómodo de leer sólo lo dice un humano leyéndolo.
+
+### Done when
+
+- [ ] Menú y acciones agrupados a la derecha; la marca empuja con `margin-right: auto`
+- [ ] Espaciado de enlaces portado del mockup, con los 44 px intactos
+- [ ] `TESTIMONIAL_PAUSE_MS = 6000`; el resto de tests de rotación en verde sin tocarlos
+
+---
+
 ## T012 — Gate de medición en navegador
 
 - **Status:** [ ]
-- **Depends on:** T007, T009, T011, **T014, T015, T016, T017, T018**
+- **Depends on:** T007, T009, T011, **T014, T015, T016, T017, T018, T019**
 - **Directory boundary:** `client/` (devDependency + script)
 - **Recommended skills:** `angular-developer`
 - **Requirements:** REQ-001 (los dos escenarios), REQ-007 escenarios "el bucle no salta" y
