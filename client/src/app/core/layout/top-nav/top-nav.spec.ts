@@ -8,6 +8,29 @@ import { LocaleService } from '../../i18n/locale.service';
 import { DrawerStateService } from '../drawer-state.service';
 import { TopNav } from './top-nav';
 
+interface NodeProcess {
+  cwd(): string;
+  getBuiltinModule?(name: string): unknown;
+}
+interface NodeFs {
+  readFileSync(path: string, encoding: string): string;
+}
+interface NodePath {
+  resolve(...paths: string[]): string;
+}
+
+const nodeProcess = (globalThis as unknown as { process?: NodeProcess }).process;
+
+function getNodeModule<T>(name: string): T {
+  if (nodeProcess?.getBuiltinModule) {
+    return nodeProcess.getBuiltinModule(name) as T;
+  }
+  throw new Error(`Cannot load built-in Node module '${name}'`);
+}
+
+const fs = getNodeModule<NodeFs>('fs');
+const path = getNodeModule<NodePath>('path');
+
 function setup(localeValue: 'es' | 'en' = 'es') {
   const locale = signal(localeValue);
   const copy = {
@@ -197,6 +220,34 @@ describe('TopNav', () => {
       expect((en as Record<string, string>)['navServicesPage']).toBe('Services');
       expect((en as Record<string, string>)['navCta']).toBe('Contact');
       expect((en as Record<string, string>)['navSectionInicio']).toBe('Top');
+    });
+  });
+
+  describe('T019 top-nav layout and right alignment', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const cssPath = path.resolve(rootDir, 'src/app/core/layout/top-nav/top-nav.css');
+    const rawCss = fs.readFileSync(cssPath, 'utf8');
+    const cleanCss = rawCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it('.topnav__inner does not declare justify-content: space-between and .brand declares margin-right: auto', () => {
+      const innerMatch = cleanCss.match(/(?<![.\w-])\.topnav__inner\s*\{([^}]*)\}/);
+      expect(innerMatch).toBeTruthy();
+      expect(innerMatch![1]).not.toMatch(/justify-content\s*:\s*space-between/);
+
+      const brandMatch = cleanCss.match(/(?<![.\w-])\.brand\s*\{([^}]*)\}/);
+      expect(brandMatch).toBeTruthy();
+      expect(brandMatch![1]).toMatch(/margin-right\s*:\s*auto/);
+    });
+
+    it('declares gap: 0.35rem on .topnav__links and padding: 0 0.85rem on links with 44px touch target preserved (KZ-001)', () => {
+      const linksMatch = cleanCss.match(/(?<![.\w-])\.topnav__links\s*\{([^}]*)\}/);
+      expect(linksMatch).toBeTruthy();
+      expect(linksMatch![1]).toMatch(/gap\s*:\s*0\.35rem/);
+
+      const linkAnchorMatch = cleanCss.match(/(?<![.\w-])\.topnav__links\s+a\s*\{([^}]*)\}/);
+      expect(linkAnchorMatch).toBeTruthy();
+      expect(linkAnchorMatch![1]).toMatch(/padding\s*:\s*0\s+0\.85rem/);
+      expect(linkAnchorMatch![1]).toMatch(/min-height\s*:\s*44px/);
     });
   });
 });

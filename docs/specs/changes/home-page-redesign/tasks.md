@@ -1035,7 +1035,7 @@ separarse.
 
 ## T019 — Ajustes HITL: alineación del top-nav y ritmo de los testimonios
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06)
 - **Depends on:** T018
 - **Origen:** Revisión HITL en navegador, 2026-09-06 (cuarta pasada).
 - **Directory boundary:** `client/src/app/core/layout/top-nav/` y `client/src/app/features/home/trust/`
@@ -1092,9 +1092,9 @@ hay literales que perseguir. Si alguno compara con `9000` a mano, es un defecto:
 
 ### Done when
 
-- [ ] Menú y acciones agrupados a la derecha; la marca empuja con `margin-right: auto`
-- [ ] Espaciado de enlaces portado del mockup, con los 44 px intactos
-- [ ] `TESTIMONIAL_PAUSE_MS = 6000`; el resto de tests de rotación en verde sin tocarlos
+- [x] `justify-content: space-between` fuera; `.brand` empuja con `margin-right: auto`, como el mockup
+- [x] `gap: 0.35rem` + `padding: 0 0.85rem` por enlace; los 44 px de área táctil intactos
+- [x] `TESTIMONIAL_PAUSE_MS = 6000`, medido sobre el copy real; sin literales `9000` en ningún test
 
 ---
 

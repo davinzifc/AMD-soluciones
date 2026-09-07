@@ -1516,3 +1516,56 @@ de anclaje no se tocó.
 **jsdom no hace scroll ni calcula layout.** Que las dos piezas compartan función **no prueba** que el
 sub-header aparezca al pulsar «Scroll», ni que la tolerancia de 2 px baste en pantallas de densidad
 distinta. Y el ritmo de 9 s es un juicio de lectura que sólo se valida leyendo. **T012 y HITL.**
+
+---
+
+## T019 — Alineación del top-nav y ritmo de los testimonios · **PASS** (1 ronda · 2026-09-06)
+
+**Origen:** cuarta pasada del cliente en navegador.
+
+### 1 · El menú seguía centrado — una sola declaración
+
+| | Mockup | Estaba |
+|---|---|---|
+| `.topnav__inner` | `display: flex; gap: 1.5rem` | + **`justify-content: space-between`** |
+| `.brand` | **`margin-right: auto`** | — |
+
+Con `space-between` y **tres** hijos —marca, `<nav>`, acciones— el navegador reparte el hueco sobrante
+**entre** ellos, y el nav aterriza en el centro. El mockup no reparte: empuja **sólo la marca**, de
+modo que enlaces y acciones quedan pegados a la derecha como un grupo.
+
+Portado también el espaciado, que cambia con la alineación: `gap: 0.35rem` entre enlaces y
+`padding: 0 0.85rem` en cada uno (antes `gap: 1.5rem` sin padding, que agrupado a la derecha se lee
+suelto). **Los `min-height: 44px` no se tocaron** (KZ-001).
+
+### 2 · La pausa baja de 9 s a 6 s — el número está medido, no elegido
+
+Sobre el copy real de `es.json`:
+
+| | Palabras | ~200 ppm | ~160 ppm (lento) |
+|---|---|---|---|
+| q1 (el más largo) | 16 | 4.8 s | **6.0 s** |
+| q2 | 12 | 3.6 s | 4.5 s |
+| q3 | 14 | 4.2 s | 5.2 s |
+| q4 | 10 | 3.0 s | 3.8 s |
+
+**6 s** cubre el peor caso incluso leyendo despacio. Por debajo de ~5 s, `q1` empezaría a cortarse
+para un lector lento. Cambió **sólo la constante**: los tests aseveran contra `TESTIMONIAL_PAUSE_MS`
+y no quedó ningún literal `9000` en la suite — comprobado por grep.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+**33 ficheros · 320 tests** verde (317 → 320), lint limpio, `main` **451.35 kB**.
+
+### Mutaciones — dos del brief y una del Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | Devolver `justify-content: space-between` | FALLA |
+| 2 | Pausa de vuelta a `9000` | FALLA |
+| 3 | Quitar `margin-right: auto` de `.brand` | **FALLA** — las dos mitades del arreglo están guardadas, no sólo una |
+
+### PENDIENTE DE T012 / HITL
+
+jsdom no calcula layout: que no haya `space-between` **no prueba** que el menú quede a la derecha. Y
+si 6 s resulta cómodo de leer sólo lo dice una persona leyéndolo.

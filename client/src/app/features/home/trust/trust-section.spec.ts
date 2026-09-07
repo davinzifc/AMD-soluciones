@@ -383,4 +383,8 @@ describe('TrustSection (T015)', () => {
     const track = fixture.nativeElement.querySelector('.ticker__track') as HTMLElement;
     expect(track.classList.contains('is-reduced-motion')).toBe(true);
   });
+
+  it('defines TESTIMONIAL_PAUSE_MS as 6000ms for comfortable reading pace (T019 · REQ-006)', () => {
+    expect(TESTIMONIAL_PAUSE_MS).toBe(6000);
+  });
 });

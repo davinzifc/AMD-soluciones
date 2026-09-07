@@ -34,11 +34,11 @@ const TESTIMONIALS: readonly Testimonial[] = [
 ];
 
 /**
- * Reading pause for auto-advancing testimonials (T018 · REQ-006 · DD-034).
- * Reverted by HITL 2026-09-06: testimonials advance automatically every 9s,
+ * Reading pause for auto-advancing testimonials (T018 · T019 · REQ-006 · DD-034).
+ * Reverted by HITL 2026-09-06: testimonials advance automatically every 6s,
  * but halt when hovered or focused so text is never replaced while being read.
  */
-export const TESTIMONIAL_PAUSE_MS = 9000;
+export const TESTIMONIAL_PAUSE_MS = 6000;
 
 /**
  * Home Trust (T018 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034 · mockup index.html#confianza).
