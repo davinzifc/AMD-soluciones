@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 
 import { LocalizePipe } from '../../i18n/localize.pipe';
 import { probeSectionThemeAt, type SectionTone } from '../../motion/section-theme';
+import { getChromeOffset, SUB_HEADER_THRESHOLD_TOLERANCE } from '../chrome-offset';
 
 export interface SectionNavAnchor {
   readonly id: string;
@@ -10,8 +11,8 @@ export interface SectionNavAnchor {
 }
 
 /**
- * The six Home section anchors, in document scroll order (DD-029, DD-037, REQ-008).
- * Labels do not repeat the main site page links ("Líneas" vs "Servicios", "Manifiesto" vs "Quiénes somos").
+ * The six Home section anchors, in document scroll order (DD-029, DD-037, REQ-008, T018).
+ * Labels do not repeat the main site page links ("Líneas" vs "Servicios", "Manifiesto" vs "Nosotros", "Arriba" vs "Inicio").
  */
 export const SECTION_NAV_ANCHORS: readonly SectionNavAnchor[] = [
   { id: 'inicio', labelKey: 'navSectionInicio' },
@@ -80,15 +81,14 @@ export class SectionNav implements AfterViewInit {
       return;
     }
 
-    // 1. Hero visibility gate (hidden inside hero, appears after exiting)
+    // 1. Hero visibility gate (hidden inside hero, appears after exiting, T018)
     const hero = document.getElementById('inicio');
+    const chromeH = getChromeOffset();
     if (hero) {
       const heroRect = hero.getBoundingClientRect();
-      const heroHeight = hero.offsetHeight || (heroRect.bottom - heroRect.top);
-      const pastHero = (heroHeight > 0 && window.scrollY > heroHeight - 120) || heroRect.bottom <= 120;
-      this.isOnSignal.set(pastHero);
+      this.isOnSignal.set(heroRect.bottom <= chromeH + SUB_HEADER_THRESHOLD_TOLERANCE);
     } else {
-      this.isOnSignal.set(window.scrollY > 100);
+      this.isOnSignal.set(window.scrollY > chromeH);
     }
 
     const sectionTones = this.collectSectionTones();

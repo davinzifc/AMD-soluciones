@@ -13,6 +13,7 @@ import { routes } from './app.routes';
 import { AmdPreset } from '../styles/theme-primeng';
 import { LocaleService } from './core/i18n/locale.service';
 import { PRIME_UI_LICENSE } from '../environments/prime-ui-license';
+import { getChromeOffset } from './core/layout/chrome-offset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,27 +35,12 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
-    // ViewportScroller anchor offset function (REQ-008 · T003):
+    // ViewportScroller anchor offset function (REQ-008 · T003 · T018):
     // Offsets anchor scrolling dynamically so sticky chrome does not cover headings.
-    // Reconciles with actual geometry: TopNav (68px min-height + 1px border = 69px)
-    // plus SectionNav sub-header (44px height = 113px total) visible only at >=900px.
-    // At >=900px: clears 113px + 1.5rem breathing room (137px at 16px root).
-    // At <900px: clears 69px + 1.5rem breathing room (93px at 16px root).
+    // Consumes single-source getChromeOffset() to prevent divergence with SectionNav.
     provideAppInitializer(() => {
       const scroller = inject(ViewportScroller);
-      scroller.setOffset(() => {
-        if (typeof window === 'undefined') {
-          return [0, 0];
-        }
-        const topNavH = 69; // 68px min-height + 1px bottom border
-        const sectionNavH = 44; // sub-header height
-        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-        const breathingRoom = 1.5 * rootFontSize;
-        const hasSubNav = window.innerWidth >= 900;
-        const chromeH = hasSubNav ? topNavH + sectionNavH : topNavH;
-        const yOffset = chromeH + breathingRoom;
-        return [0, yOffset];
-      });
+      scroller.setOffset(() => [0, getChromeOffset()]);
     }),
     // Gate first paint on the active locale's dictionary (REQ-009 / T003 review fix):
     // without this, LocalizePipe bindings render raw keys until the async fetch resolves.

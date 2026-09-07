@@ -1,8 +1,8 @@
 {
-  "navHome": "Home",
-  "navAboutPage": "Quiénes somos",
+  "navHome": "Inicio",
+  "navAboutPage": "Nosotros",
   "navServicesPage": "Servicios",
-  "navCta": "Contactar",
+  "navCta": "Contacto",
   "menuAria": "Menú",
   "langAria": "Idioma",
   "navSiteAria": "Sitio",
@@ -12,7 +12,7 @@
   "waAria": "WhatsApp",
   "navSectionsAria": "Secciones del landing",
 
-  "navSectionInicio": "Inicio",
+  "navSectionInicio": "Arriba",
   "navServices": "Líneas",
   "navAbout": "Manifiesto",
   "navSectionCifras": "Cifras",

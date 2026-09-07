@@ -952,7 +952,7 @@ accesible del enlace.
 
 ## T018 — Ajustes HITL: etiquetas del nav, aterrizaje del sub-header y rotación de testimonios
 
-- **Status:** [ ]
+- **Status:** [x] PASS (2 rondas · 2026-09-06)
 - **Depends on:** T015, T017
 - **Origen:** Revisión HITL en navegador, 2026-09-06 (tercera pasada).
 - **Directory boundary:** `client/src/app/core/layout/`, `client/src/app/app.config.ts`,
@@ -1026,10 +1026,10 @@ separarse.
 
 ### Done when
 
-- [ ] Menú de páginas idéntico al mockup; `navSectionInicio` = «Arriba»/«Top»; no-repetición en verde
-- [ ] Alto del chrome en **una sola función** compartida por el offset de anclaje y el umbral del sub-header
-- [ ] Testimonios rotan a 9 s, se detienen al hover/foco, y no rotan bajo reduced-motion
-- [ ] La regresión de 15 s borrada; REQ-006 y DD-034 ya reflejan la reversión
+- [x] Menú `Inicio / Nosotros / Servicios` + CTA `Contacto`; `navSectionInicio` = «Arriba»/«Top»; el test de no-repetición de T004 en verde **sin tocarlo**
+- [x] `chrome-offset.ts` como fuente única: `getChromeOffset()` la consumen `app.config.ts` y `SectionNav`. Umbral con `SUB_HEADER_THRESHOLD_TOLERANCE = 2` para absorber el subpíxel del aterrizaje
+- [x] Rotación a 9 s contra la constante; pausa al cursor y al foco por **una sola vía**; sin temporizador bajo reduced-motion; el punto reinicia la cuenta
+- [x] Regresión de 15 s borrada con su sujeto; REQ-006 y DD-034 actualizados **antes** de implementar
 
 ---
 

@@ -5,7 +5,7 @@ import es from '../../../../assets/i18n/es.json';
 import en from '../../../../assets/i18n/en.json';
 import { LocaleService } from '../../../core/i18n/locale.service';
 import { MotionService } from '../../../core/motion/motion.service';
-import { TrustSection } from './trust-section';
+import { TESTIMONIAL_PAUSE_MS, TrustSection } from './trust-section';
 
 interface NodeProcess {
   cwd(): string;
@@ -195,20 +195,148 @@ describe('TrustSection (T015)', () => {
     }
   });
 
-  // ── Test 7: Regresiones (sin temporizador, ClientWall, 44x44, tokens) ───────
-  it('does NOT auto-advance testimonials over time (REQ-006: 15s fake timers regression test)', () => {
+  // ── Test 7: Auto-rotación y pausas (T018 · REQ-006 · DD-034 · ClientWall, 44x44, tokens) ─
+  it('auto-advances testimonials every 9s reading pause asserting against TESTIMONIAL_PAUSE_MS (T018 · REQ-006 · DD-034)', () => {
     vi.useFakeTimers();
     const fixture = setup(false);
     const root = fixture.nativeElement as HTMLElement;
+    const quotes = () => root.querySelectorAll('figure.quote');
 
-    expect(root.querySelectorAll('figure.quote')[0].classList.contains('is-active')).toBe(true);
-    expect(root.querySelectorAll('figure.quote')[1].classList.contains('is-active')).toBe(false);
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+    expect(quotes()[1].classList.contains('is-active')).toBe(false);
 
-    vi.advanceTimersByTime(15_000);
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS);
     fixture.detectChanges();
 
-    expect(root.querySelectorAll('figure.quote')[0].classList.contains('is-active')).toBe(true);
-    expect(root.querySelectorAll('figure.quote')[1].classList.contains('is-active')).toBe(false);
+    expect(quotes()[0].classList.contains('is-active')).toBe(false);
+    expect(quotes()[1].classList.contains('is-active')).toBe(true);
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS);
+    fixture.detectChanges();
+
+    expect(quotes()[1].classList.contains('is-active')).toBe(false);
+    expect(quotes()[2].classList.contains('is-active')).toBe(true);
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS);
+    fixture.detectChanges();
+
+    expect(quotes()[2].classList.contains('is-active')).toBe(false);
+    expect(quotes()[3].classList.contains('is-active')).toBe(true);
+
+    // Cycles back to 0
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS);
+    fixture.detectChanges();
+
+    expect(quotes()[3].classList.contains('is-active')).toBe(false);
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+  });
+
+  it('does NOT auto-advance while pointer is over the section (hover pause)', () => {
+    vi.useFakeTimers();
+    const fixture = setup(false);
+    const root = fixture.nativeElement as HTMLElement;
+    const section = root.querySelector('#confianza') as HTMLElement;
+    const quotes = () => root.querySelectorAll('figure.quote');
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+
+    section.dispatchEvent(new Event('pointerenter'));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS * 2);
+    fixture.detectChanges();
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+    expect(quotes()[1].classList.contains('is-active')).toBe(false);
+
+    // Leaves hover
+    section.dispatchEvent(new Event('pointerleave'));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS);
+    fixture.detectChanges();
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(false);
+    expect(quotes()[1].classList.contains('is-active')).toBe(true);
+  });
+
+  it('does NOT auto-advance while focus is inside the section (focus-within pause)', () => {
+    vi.useFakeTimers();
+    const fixture = setup(false);
+    const root = fixture.nativeElement as HTMLElement;
+    const dots = root.querySelectorAll<HTMLButtonElement>('.quote__dots button');
+    const quotes = () => root.querySelectorAll('figure.quote');
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+
+    dots[0].dispatchEvent(new Event('focusin', { bubbles: true }));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS * 2);
+    fixture.detectChanges();
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+    expect(quotes()[1].classList.contains('is-active')).toBe(false);
+
+    // Focus moves outside
+    dots[0].dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS);
+    fixture.detectChanges();
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(false);
+    expect(quotes()[1].classList.contains('is-active')).toBe(true);
+  });
+
+  it('does NOT auto-advance under prefers-reduced-motion: reduce', () => {
+    vi.useFakeTimers();
+    const fixture = setup(true);
+    const root = fixture.nativeElement as HTMLElement;
+    const quotes = () => root.querySelectorAll('figure.quote');
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+
+    vi.advanceTimersByTime(TESTIMONIAL_PAUSE_MS * 3);
+    fixture.detectChanges();
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+    expect(quotes()[1].classList.contains('is-active')).toBe(false);
+  });
+
+  it('activating a dot selects the testimonial and restarts the timer count', () => {
+    vi.useFakeTimers();
+    const fixture = setup(false);
+    const root = fixture.nativeElement as HTMLElement;
+    const dots = root.querySelectorAll<HTMLButtonElement>('.quote__dots button');
+    const quotes = () => root.querySelectorAll('figure.quote');
+
+    expect(quotes()[0].classList.contains('is-active')).toBe(true);
+
+    // Advance 5 seconds into the 9s pause
+    vi.advanceTimersByTime(5000);
+    fixture.detectChanges();
+
+    // Click dot 2 (quote index 2)
+    dots[2].click();
+    fixture.detectChanges();
+
+    expect(quotes()[2].classList.contains('is-active')).toBe(true);
+
+    // Advance another 5 seconds (10s from test start, but only 5s since dot click)
+    vi.advanceTimersByTime(5000);
+    fixture.detectChanges();
+
+    // Must STILL be quote 2 because click restarted the timer count
+    expect(quotes()[2].classList.contains('is-active')).toBe(true);
+
+    // Advance remaining 4000ms to complete 9s from click
+    vi.advanceTimersByTime(4000);
+    fixture.detectChanges();
+
+    // Now advances to quote 3
+    expect(quotes()[2].classList.contains('is-active')).toBe(false);
+    expect(quotes()[3].classList.contains('is-active')).toBe(true);
   });
 
   it('contains ClientWall within the #confianza section (KZ-004 ancestry)', () => {

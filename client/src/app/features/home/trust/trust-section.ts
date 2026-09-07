@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
 import { LocaleService } from '../../../core/i18n/locale.service';
@@ -34,12 +34,17 @@ const TESTIMONIALS: readonly Testimonial[] = [
 ];
 
 /**
- * Home Trust (T015 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034 · mockup index.html#confianza).
+ * Reading pause for auto-advancing testimonials (T018 · REQ-006 · DD-034).
+ * Reverted by HITL 2026-09-06: testimonials advance automatically every 9s,
+ * but halt when hovered or focused so text is never replaced while being read.
+ */
+export const TESTIMONIAL_PAUSE_MS = 9000;
+
+/**
+ * Home Trust (T018 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034 · mockup index.html#confianza).
  *
- * Centered layout with eyebrow, large centered quote with 4 dots (manual navigation only,
- * REQ-006 regression guard), ClientWall, and flat-text ticker of 9 localized sectors (18 items).
- *
- * Metrics cards and CTA button removed per mockup parity (HITL 2026-09-06).
+ * Centered layout with eyebrow, large centered quote with 4 dots and 9s auto-advance
+ * with hover/focus-within pause, ClientWall, and flat-text ticker of 9 localized sectors (18 items).
  */
 @Component({
   selector: 'app-trust-section',
@@ -47,7 +52,7 @@ const TESTIMONIALS: readonly Testimonial[] = [
   templateUrl: './trust-section.html',
   styleUrl: './trust-section.css',
 })
-export class TrustSection {
+export class TrustSection implements OnDestroy {
   protected readonly sectors = [...SECTOR_KEYS, ...SECTOR_KEYS];
   protected readonly testimonials = TESTIMONIALS;
 
@@ -58,6 +63,45 @@ export class TrustSection {
   private readonly activeIndexSignal = signal(0);
   protected readonly activeIndex = this.activeIndexSignal.asReadonly();
 
+  private readonly isHoveredSignal = signal(false);
+  protected readonly isHovered = this.isHoveredSignal.asReadonly();
+
+  private readonly isFocusedSignal = signal(false);
+  protected readonly isFocused = this.isFocusedSignal.asReadonly();
+
+  private timer: ReturnType<typeof setInterval> | undefined;
+
+  constructor() {
+    effect(() => {
+      this.restartTimer();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.clearTimer();
+  }
+
+  protected onPointerEnter(): void {
+    this.isHoveredSignal.set(true);
+  }
+
+  protected onPointerLeave(): void {
+    this.isHoveredSignal.set(false);
+  }
+
+  protected onFocusIn(): void {
+    this.isFocusedSignal.set(true);
+  }
+
+  protected onFocusOut(event?: FocusEvent): void {
+    const currentTarget = event?.currentTarget as HTMLElement | null;
+    const relatedTarget = event?.relatedTarget as Node | null;
+    if (relatedTarget && currentTarget && currentTarget.contains(relatedTarget)) {
+      return;
+    }
+    this.isFocusedSignal.set(false);
+  }
+
   protected isActive(index: number): boolean {
     return this.activeIndexSignal() === index;
   }
@@ -66,8 +110,27 @@ export class TrustSection {
     return this.locale.translate('testimonialDotLabel').replace('{n}', String(index + 1));
   }
 
-  /** Dot click: manual selection is the only way to navigate testimonials (REQ-006). */
+  /** Dot click: manual selection sets active quote and resets the reading pause (REQ-006 · T018). */
   protected selectTestimonial(index: number): void {
     this.activeIndexSignal.set(index);
+    this.restartTimer();
+  }
+
+  private restartTimer(): void {
+    this.clearTimer();
+    const isPaused = this.reducedMotion() || this.isHoveredSignal() || this.isFocusedSignal();
+    if (isPaused || this.testimonials.length < 2) {
+      return;
+    }
+    this.timer = setInterval(() => {
+      this.activeIndexSignal.update((current) => (current + 1) % this.testimonials.length);
+    }, TESTIMONIAL_PAUSE_MS);
+  }
+
+  private clearTimer(): void {
+    if (this.timer !== undefined) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
   }
 }

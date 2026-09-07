@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
 
+import es from '../../../../assets/i18n/es.json';
+import en from '../../../../assets/i18n/en.json';
 import { LocaleService } from '../../i18n/locale.service';
 import { DrawerStateService } from '../drawer-state.service';
 import { TopNav } from './top-nav';
@@ -10,17 +12,17 @@ function setup(localeValue: 'es' | 'en' = 'es') {
   const locale = signal(localeValue);
   const copy = {
     es: {
-      navHome: 'Home',
-      navAboutPage: 'Quiénes somos',
+      navHome: 'Inicio',
+      navAboutPage: 'Nosotros',
       navServicesPage: 'Servicios',
-      navCta: 'Contactar',
+      navCta: 'Contacto',
       navSiteAria: 'Sitio',
       langAria: 'Idioma',
       menuAria: 'Menú',
     },
     en: {
       navHome: 'Home',
-      navAboutPage: 'About us',
+      navAboutPage: 'About',
       navServicesPage: 'Services',
       navCta: 'Contact',
       navSiteAria: 'Site',
@@ -50,10 +52,10 @@ describe('TopNav', () => {
     expect(links.length).toBe(3);
   });
 
-  it('renders the Contactar CTA', () => {
+  it('renders the Contacto CTA', () => {
     const { fixture } = setup();
     const cta = fixture.nativeElement.querySelector('.btn--gold');
-    expect(cta?.textContent).toContain('Contactar');
+    expect(cta?.textContent).toContain('Contacto');
   });
 
   it('clicking ES/EN calls LocaleService.setLocale with the target locale', () => {
@@ -96,13 +98,13 @@ describe('TopNav', () => {
 
     const root = fixture.nativeElement as HTMLElement;
     const labels = Array.from(root.querySelectorAll('.topnav__links a')).map((link) => link.textContent?.trim());
-    expect(labels).toEqual(['Home', 'About us', 'Services']);
+    expect(labels).toEqual(['Home', 'About', 'Services']);
     expect(root.querySelector('.btn--gold')?.textContent?.trim()).toBe('Contact');
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Site');
     expect(root.querySelector('.lang')?.getAttribute('aria-label')).toBe('Language');
     expect(root.querySelector('.menu-btn')?.getAttribute('aria-label')).toBe('Menu');
-    expect(root.textContent).not.toContain('Quiénes somos');
-    expect(root.textContent).not.toContain('Contactar');
+    expect(root.textContent).not.toContain('Nosotros');
+    expect(root.textContent).not.toContain('Contacto');
   });
 
   it('menu button exposes an accessible name from menuAria and aria-controls="drawer"', () => {
@@ -180,6 +182,22 @@ describe('TopNav', () => {
     } finally {
       mockCifrasSection.remove();
     }
+  });
+
+  describe('T018 navigation labels and mockup parity', () => {
+    it('has exact mockup values for the five keys in es.json and en.json', () => {
+      expect((es as Record<string, string>)['navHome']).toBe('Inicio');
+      expect((es as Record<string, string>)['navAboutPage']).toBe('Nosotros');
+      expect((es as Record<string, string>)['navServicesPage']).toBe('Servicios');
+      expect((es as Record<string, string>)['navCta']).toBe('Contacto');
+      expect((es as Record<string, string>)['navSectionInicio']).toBe('Arriba');
+
+      expect((en as Record<string, string>)['navHome']).toBe('Home');
+      expect((en as Record<string, string>)['navAboutPage']).toBe('About');
+      expect((en as Record<string, string>)['navServicesPage']).toBe('Services');
+      expect((en as Record<string, string>)['navCta']).toBe('Contact');
+      expect((en as Record<string, string>)['navSectionInicio']).toBe('Top');
+    });
   });
 });
 

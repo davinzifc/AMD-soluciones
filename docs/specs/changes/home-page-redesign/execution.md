@@ -1423,3 +1423,96 @@ a `.parallax-layer`, que son decorativos y deben tenerlo.
 **jsdom no calcula posición.** Que `.hero__content` no declare `max-width` **no prueba** que el bloque
 quede a la izquierda: el aserto es sobre el texto del CSS. Lo mide T012, junto con el objetivo táctil
 real del enlace de scroll y que su destino haga scroll de verdad.
+
+---
+
+## T018 — Ajustes HITL: nav, aterrizaje del sub-header y rotación de testimonios · **PASS** (2 rondas · 2026-09-06)
+
+**Origen:** tercera pasada del cliente en navegador.
+
+### 1 · Etiquetas del menú de páginas
+
+`Inicio / Nosotros / Servicios` + CTA `Contacto`, como el mockup. **Colisión resuelta antes de
+despachar:** el mockup dice «Inicio» en el menú de páginas **y** en el índice de secciones, lo que
+rompería el test de no-repetición de T004 —en el panel de hamburguesa las dos listas aparecen juntas—.
+Decisión HITL: el menú queda exacto y `navSectionInicio` pasa a **«Arriba»** en ES («Top» en EN desde
+T004), que describe lo que hace el ancla. El test de T004 sigue verde **sin haberse tocado**.
+
+### 2 · El sub-header no aparecía al aterrizar en un ancla — y no era lo que parecía
+
+La banda negra vacía entre el nav y el ledger **era correcta**: es el hueco que el offset de anclaje
+reserva para el sub-header. El fallo era que **la barra no se encendía**, dejando el hueco vacío.
+
+**Causa raíz: dos números que debían ser el mismo, en ficheros distintos.**
+
+| Sitio | Valor |
+|---|---|
+| `app.config.ts` → `ViewportScroller.setOffset` | **137 px** (69 top-nav + 44 sub-header + 1.5rem) |
+| `section-nav.ts:88` → umbral | `scrollY > heroHeight - **120**` |
+
+Al aterrizar en `ledgerTop − 137`, con el `margin-top: -68px` del hero, `scrollY` quedaba **85 px por
+debajo** del umbral. En el mockup el equivalente funciona por **4 px** de margen (offset 116 contra
+umbral 120); aquí el offset es mayor y el margen negativo del hero se comió el resto. Había además una
+**tercera copia** del 120 en la rama `heroRect.bottom <= 120`.
+
+**No se subió el literal.** Se extrajo `core/layout/chrome-offset.ts` con `getChromeHeight()` y
+`getChromeOffset()`, consumidas por `app.config.ts` **y** por `SectionNav`, cuyo umbral pasa a
+`heroRect.bottom <= chromeH`. Los dos números ya no pueden separarse, y hay un test que asevera que
+comparten la función.
+
+### 3 · Los testimonios vuelven a rotar — reversión de REQ-006 y DD-034
+
+**Los dos documentos se actualizaron ANTES de implementar**, no después: implementar contra un spec
+que dice lo contrario deja la contradicción en el repo. REQ-006 decía *«it must NOT existir ningún
+temporizador»* y DD-034 había elegido no rotar.
+
+**La objeción original se conserva por otra vía.** Lo que REQ-006 protegía es que el texto no se
+sustituya *mientras alguien lo lee*; eso se cubre con la **pausa al cursor y al foco**, no renunciando
+a la rotación. Pausa de lectura de **9 s** en constante exportada, sin temporizador bajo
+`prefers-reduced-motion`, y el punto reinicia la cuenta. La regresión de 15 s de T011 **se borró**: su
+sujeto dejó de ser un defecto.
+
+### Ronda 2 — dos defectos, uno destapado por una mutación que pasó
+
+**a) Los seis eventos de pausa estaban enlazados dos veces**, por `@HostListener` en el componente
+**y** en la plantilla sobre `<section id="confianza">`. Ambas vías vivas en navegador; el gesto
+disparaba el manejador dos veces. Inocuo —`set(true)` es idempotente— pero:
+
+> **Sustituí los decoradores `pointerenter`/`mouseenter` por uno inexistente y los 18 tests siguieron
+> pasando.** Vaciando el cuerpo del método **sí** fallaban. Conclusión: los tests ejercitaban **sólo
+> la copia de la plantilla**, y la del `@HostListener` era **código sin guardar por ningún test**.
+
+Es la **tercera aparición del mismo patrón** en esta spec: reduced-motion por tres mecanismos (T010),
+el `height: auto` muerto (T006), y ahora el doble enlace. Resuelto dejando **una sola vía** —la de la
+plantilla, que es la que los tests ejercitan y está acotada a la sección visible—. Tras el cambio,
+quitar `(pointerenter)` **sí** rompe el test.
+
+**b) El umbral quedó a cero píxeles de margen, y fue efecto lateral de mi propia instrucción.** Pedir
+que umbral y offset compartieran función era correcto, pero dejó
+`heroRect.bottom <= getChromeOffset()` comparándose contra el valor **exacto** del aterrizaje: de los
+4 px de holgura del mockup a **0**. `getBoundingClientRect()` devuelve fracciones y el navegador
+redondea el scroll al píxel físico, así que un aterrizaje en 137.5 apagaría la barra y devolvería el
+hueco vacío **de forma intermitente**. Resuelto con `SUB_HEADER_THRESHOLD_TOLERANCE = 2` en
+`chrome-offset.ts`, documentada como absorción de subpíxel y **no** como ajuste de diseño. El offset
+de anclaje no se tocó.
+
+### Verificación (Node del `.nvmrc`, v24.20.0)
+
+**33 ficheros · 317 tests** verde (303 → 317), lint limpio, `main` **451.34 kB**.
+
+### Mutaciones — seis en total, todas corridas por el Reviewer
+
+| # | Mutación | Observado |
+|---|---|---|
+| 1 | `navSectionInicio` → «Inicio» | FALLA la no-repetición (2 tests) |
+| 2 | Literal `120` en vez de la función compartida | FALLA la fuente única (2 tests) |
+| 3 | `@HostListener` de hover eliminado (ronda 1) | **PASÓ** → destapó el defecto (a) |
+| 4 | Quitar `(pointerenter)` de la plantilla (ronda 2) | FALLA |
+| 5 | Quitar `(focusin)` | FALLA |
+| 6 | Umbral a `<= 0` | FALLA (3 tests) |
+
+### PENDIENTE DE T012
+
+**jsdom no hace scroll ni calcula layout.** Que las dos piezas compartan función **no prueba** que el
+sub-header aparezca al pulsar «Scroll», ni que la tolerancia de 2 px baste en pantallas de densidad
+distinta. Y el ritmo de 9 s es un juicio de lectura que sólo se valida leyendo. **T012 y HITL.**

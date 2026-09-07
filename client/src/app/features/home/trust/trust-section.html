@@ -1,4 +1,11 @@
-<section id="confianza" class="trust section--light">
+<section
+  id="confianza"
+  class="trust section--light"
+  (pointerenter)="onPointerEnter()"
+  (pointerleave)="onPointerLeave()"
+  (focusin)="onFocusIn()"
+  (focusout)="onFocusOut($event)"
+>
   <div class="wrap">
     <p class="eyebrow eyebrow--ink">{{ 'trustEyebrow' | localize }}</p>
 

@@ -1,10 +1,13 @@
+import { ViewportScroller } from '@angular/common';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import en from '../../../../assets/i18n/en.json';
 import es from '../../../../assets/i18n/es.json';
+import { appConfig } from '../../../app.config';
 import { LocaleService } from '../../i18n/locale.service';
+import { getChromeOffset, SUB_HEADER_THRESHOLD_TOLERANCE } from '../chrome-offset';
 import { TopNav } from '../top-nav/top-nav';
 import { SectionNav, SECTION_NAV_ANCHORS } from './section-nav';
 
@@ -333,6 +336,101 @@ describe('SectionNav (T003 · REQ-008 · DD-029 · DD-030 · DD-037)', () => {
 
       // SectionNav at y = 100 falls inside Section 2 (dark) -> isOnLight === false
       expect(sectionNavFixture.componentInstance.isOnLight()).toBe(false);
+    });
+  });
+
+  describe('single source of truth for chrome height & anchor landing (T018 · REQ-008)', () => {
+    it('activates SectionNav at heroRect.bottom <= getChromeOffset() + tolerance (137px at >=900px), failing if hardcoded to 120 or 0', () => {
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+      const chromeOffset = getChromeOffset(1024);
+      expect(chromeOffset).toBe(137);
+
+      // Hero scrolled such that its bottom is exactly at 137px (clearing the anchor scroll offset)
+      appendSection({ id: 'inicio', top: -663, bottom: 137, light: false, height: 800 });
+      appendSection({ id: 'servicios', top: 137, bottom: 937, light: true, height: 800 });
+
+      const { fixture } = setup(663, 800);
+      window.dispatchEvent(new Event('scroll'));
+      fixture.detectChanges();
+
+      // At landing position (bottom = 137px):
+      // With getChromeOffset() + tolerance: 137 <= 139 -> isOn() === true
+      // With hardcoded 120: 137 <= 120 -> isOn() === false (FAILS)
+      // With hardcoded 0: 137 <= 0 -> isOn() === false (FAILS)
+      expect(fixture.componentInstance.isOn()).toBe(true);
+    });
+
+    it('absorbs fractional subpixel landing (e.g. 137.5px) within SUB_HEADER_THRESHOLD_TOLERANCE', () => {
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+      const chromeOffset = getChromeOffset(1024);
+
+      // Fractional landing at 137.5px (due to browser subpixel rounding)
+      appendSection({ id: 'inicio', top: -662.5, bottom: chromeOffset + 0.5, light: false, height: 800 });
+      appendSection({ id: 'servicios', top: chromeOffset + 0.5, bottom: chromeOffset + 800.5, light: true, height: 800 });
+
+      const { fixture } = setup(662.5, 800);
+      window.dispatchEvent(new Event('scroll'));
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.isOn()).toBe(true);
+    });
+
+    it('does NOT activate SectionNav when hero bottom exceeds getChromeOffset() + tolerance', () => {
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+      const chromeOffset = getChromeOffset(1024);
+      const threshold = chromeOffset + SUB_HEADER_THRESHOLD_TOLERANCE;
+
+      appendSection({ id: 'inicio', top: -660, bottom: threshold + 1, light: false, height: 800 });
+      appendSection({ id: 'servicios', top: threshold + 1, bottom: threshold + 801, light: true, height: 800 });
+
+      const { fixture } = setup(660, 800);
+      window.dispatchEvent(new Event('scroll'));
+      fixture.detectChanges();
+
+      expect(fixture.componentInstance.isOn()).toBe(false);
+    });
+
+    it('both appConfig and SectionNav dynamically track getChromeOffset across breakpoints', () => {
+      // 1. appConfig ViewportScroller offset consumes getChromeOffset:
+      let registeredOffsetFn: (() => [number, number]) | undefined;
+      const fakeScroller = {
+        setOffset: vi.fn((fn: () => [number, number]) => {
+          registeredOffsetFn = fn;
+        }),
+      };
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          ...appConfig.providers,
+          { provide: ViewportScroller, useValue: fakeScroller },
+          { provide: LocaleService, useValue: { ...fakeLocaleService, whenReady: () => Promise.resolve() } },
+        ],
+      });
+      TestBed.inject(ViewportScroller);
+      expect(fakeScroller.setOffset).toHaveBeenCalled();
+      expect(registeredOffsetFn).toBeDefined();
+
+      // At >= 900px (1024)
+      Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+      expect(registeredOffsetFn!()).toEqual([0, getChromeOffset(1024)]);
+      expect(registeredOffsetFn!()).toEqual([0, 137]);
+
+      // At < 900px (768)
+      Object.defineProperty(window, 'innerWidth', { value: 768, configurable: true });
+      expect(registeredOffsetFn!()).toEqual([0, getChromeOffset(768)]);
+      expect(registeredOffsetFn!()).toEqual([0, 93]);
+
+      // 2. SectionNav threshold dynamically matches getChromeOffset at 768px:
+      appendSection({ id: 'inicio', top: -707, bottom: 93, light: false, height: 800 });
+      const { fixture } = setup(707, 800);
+      fixture.componentInstance.updateScrollSpy();
+      expect(fixture.componentInstance.isOn()).toBe(true);
+
+      // And turns off when hero bottom exceeds chrome offset + tolerance (bottom = 93 + 2 + 1 = 96)
+      document.querySelectorAll('section').forEach((el) => el.remove());
+      appendSection({ id: 'inicio', top: -704, bottom: 93 + SUB_HEADER_THRESHOLD_TOLERANCE + 1, light: false, height: 800 });
+      fixture.componentInstance.updateScrollSpy();
+      expect(fixture.componentInstance.isOn()).toBe(false);
     });
   });
 });
