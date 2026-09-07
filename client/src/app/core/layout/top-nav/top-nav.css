@@ -158,6 +158,10 @@
   background: var(--amd-gold-soft);
 }
 
+.topnav__cta {
+  display: none;
+}
+
 .menu-btn {
   display: inline-flex;
   width: 44px;
@@ -174,6 +178,10 @@
 @media (min-width: 900px) {
   .topnav__links {
     display: flex;
+  }
+
+  .topnav__cta {
+    display: inline-flex;
   }
 
   .menu-btn {

@@ -250,6 +250,31 @@ describe('TopNav', () => {
       expect(linkAnchorMatch![1]).toMatch(/min-height\s*:\s*44px/);
     });
   });
+
+  describe('T020 top-nav CTA responsive hiding below 900px', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const cssPath = path.resolve(rootDir, 'src/app/core/layout/top-nav/top-nav.css');
+    const rawCss = fs.readFileSync(cssPath, 'utf8');
+    const cleanCss = rawCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it('declares topnav__cta class on the Contacto CTA anchor in template', () => {
+      const { fixture } = setup();
+      const cta = fixture.nativeElement.querySelector('.topnav__cta');
+      expect(cta).toBeTruthy();
+      expect(cta?.getAttribute('routerLink')).toBe('/');
+      expect(cta?.getAttribute('fragment')).toBe('contacto');
+    });
+
+    it('hides .topnav__cta by default (< 900px) and displays it at @media (min-width: 900px)', () => {
+      const ctaBaseMatch = cleanCss.match(/(?<![.\w-])\.topnav__cta\s*\{([^}]*)\}/);
+      expect(ctaBaseMatch).toBeTruthy();
+      expect(ctaBaseMatch![1]).toMatch(/display\s*:\s*none/);
+
+      const mediaMatch = cleanCss.match(/@media\s*\(\s*min-width\s*:\s*900px\s*\)\s*\{([\s\S]*?)\n\}/);
+      expect(mediaMatch).toBeTruthy();
+      expect(mediaMatch![1]).toMatch(/\.topnav__cta\s*\{[^}]*display\s*:\s*inline-flex/);
+    });
+  });
 });
 
 

@@ -1643,3 +1643,47 @@ Aislado en **T020**; el brief prohibía arreglarlo aquí, y con razón: el entre
    0.00 / −0.03 / −0.13. Pasa, pero sin margen: conviene mirar si es efecto real o artefacto de
    redondeo de la medición antes de fiarse de ese número en CI.
 2. `test-results/` añadido a `.gitignore`.
+
+---
+
+## T020 — El top-nav desborda 97 px a 375 px · **PASS** (1 ronda · 2026-09-06)
+
+**Origen: el primer defecto que el gate de T012 encuentra por sí solo.** Era el bug preexistente que
+el `HANDOFF.md` nombraba sin número («rama `bugfix/topnav-overflow-mobile` sin abrir»).
+
+### El arreglo
+
+El CTA «Contacto» del top-nav recibe la clase `topnav__cta`, oculta por defecto y `inline-flex` dentro
+del `@media (min-width: 900px)` que el fichero ya tenía. Es lo mismo que hace el mockup
+(`home-redesign.css:842`), en el sentido que deja el CSS coherente con lo que había al lado.
+
+**El contacto en móvil no se pierde, y se verificó antes de aplicar el arreglo:**
+
+- `mobile-drawer.html:28` — enlace a `#contacto` en el panel de hamburguesa (desde T004).
+- `app.html:12` — `<app-whatsapp-fab />`, presente en toda la página.
+
+### Verificación — la que manda es el gate
+
+```
+Medición 03 · Sin scroll horizontal (6 anchos):  +97.00 px  →  0.00 px
+Resumen: 13 PASS · 0 FAIL · 0 INCONCLUSO      salida 0
+```
+
+Las otras doce **no se movieron**. Importaba especialmente la **11** (agrupación de los enlaces a la
+derecha, que T019 acababa de portar): tocar el layout del nav para arreglar la 3 podía haberla roto, y
+habría sido cambiar un defecto por otro.
+
+`npm run test:agent`: **33 ficheros · 322 tests** verde (320 → 322). Lint limpio.
+`main` **451.46 kB**.
+
+### Mutación
+
+Quitar el `display: none` base del CTA → la medición 3 vuelve a **+97.00 px** y el gate sale con
+código 1. El arreglo está guardado por el instrumento, no sólo por un aserto sobre el texto del CSS.
+
+### Nota sobre lo que jsdom sí y no puede decir aquí
+
+Los dos tests unitarios de T020 comprueban que la clase existe y que el CSS la oculta. **Eso no
+prueba que no haya desborde** — jsdom no aplica media queries ni calcula layout. Lo prueba la
+medición 3 y sólo ella. Se dejan porque documentan la intención y fallan rápido si alguien borra la
+regla, pero el gate es la evidencia.

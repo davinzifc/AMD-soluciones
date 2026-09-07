@@ -1177,7 +1177,7 @@ este gate debía cubrir. Se añaden como mediciones 10-13, todas lecturas de pos
 
 ## T020 — El top-nav desborda 97 px a 375 px
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06) — **el gate pasa a 13/13**
 - **Depends on:** T012 (lo detectó su medición 3)
 - **Origen:** **T012, medición 3 — primer defecto que encuentra el gate por sí solo.** Es el bug
   preexistente que el `HANDOFF.md` ya nombraba («rama `bugfix/topnav-overflow-mobile` sin abrir»),
@@ -1223,9 +1223,9 @@ enlace a `#contacto`— y el FAB flotante de WhatsApp, presente en toda la pági
 
 ### Done when
 
-- [ ] Medición 3 en PASS a 375 · 768 · 900 · 1200 · 1600 · 1920
-- [ ] Las otras doce mediciones siguen en PASS
-- [ ] El acceso a contacto sigue disponible en móvil por la hamburguesa y el FAB
+- [x] Medición 3: de **+97.00 px** a **0.00 px** en los seis anchos
+- [x] Las otras doce sin moverse — en particular la **11**, que era el riesgo de tocar el layout del nav
+- [x] Contacto en móvil por dos vías, verificadas: `mobile-drawer.html:28` (`#contacto`) y `app.html:12` (`<app-whatsapp-fab />`)
 
 ---
 
