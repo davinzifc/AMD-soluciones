@@ -1687,3 +1687,65 @@ Los dos tests unitarios de T020 comprueban que la clase existe y que el CSS la o
 prueba que no haya desborde** — jsdom no aplica media queries ni calcula layout. Lo prueba la
 medición 3 y sólo ella. Se dejan porque documentan la intención y fallan rápido si alguien borra la
 regla, pero el gate es la evidencia.
+
+---
+
+## T013 — Sincronizar `docs/ux-ui/design.md` · **PASS** (1 ronda · 2026-09-06)
+
+**Ejecutada por el Leader, sin delegar** (decisión HITL: la documentación no se delega). Es la única
+tarea de la spec que no pasó por el Implementer.
+
+### Las cuatro filas que la tarea pedía
+
+| Sección | Antes | Ahora |
+|---|---|---|
+| §2 IA | «Left dot sidenav, `≥1100px`» y cinco anclas | Sub-header `SectionNav` desde 900 px; las **seis** anclas, con `#cifras` |
+| §5 Navigation | Tabla del «Sidenav flotante ≥1100px» | `SectionNav` con `aria-current`, retirado del orden de foco al ocultarse (DD-037), tema medido en su propia posición (DD-030) |
+| §7 Tokens | Sin dorado de tinta | **Los dos** tokens con la tabla de reparto **por tamaño computado** |
+| §11 Dark Mode | «tema principal dark premium» | Claro dominante; el oscuro es puntuación (DD-028) |
+
+### Tres secciones más que también habían quedado obsoletas
+
+El barrido de la tarea (`grep sidenav\|1100px`) es estrecho y no las habría encontrado. Salieron de
+revisar el documento entero contra lo que la spec entregó:
+
+- **§4 Screen Inventory** — «Servicios» en la Home pasa a ser el **ledger**; entra **Cifras** como
+  fila nueva; **Confianza pierde sus métricas y su CTA final**; y los CTA primarios estaban todos
+  desactualizados («Contactar» donde hoy dice «Hablar con un asesor», «Enviar por WhatsApp»…).
+- **§8 Component Inventory** — decía `p-carousel` para los testimonios, que **nunca se usó**: son un
+  componente propio. Añadidos `ClientWall` y el ticker de sectores, con sus dos invariantes
+  (`margin-inline` en vez de `gap`; sentidos opuestos).
+- **§9 Responsive** — no mencionaba el corte de **900 px**, que es el que gobierna el índice de
+  secciones, el CTA del top-nav y el apilado del Manifiesto.
+
+### §12 Design Decisions
+
+Añadidas cinco decisiones que vivían sólo en la spec y no en la baseline: ritmo claro/oscuro, índice
+de secciones, dorado sobre claro, testimonios y verificación visual. **Cada una con su número medido**,
+no con su conclusión: 68.2 % de tinta y 2.4 pantallas en la v1 rechazada; 1.73:1 del dorado sobre
+claro; los 900–1099 px que el rail dejaba sin índice.
+
+### Las dos reversiones de esta sesión, documentadas donde toca
+
+1. **Los testimonios rotan** (REQ-006 / DD-034, revertido por HITL). §8 y §12 lo recogen con el
+   **porqué del ritmo**: 6 s salen de medir el copy —el testimonio más largo son 16 palabras, ~6 s
+   leyendo despacio—, y la objeción original se resuelve con la **pausa al cursor/foco**, no
+   renunciando a la rotación.
+2. **Las etiquetas del nav** (`Inicio · Nosotros · Servicios · Contacto`) y el porqué de «Arriba» en
+   el índice de secciones: ninguna etiqueta puede repetirse entre las dos listas, porque en el drawer
+   aparecen juntas.
+
+Sin esto, la baseline habría vuelto a contradecir al código — **que es exactamente el defecto que
+KZ-007 registra y que costó seis tareas de corrección** (T014–T019).
+
+### Verificación (la que pide la tarea)
+
+```
+grep -rn "sidenav\|1100px\|dot sidenav" docs/ux-ui/design.md   → sin resultados ✅
+grep -n  "amd-gold-ink-deep" docs/ux-ui/design.md              → 2 resultados  ✅
+```
+
+**Falsabilidad comprobada:** reintroducir «Left dot sidenav, ≥1100px» en una fila de §2 hace que el
+primer grep devuelva línea. El gate muerde.
+
+El documento pasa de 202 a **274 líneas**.

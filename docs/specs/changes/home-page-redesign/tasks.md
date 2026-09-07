@@ -1231,7 +1231,7 @@ enlace a `#contacto`— y el FAB flotante de WhatsApp, presente en toda la pági
 
 ## T013 — Sincronizar `docs/ux-ui/design.md`
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06) — **editada por el Leader, sin delegar** (decisión HITL: la documentación no se delega)
 - **Depends on:** T003, T007, T011
 - **Directory boundary:** `docs/ux-ui/`
 - **Recommended skills:** `cognitive-doc-design`
