@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8"><title>Visor responsive — Home redesign</title><style>
+html,body{margin:0;background:#2a2a2e;font:12px system-ui;color:#ccc}
+.row{display:flex;gap:14px;padding:12px;align-items:flex-start;flex-wrap:wrap}
+figure{margin:0}figcaption{padding:4px 0}
+iframe{border:0;background:#000;display:block}
+.s1600{width:1600px;height:980px;transform:scale(.62);transform-origin:top left}
+.b1600{width:992px;height:608px;overflow:hidden}
+.s1200{width:1200px;height:900px;transform:scale(.62);transform-origin:top left}
+.b1200{width:744px;height:558px;overflow:hidden}
+</style>
+<div class="row">
+  <figure><figcaption>1600 × 980 — sub-header</figcaption>
+    <div class="b1600"><iframe class="s1600" src="index.html" id="w"></iframe></div></figure>
+  <figure><figcaption>1200 × 900 — sub-header</figcaption>
+    <div class="b1200"><iframe class="s1200" src="index.html" id="m"></iframe></div></figure>
+</div>
+<div class="row">
+  <figure><figcaption>375 × 812 — hamburguesa</figcaption><iframe src="index.html" width="375" height="812" id="a"></iframe></figure>
+  <figure><figcaption>768 × 812 — hamburguesa</figcaption><iframe src="index.html" width="768" height="812" id="b"></iframe></figure>
+</div>

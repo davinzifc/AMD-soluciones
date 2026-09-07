@@ -27,8 +27,7 @@
 .topnav__inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
   min-height: 68px;
 }
 
@@ -36,6 +35,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-right: auto;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.95rem;
@@ -64,7 +64,7 @@
 
 .topnav__links {
   display: none;
-  gap: 1.5rem;
+  gap: 0.35rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -76,6 +76,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  padding: 0 0.85rem;
   color: inherit;
   text-decoration: none;
 }
@@ -157,6 +158,10 @@
   background: var(--amd-gold-soft);
 }
 
+.topnav__cta {
+  display: none;
+}
+
 .menu-btn {
   display: inline-flex;
   width: 44px;
@@ -175,7 +180,58 @@
     display: flex;
   }
 
+  .topnav__cta {
+    display: inline-flex;
+  }
+
   .menu-btn {
     display: none;
   }
+}
+
+/* Chrome inversion over light sections (DD-030 · REQ-008 · mockup parity) */
+.topnav.on-light {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+}
+
+.topnav.on-light .brand {
+  color: var(--amd-ink, #0d141a);
+}
+
+.topnav.on-light .brand__text span {
+  color: var(--amd-slate, #475569);
+}
+
+.topnav.on-light .topnav__links {
+  color: var(--amd-slate, #475569);
+}
+
+.topnav.on-light .topnav__links a:hover,
+.topnav.on-light .topnav__links a.is-active {
+  color: var(--amd-ink, #0d141a);
+}
+
+.topnav.on-light .topnav__links a.is-active {
+  box-shadow: inset 0 -2px 0 var(--amd-gold-ink);
+}
+
+.topnav.on-light .lang {
+  border-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.topnav.on-light .lang button {
+  color: var(--amd-slate, #475569);
+}
+
+.topnav.on-light .lang button[aria-pressed='true'] {
+  background: rgba(207, 187, 102, 0.24);
+  color: var(--amd-gold-ink-deep);
+}
+
+.topnav.on-light .menu-btn {
+  border-color: var(--amd-border, rgba(0, 0, 0, 0.08));
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--amd-ink, #0d141a);
 }

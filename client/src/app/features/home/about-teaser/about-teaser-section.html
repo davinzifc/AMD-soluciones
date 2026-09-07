@@ -1,17 +1,46 @@
-<section id="sobre-amd" class="about-teaser">
-  <div class="wrap about-grid">
-    <figure class="about-visual" aria-hidden="true">
-      <figcaption>Cali · Colombia</figcaption>
-    </figure>
+<section id="sobre-amd" class="about section--light">
+  <div class="wrap">
+    <div class="about__lead">
+      <figure class="about__figure">
+        <img
+          src="media/about-asesoria.webp"
+          [alt]="'aboutFigureAlt' | localize"
+          loading="lazy"
+          decoding="async"
+          width="1600"
+          height="1067"
+        />
+        <figcaption>{{ 'aboutFigureCaption' | localize }}</figcaption>
+      </figure>
 
-    <div class="about-copy">
-      <h2>{{ 'aboutTitle' | localize }}</h2>
-      <p>{{ 'aboutBody' | localize }}</p>
-
-      <div class="about-actions">
-        <a class="btn btn--gold" routerLink="/about-us">{{ 'seeMore' | localize }}</a>
-        <a class="btn btn--ghost" routerLink="/" fragment="contacto">{{ 'aboutCta' | localize }}</a>
+      <div class="about__copy">
+        <p class="eyebrow eyebrow--ink">{{ 'aboutEyebrow' | localize }}</p>
+        <h2 class="about__quote">{{ 'aboutQuote' | localize }}</h2>
+        <p class="about__body">{{ 'aboutLeadBody' | localize }}</p>
       </div>
+    </div>
+
+    <ol class="pillars">
+      <li>
+        <span class="pillars__ord">01</span>
+        <h3>{{ 'aboutPillar1Title' | localize }}</h3>
+        <p>{{ 'aboutPillar1Desc' | localize }}</p>
+      </li>
+      <li>
+        <span class="pillars__ord">02</span>
+        <h3>{{ 'aboutPillar2Title' | localize }}</h3>
+        <p>{{ 'aboutPillar2Desc' | localize }}</p>
+      </li>
+      <li>
+        <span class="pillars__ord">03</span>
+        <h3>{{ 'aboutPillar3Title' | localize }}</h3>
+        <p>{{ 'aboutPillar3Desc' | localize }}</p>
+      </li>
+    </ol>
+
+    <div class="about__cta">
+      <a class="btn btn--ink" routerLink="/about-us">{{ 'aboutMeetTeam' | localize }}</a>
+      <a class="btn btn--ghost btn--ghost-ink" routerLink="/" fragment="contacto">{{ 'aboutCta' | localize }}</a>
     </div>
   </div>
 </section>

@@ -1,0 +1,158 @@
+/*
+ * AMD Soluciones — Home redesign · VARIANTE CLARA (iteración HITL 2026-09-06)
+ * ---------------------------------------------------------------------------
+ * Capa de OVERRIDE sobre home-redesign.css. No duplica layout: sólo cambia el
+ * ritmo claro/oscuro de la página y lo que el ledger necesita para vivir sobre
+ * papel en vez de sobre tinta.
+ *
+ * Motivo (HITL): «me agrada, lo único es que siento que está muy oscuro» y
+ * «tener en cuenta la página que tienen actualmente», que es blanco + dorado.
+ *
+ * Medición de la versión oscura, 1440 px: 68.2 % del alto de la página es
+ * tinta, y el primer tramo claro no llega hasta y=2162 px — 2.4 pantallas de
+ * scroll seguidas en oscuro (hero + ledger pegados).
+ *
+ * Qué cambia: el LEDGER pasa a claro. Nada más. El oscuro deja de ser el suelo
+ * de la página y pasa a ser puntuación: hero (entrada), banda de Cifras (el
+ * momento cinematográfico con el video) y Contacto (cierre).
+ *
+ * Paleta: sin colores nuevos salvo UNA derivada, --amd-gold-ink, que es el
+ * mismo dorado de marca (H 48.6°, S 52 %) bajado de luminosidad. Es obligatoria:
+ * #cfbb66 sobre #f2f3f6 da 1.73:1 — invisible como texto y reprobado por WCAG
+ * incluso en tamaño grande. #8a7a2e da 3.86:1 sobre mist y 4.28:1 sobre blanco.
+ * En los tramos oscuros el dorado de marca se queda tal cual (9.68:1).
+ */
+
+:root {
+  /* Dorado de marca oscurecido para texto sobre claro. NO es un color nuevo:
+     es exactamente el valor que el mockup ya usaba suelto en `.eyebrow--ink`
+     para los eyebrows de las secciones claras. Aquí sólo se le pone nombre
+     para que deje de estar hardcodeado en un sitio y sin aplicar en el resto. */
+  --amd-gold-ink: #8a7a2e;
+}
+
+/* ── INVARIANTE: el corte tinta → papel va A FILO, sin degradado ────
+   Se probó un puente de 140 px (`.hero::before` con gradiente ink→mist) para
+   suavizar el salto. Medido en el navegador: no suaviza, ENSUCIA — vela el
+   tercio inferior del hero con una niebla gris, apaga los orbes y deja el
+   indicador "SCROLL" flotando en una zona lechosa. Lo mismo al revés en
+   Confianza → Contacto: el degradado se lee como un borde sucio, no como
+   una transición.
+   El corte limpio es además el gesto correcto: pasar de tinta a papel de
+   golpe es pasar la página de un libro. NO reintroducir el degradado. */
+
+/* ══════════════════════════════════════════════════════════════════
+   02 · LEDGER SOBRE PAPEL
+   Toda la sección se invierte redefiniendo las cuatro derivadas de
+   sección oscura en el propio scope (mismo patrón DD-024 que usa
+   services-page.css). El layout no se toca.
+   ══════════════════════════════════════════════════════════════════ */
+.ledger {
+  --ink-text: var(--amd-ink);                 /* 16.7:1 sobre mist */
+  --ink-text-2: var(--amd-slate);             /*  6.4:1 sobre mist */
+  --ink-text-3: rgba(13, 20, 26, 0.58);       /*  6.0:1 sobre mist */
+  --hairline: rgba(13, 20, 26, 0.12);
+  --ledger-ground: var(--amd-mist);
+
+  background: var(--amd-mist);
+  color: var(--amd-ink);
+  border-top: 0;
+}
+
+/* El halo dorado sobrevive: sobre papel deja de ser un brillo y pasa a ser
+   una mancha cálida — el mismo gesto, leído como luz sobre una hoja. */
+.ledger::before {
+  background: radial-gradient(circle, rgba(207, 187, 102, 0.22), transparent 64%);
+}
+
+/* Spine: el "camino" se conserva en dorado pleno (es relleno, no texto, así
+   que no le aplica el mínimo de contraste). Se le quita el glow, que sólo
+   funciona sobre tinta y sobre papel ensucia. */
+.spine i { box-shadow: none; }
+
+/* ── Revelado de foto sobre papel ──────────────────────────────────
+   Sobre tinta la foto NACÍA de la oscuridad (opacity 0→.38 sobre negro).
+   Sobre papel el gesto correcto es el inverso: la foto se IMPRIME en la
+   hoja. `multiply` la mete dentro del papel en vez de apoyarla encima —
+   y es lo que hace que la metáfora del libro contable funcione mejor en
+   claro que en oscuro.
+   Las dos invariantes de la versión oscura siguen vigentes tal cual:
+   overflow:hidden en el contenedor, y right:0 en el borde del contenido. */
+.line__media img {
+  filter: grayscale(1) brightness(1.04) contrast(1.06);
+  mix-blend-mode: multiply;
+}
+.line__tint {
+  background: var(--amd-gold);
+  mix-blend-mode: multiply;
+}
+.line.is-hot .line__media img,
+.line.is-open .line__media img { opacity: 0.5; }
+.line.is-hot .line__tint,
+.line.is-open .line__tint { opacity: 0.2; }
+
+/* Viñeta: mismos cuatro lados, disolviendo en papel en vez de en tinta. */
+.line__media::after {
+  background:
+    linear-gradient(90deg, var(--ledger-ground) 0%, rgba(242, 243, 246, 0) 60%),
+    linear-gradient(270deg, var(--ledger-ground) 0%, rgba(242, 243, 246, 0) 34%),
+    linear-gradient(180deg, var(--ledger-ground) 0%, rgba(242, 243, 246, 0) 34%, rgba(242, 243, 246, 0) 66%, var(--ledger-ground) 100%);
+}
+
+/* ── Estados de fila ───────────────────────────────────────────────
+   El ordinal seguía siendo dorado #cfbb66 al activarse. Sobre papel eso
+   es 1.73:1: ilegible. Pasa a --amd-gold-ink (3.86:1), que además sobre
+   una hoja lee más a bronce de libro contable que a brillo. */
+.line__ord { color: rgba(13, 20, 26, 0.20); }
+.line.is-hot .line__ord,
+.line.is-open .line__ord { color: var(--amd-gold-ink); }
+
+.line__count b { color: var(--amd-gold-ink); }
+
+/* El eyebrow "LO QUE HACEMOS" se quedaba en dorado de marca: 1.73:1 sobre
+   papel, o sea invisible. Es el mismo defecto que `.eyebrow--ink` ya resolvía
+   en las otras secciones claras, sólo que aquí no se estaba aplicando. */
+.ledger .eyebrow { color: var(--amd-gold-ink); }
+
+/* El `+` activo: anillo dorado RELLENO con los trazos en tinta (9.7:1),
+   en vez de trazos dorados sobre papel (1.7:1). El dorado gana presencia
+   justo donde antes se perdía. */
+.line.is-hot .line__plus,
+.line.is-open .line__plus {
+  border-color: var(--amd-gold);
+  background: var(--amd-gold);
+}
+.line.is-hot .line__plus::before,
+.line.is-hot .line__plus::after,
+.line.is-open .line__plus::before,
+.line.is-open .line__plus::after { background: var(--amd-ink); }
+
+/* Subrayado dorado bajo el título activo: recupera como relleno la
+   presencia de marca que el texto ya no puede cargar. */
+.line__title {
+  /* `width: fit-content` es obligatorio: como hijo de un grid, un
+     `display: inline` se blockifica y el degradado se estira a los 846 px de
+     la celda — deja de ser un subrayado y se lee como un renglón suelto que
+     choca con el contador. */
+  width: fit-content;
+  background-repeat: no-repeat; background-position: 0 100%;
+  background-image: linear-gradient(var(--amd-gold), var(--amd-gold));
+  background-size: 0% 3px;
+  transition: background-size var(--amd-motion-slow) var(--amd-ease);
+}
+.line.is-hot .line__title,
+.line.is-open .line__title { background-size: 100% 3px; }
+
+/* Enlaces "Más info →" dentro del ledger: el dorado de texto no pasa. */
+.ledger .linkarrow { color: var(--amd-gold-ink); }
+.ledger .linkarrow:hover { border-bottom-color: var(--amd-gold-ink); }
+
+/* Foco visible sobre papel: el anillo dorado claro se pierde. */
+.ledger :focus-visible { outline-color: var(--amd-gold-ink); }
+
+/* ── Ledger → Nosotros ─────────────────────────────────────────────
+   Mist → blanco sí es un salto pequeño, y un hairline basta para que las dos
+   secciones claras no se lean como un solo bloque sin ritmo. Un hairline no
+   es un degradado: no vela nada. */
+.about { border-top: 1px solid var(--amd-border); }
+

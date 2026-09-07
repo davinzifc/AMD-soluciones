@@ -74,8 +74,8 @@ describe('AboutPage', () => {
     expect(ghostLinks[1].textContent).toContain('backHome');
   });
 
-  it('does not render a Home section sidenav host on this deep page (REQ-002 / evidence disqualifier)', () => {
+  it('does not render SectionNav on this deep page (REQ-008)', () => {
     const fixture = setup();
-    expect(fixture.nativeElement.querySelector('.sidenav-host')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-section-nav')).toBeNull();
   });
 });

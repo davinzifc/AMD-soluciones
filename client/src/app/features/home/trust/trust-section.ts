@@ -1,37 +1,29 @@
-import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 
 import { LocalizePipe } from '../../../core/i18n/localize.pipe';
+import { LocaleService } from '../../../core/i18n/locale.service';
 import { MotionService } from '../../../core/motion/motion.service';
-
-interface Metric {
-  readonly value: string;
-  readonly labelKey: string;
-}
+import { ClientWall } from '../clients/client-wall';
 
 interface Testimonial {
   readonly textKey: string;
   readonly byKey: string;
 }
 
-/** Values are locale-independent (mockup parity); only the labels are i18n keys. */
-const METRICS: readonly Metric[] = [
-  { value: '10+', labelKey: 'm1' },
-  { value: '98%', labelKey: 'm2' },
-  { value: 'ES/EN', labelKey: 'm3' },
-  { value: 'Cali', labelKey: 'm4' },
-];
-
-/** Decorative sector pills (mockup `index.html` `.logo-pill`, `aria-hidden`) — not i18n'd. */
-const SECTORS: readonly string[] = [
-  'Cripto',
-  'Moda',
-  'Oro',
-  'Educación',
-  'Fundaciones',
-  'Minimarket',
-  'Ploteo',
-  'Turismo',
+/**
+ * 9 sectors from mockup (home-redesign.js:268-276) localized via i18n keys (REQ-011).
+ * Duplicated once for the 50% seamless marquee loop -> 18 elements.
+ */
+const SECTOR_KEYS: readonly string[] = [
+  'sectorCommerce',
+  'sectorServices',
+  'sectorHealthcare',
+  'sectorConstruction',
+  'sectorTransport',
+  'sectorEducation',
+  'sectorManufacturing',
+  'sectorTechnology',
+  'sectorAgribusiness',
 ];
 
 const TESTIMONIALS: readonly Testimonial[] = [
@@ -42,53 +34,73 @@ const TESTIMONIALS: readonly Testimonial[] = [
 ];
 
 /**
- * Production auto-advance pause (REQ-007 "~9s"; mockup `landing.js` `PAUSE_MS`).
- * Exported so the spec asserts against this single source instead of a
- * duplicated magic number, and so any future speed-up in tests documents
- * itself as a visible deviation from this constant rather than a silent one.
+ * Reading pause for auto-advancing testimonials (T018 · T019 · REQ-006 · DD-034).
+ * Reverted by HITL 2026-09-06: testimonials advance automatically every 6s,
+ * but halt when hovered or focused so text is never replaced while being read.
  */
-export const TESTIMONIAL_PAUSE_MS = 9000;
+export const TESTIMONIAL_PAUSE_MS = 6000;
 
 /**
- * Home Trust (T009 · REQ-007 · design.md §6 `TrustSection` · DD-008).
+ * Home Trust (T018 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034 · mockup index.html#confianza).
  *
- * Two independent motion models on purpose (DD-008): the sector/logo strip
- * is a continuous CSS `logo-marquee` loop, edge-faded only on its own
- * `.logos__viewport` mask — the section title/lead sit outside that wrapper
- * and stay sharp. Testimonials are a timed crossfade (`~9000ms` pause, dots
- * for manual selection), never a horizontal marquee of quotes.
- *
- * `MotionService` (T013; replaces the T009-era `TrustMotionQuery` stub)
- * gates both: under `prefers-reduced-motion: reduce` the marquee loses its
- * CSS animation (`.is-reduced-motion` class + defense-in-depth `@media`
- * rule in the stylesheet) and the testimonial timer is never scheduled at
- * all — content still reaches every quote via the dots (REQ-010 "keep all
- * content ... reachable"). Because `MotionService.reducedMotion` is a live
- * signal (not a one-time read), an `effect()` re-evaluates the timer any
- * time the OS preference changes mid-session, not just once at construction.
+ * Centered layout with eyebrow, large centered quote with 4 dots and auto-advance every
+ * `TESTIMONIAL_PAUSE_MS` (6s, T019) with hover/focus-within pause, ClientWall, and flat-text
+ * ticker of 9 localized sectors (18 items).
  */
 @Component({
   selector: 'app-trust-section',
-  imports: [RouterLink, LocalizePipe],
+  imports: [LocalizePipe, ClientWall],
   templateUrl: './trust-section.html',
   styleUrl: './trust-section.css',
 })
-export class TrustSection {
-  protected readonly metrics = METRICS;
-  protected readonly logoTrack = [...SECTORS, ...SECTORS];
+export class TrustSection implements OnDestroy {
+  protected readonly sectors = [...SECTOR_KEYS, ...SECTOR_KEYS];
   protected readonly testimonials = TESTIMONIALS;
 
+  private readonly locale = inject(LocaleService);
   private readonly motion = inject(MotionService);
   protected readonly reducedMotion = this.motion.reducedMotion;
 
   private readonly activeIndexSignal = signal(0);
   protected readonly activeIndex = this.activeIndexSignal.asReadonly();
 
+  private readonly isHoveredSignal = signal(false);
+  protected readonly isHovered = this.isHoveredSignal.asReadonly();
+
+  private readonly isFocusedSignal = signal(false);
+  protected readonly isFocused = this.isFocusedSignal.asReadonly();
+
   private timer: ReturnType<typeof setInterval> | undefined;
 
   constructor() {
-    effect(() => this.restartTimer());
-    inject(DestroyRef).onDestroy(() => clearInterval(this.timer));
+    effect(() => {
+      this.restartTimer();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.clearTimer();
+  }
+
+  protected onPointerEnter(): void {
+    this.isHoveredSignal.set(true);
+  }
+
+  protected onPointerLeave(): void {
+    this.isHoveredSignal.set(false);
+  }
+
+  protected onFocusIn(): void {
+    this.isFocusedSignal.set(true);
+  }
+
+  protected onFocusOut(event?: FocusEvent): void {
+    const currentTarget = event?.currentTarget as HTMLElement | null;
+    const relatedTarget = event?.relatedTarget as Node | null;
+    if (relatedTarget && currentTarget && currentTarget.contains(relatedTarget)) {
+      return;
+    }
+    this.isFocusedSignal.set(false);
   }
 
   protected isActive(index: number): boolean {
@@ -96,23 +108,30 @@ export class TrustSection {
   }
 
   protected testimonialLabel(index: number): string {
-    return `Testimonio ${index + 1}`;
+    return this.locale.translate('testimonialDotLabel').replace('{n}', String(index + 1));
   }
 
-  /** Dot click mirrors mockup `showQuote(idx); restartTestimonials();` — manual pick resets the pause window. */
+  /** Dot click: manual selection sets active quote and resets the reading pause (REQ-006 · T018). */
   protected selectTestimonial(index: number): void {
     this.activeIndexSignal.set(index);
     this.restartTimer();
   }
 
   private restartTimer(): void {
-    clearInterval(this.timer);
-    const reduce = this.reducedMotion();
-    this.timer =
-      reduce || this.testimonials.length < 2
-        ? undefined
-        : setInterval(() => {
-            this.activeIndexSignal.update((current) => (current + 1) % this.testimonials.length);
-          }, TESTIMONIAL_PAUSE_MS);
+    this.clearTimer();
+    const isPaused = this.reducedMotion() || this.isHoveredSignal() || this.isFocusedSignal();
+    if (isPaused || this.testimonials.length < 2) {
+      return;
+    }
+    this.timer = setInterval(() => {
+      this.activeIndexSignal.update((current) => (current + 1) % this.testimonials.length);
+    }, TESTIMONIAL_PAUSE_MS);
+  }
+
+  private clearTimer(): void {
+    if (this.timer !== undefined) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
   }
 }

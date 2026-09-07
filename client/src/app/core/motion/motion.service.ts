@@ -5,9 +5,9 @@ const REDUCE_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 /**
  * Shared reduced-motion gate (T013 · REQ-010 · design.md §2 "Reduced motion"
  * tactic · DD-005). Every scroll/motion consumer — hero storytelling
- * parallax, services-road deco parallax + progress fill, Trust marquee and
- * testimonial timer — reads `reducedMotion()` instead of calling
- * `matchMedia` inline.
+ * parallax, ledger spine + reveal, Figures band video + count-up, ClientWall
+ * marquee, Trust sector ticker and the testimonial timer — reads
+ * `reducedMotion()` instead of calling `matchMedia` inline.
  *
  * Unlike the T009-era `TrustMotionQuery` stub it replaces (which read the
  * preference once at construction and never again), this service subscribes

@@ -38,7 +38,6 @@ describe('App', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    document.body.classList.remove('has-side-nav');
   });
 
   it('should create the app', () => {
@@ -59,19 +58,20 @@ describe('App', () => {
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 
-  describe('Home-vs-deep shell flag (T005)', () => {
-    it('renders the .sidenav-host slot with the real HomeSideNav mounted and adds body.has-side-nav on Home ("/")', () => {
+  describe('Home-vs-deep shell flag (T003 · REQ-008)', () => {
+    it('mounts SectionNav inside <main> and does not add body.has-side-nav on Home ("/")', () => {
       const fixture = TestBed.createComponent(App);
       fixture.detectChanges();
 
-      const host = fixture.nativeElement.querySelector('.sidenav-host');
-      expect(host).toBeTruthy();
-      expect(host.hasAttribute('aria-hidden')).toBe(false);
-      expect(fixture.nativeElement.querySelector('app-home-side-nav')).toBeTruthy();
-      expect(document.body.classList.contains('has-side-nav')).toBe(true);
+      const main = fixture.nativeElement.querySelector('main.app-shell');
+      const sectionNav = fixture.nativeElement.querySelector('app-section-nav');
+      expect(sectionNav).toBeTruthy();
+      // KZ-004 ancestry assertion: main host contains SectionNav
+      expect(main.contains(sectionNav)).toBe(true);
+      expect(document.body.classList.contains('has-side-nav')).toBe(false);
     });
 
-    it('removes the .sidenav-host slot (and HomeSideNav) and body.has-side-nav once navigated to a deep route (REQ-002)', async () => {
+    it('removes SectionNav once navigated to deep routes like /about-us and /services (REQ-008)', async () => {
       const fixture = TestBed.createComponent(App);
       fixture.detectChanges();
 
@@ -79,8 +79,13 @@ describe('App', () => {
       await router.navigateByUrl('/about-us');
       fixture.detectChanges();
 
-      expect(fixture.nativeElement.querySelector('.sidenav-host')).toBeNull();
-      expect(fixture.nativeElement.querySelector('app-home-side-nav')).toBeNull();
+      expect(fixture.nativeElement.querySelector('app-section-nav')).toBeNull();
+      expect(document.body.classList.contains('has-side-nav')).toBe(false);
+
+      await router.navigateByUrl('/services');
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('app-section-nav')).toBeNull();
       expect(document.body.classList.contains('has-side-nav')).toBe(false);
     });
   });

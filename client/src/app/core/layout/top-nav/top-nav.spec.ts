@@ -2,25 +2,50 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
 
+import es from '../../../../assets/i18n/es.json';
+import en from '../../../../assets/i18n/en.json';
 import { LocaleService } from '../../i18n/locale.service';
 import { DrawerStateService } from '../drawer-state.service';
 import { TopNav } from './top-nav';
+
+interface NodeProcess {
+  cwd(): string;
+  getBuiltinModule?(name: string): unknown;
+}
+interface NodeFs {
+  readFileSync(path: string, encoding: string): string;
+}
+interface NodePath {
+  resolve(...paths: string[]): string;
+}
+
+const nodeProcess = (globalThis as unknown as { process?: NodeProcess }).process;
+
+function getNodeModule<T>(name: string): T {
+  if (nodeProcess?.getBuiltinModule) {
+    return nodeProcess.getBuiltinModule(name) as T;
+  }
+  throw new Error(`Cannot load built-in Node module '${name}'`);
+}
+
+const fs = getNodeModule<NodeFs>('fs');
+const path = getNodeModule<NodePath>('path');
 
 function setup(localeValue: 'es' | 'en' = 'es') {
   const locale = signal(localeValue);
   const copy = {
     es: {
-      navHome: 'Home',
-      navAboutPage: 'Quiénes somos',
+      navHome: 'Inicio',
+      navAboutPage: 'Nosotros',
       navServicesPage: 'Servicios',
-      navCta: 'Contactar',
+      navCta: 'Contacto',
       navSiteAria: 'Sitio',
       langAria: 'Idioma',
       menuAria: 'Menú',
     },
     en: {
       navHome: 'Home',
-      navAboutPage: 'About us',
+      navAboutPage: 'About',
       navServicesPage: 'Services',
       navCta: 'Contact',
       navSiteAria: 'Site',
@@ -50,10 +75,10 @@ describe('TopNav', () => {
     expect(links.length).toBe(3);
   });
 
-  it('renders the Contactar CTA', () => {
+  it('renders the Contacto CTA', () => {
     const { fixture } = setup();
     const cta = fixture.nativeElement.querySelector('.btn--gold');
-    expect(cta?.textContent).toContain('Contactar');
+    expect(cta?.textContent).toContain('Contacto');
   });
 
   it('clicking ES/EN calls LocaleService.setLocale with the target locale', () => {
@@ -96,13 +121,13 @@ describe('TopNav', () => {
 
     const root = fixture.nativeElement as HTMLElement;
     const labels = Array.from(root.querySelectorAll('.topnav__links a')).map((link) => link.textContent?.trim());
-    expect(labels).toEqual(['Home', 'About us', 'Services']);
+    expect(labels).toEqual(['Home', 'About', 'Services']);
     expect(root.querySelector('.btn--gold')?.textContent?.trim()).toBe('Contact');
     expect(root.querySelector('nav')?.getAttribute('aria-label')).toBe('Site');
     expect(root.querySelector('.lang')?.getAttribute('aria-label')).toBe('Language');
     expect(root.querySelector('.menu-btn')?.getAttribute('aria-label')).toBe('Menu');
-    expect(root.textContent).not.toContain('Quiénes somos');
-    expect(root.textContent).not.toContain('Contactar');
+    expect(root.textContent).not.toContain('Nosotros');
+    expect(root.textContent).not.toContain('Contacto');
   });
 
   it('menu button exposes an accessible name from menuAria and aria-controls="drawer"', () => {
@@ -125,4 +150,132 @@ describe('TopNav', () => {
     expect(drawerState.isOpen()).toBe(true);
     expect(menuBtn.getAttribute('aria-expanded')).toBe('true');
   });
+
+  it('stays isOnLight() === false on deep pages (e.g. /about-us) even if .section--light elements exist in DOM', () => {
+    const { fixture } = setup();
+    const mockAboutSection = document.createElement('section');
+    mockAboutSection.id = 'about-story';
+    mockAboutSection.className = 'section--light';
+    vi.spyOn(mockAboutSection, 'getBoundingClientRect').mockReturnValue({
+      top: 0,
+      bottom: 500,
+      height: 500,
+      width: 1000,
+      left: 0,
+      right: 1000,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    document.body.appendChild(mockAboutSection);
+
+    try {
+      fixture.componentInstance.updateScrollSpy();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.isOnLight()).toBe(false);
+      expect(fixture.nativeElement.querySelector('.topnav')?.classList.contains('on-light')).toBe(false);
+    } finally {
+      mockAboutSection.remove();
+    }
+  });
+
+  it('activates isOnLight() === true when a Home section in SECTION_ANCHOR_IDS with .section--light is active', () => {
+    const { fixture } = setup();
+    const mockCifrasSection = document.createElement('section');
+    mockCifrasSection.id = 'cifras';
+    mockCifrasSection.className = 'section--light';
+    vi.spyOn(mockCifrasSection, 'getBoundingClientRect').mockReturnValue({
+      top: 0,
+      bottom: 500,
+      height: 500,
+      width: 1000,
+      left: 0,
+      right: 1000,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    document.body.appendChild(mockCifrasSection);
+
+    try {
+      fixture.componentInstance.updateScrollSpy();
+      fixture.detectChanges();
+      expect(fixture.componentInstance.isOnLight()).toBe(true);
+      expect(fixture.nativeElement.querySelector('.topnav')?.classList.contains('on-light')).toBe(true);
+    } finally {
+      mockCifrasSection.remove();
+    }
+  });
+
+  describe('T018 navigation labels and mockup parity', () => {
+    it('has exact mockup values for the five keys in es.json and en.json', () => {
+      expect((es as Record<string, string>)['navHome']).toBe('Inicio');
+      expect((es as Record<string, string>)['navAboutPage']).toBe('Nosotros');
+      expect((es as Record<string, string>)['navServicesPage']).toBe('Servicios');
+      expect((es as Record<string, string>)['navCta']).toBe('Contacto');
+      expect((es as Record<string, string>)['navSectionInicio']).toBe('Arriba');
+
+      expect((en as Record<string, string>)['navHome']).toBe('Home');
+      expect((en as Record<string, string>)['navAboutPage']).toBe('About');
+      expect((en as Record<string, string>)['navServicesPage']).toBe('Services');
+      expect((en as Record<string, string>)['navCta']).toBe('Contact');
+      expect((en as Record<string, string>)['navSectionInicio']).toBe('Top');
+    });
+  });
+
+  describe('T019 top-nav layout and right alignment', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const cssPath = path.resolve(rootDir, 'src/app/core/layout/top-nav/top-nav.css');
+    const rawCss = fs.readFileSync(cssPath, 'utf8');
+    const cleanCss = rawCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it('.topnav__inner does not declare justify-content: space-between and .brand declares margin-right: auto', () => {
+      const innerMatch = cleanCss.match(/(?<![.\w-])\.topnav__inner\s*\{([^}]*)\}/);
+      expect(innerMatch).toBeTruthy();
+      expect(innerMatch![1]).not.toMatch(/justify-content\s*:\s*space-between/);
+
+      const brandMatch = cleanCss.match(/(?<![.\w-])\.brand\s*\{([^}]*)\}/);
+      expect(brandMatch).toBeTruthy();
+      expect(brandMatch![1]).toMatch(/margin-right\s*:\s*auto/);
+    });
+
+    it('declares gap: 0.35rem on .topnav__links and padding: 0 0.85rem on links with 44px touch target preserved (KZ-001)', () => {
+      const linksMatch = cleanCss.match(/(?<![.\w-])\.topnav__links\s*\{([^}]*)\}/);
+      expect(linksMatch).toBeTruthy();
+      expect(linksMatch![1]).toMatch(/gap\s*:\s*0\.35rem/);
+
+      const linkAnchorMatch = cleanCss.match(/(?<![.\w-])\.topnav__links\s+a\s*\{([^}]*)\}/);
+      expect(linkAnchorMatch).toBeTruthy();
+      expect(linkAnchorMatch![1]).toMatch(/padding\s*:\s*0\s+0\.85rem/);
+      expect(linkAnchorMatch![1]).toMatch(/min-height\s*:\s*44px/);
+    });
+  });
+
+  describe('T020 top-nav CTA responsive hiding below 900px', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const cssPath = path.resolve(rootDir, 'src/app/core/layout/top-nav/top-nav.css');
+    const rawCss = fs.readFileSync(cssPath, 'utf8');
+    const cleanCss = rawCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it('declares topnav__cta class on the Contacto CTA anchor in template', () => {
+      const { fixture } = setup();
+      const cta = fixture.nativeElement.querySelector('.topnav__cta');
+      expect(cta).toBeTruthy();
+      expect(cta?.getAttribute('routerLink')).toBe('/');
+      expect(cta?.getAttribute('fragment')).toBe('contacto');
+    });
+
+    it('hides .topnav__cta by default (< 900px) and displays it at @media (min-width: 900px)', () => {
+      const ctaBaseMatch = cleanCss.match(/(?<![.\w-])\.topnav__cta\s*\{([^}]*)\}/);
+      expect(ctaBaseMatch).toBeTruthy();
+      expect(ctaBaseMatch![1]).toMatch(/display\s*:\s*none/);
+
+      const mediaMatch = cleanCss.match(/@media\s*\(\s*min-width\s*:\s*900px\s*\)\s*\{([\s\S]*?)\n\}/);
+      expect(mediaMatch).toBeTruthy();
+      expect(mediaMatch![1]).toMatch(/\.topnav__cta\s*\{[^}]*display\s*:\s*inline-flex/);
+    });
+  });
 });
+
+
+

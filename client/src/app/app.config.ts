@@ -13,6 +13,7 @@ import { routes } from './app.routes';
 import { AmdPreset } from '../styles/theme-primeng';
 import { LocaleService } from './core/i18n/locale.service';
 import { PRIME_UI_LICENSE } from '../environments/prime-ui-license';
+import { getChromeOffset } from './core/layout/chrome-offset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,23 +35,12 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
-    // ViewportScroller anchor offset function (REQ-002 / T008):
+    // ViewportScroller anchor offset function (REQ-008 · T003 · T018):
     // Offsets anchor scrolling dynamically so sticky chrome does not cover headings.
-    // Adapts to breakpoint matching CSS scroll-margin-top: calc(var(--nav-h) + 1.5rem)
-    // on desktop (>1099px) and calc(var(--nav-h) + 4.5rem) on mobile/tablet (<=1099px)
-    // under the sticky chip rail.
+    // Consumes single-source getChromeOffset() to prevent divergence with SectionNav.
     provideAppInitializer(() => {
       const scroller = inject(ViewportScroller);
-      scroller.setOffset(() => {
-        if (typeof window === 'undefined') {
-          return [0, 0];
-        }
-        const navH = 72;
-        const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-        const isMobileOrTablet = window.innerWidth <= 1099;
-        const yOffset = isMobileOrTablet ? navH + 4.5 * rootFontSize : navH + 1.5 * rootFontSize;
-        return [0, yOffset];
-      });
+      scroller.setOffset(() => [0, getChromeOffset()]);
     }),
     // Gate first paint on the active locale's dictionary (REQ-009 / T003 review fix):
     // without this, LocalizePipe bindings render raw keys until the async fetch resolves.

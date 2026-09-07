@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "start:dev": "ng serve",
     "start": "npm run license:apply && ng serve",
     "build": "npm run license:apply && ng build",
     "build:pages": "npm run license:apply && ng build --configuration production --base-href /AMD-soluciones/",
@@ -11,7 +12,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:agent": "ng test --watch=false --reporters=dot",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "verify:visual": "playwright test"
   },
   "private": true,
   "packageManager": "npm@12.0.2",
@@ -34,6 +36,7 @@
     "@angular/cli": "^22.1.3",
     "@angular/compiler-cli": "^22.1.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "angular-eslint": "22.1.0",
     "eslint": "^10.6.0",
     "jsdom": "^28.0.0",

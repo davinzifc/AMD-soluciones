@@ -20,8 +20,10 @@
   <a routerLink="/services" routerLinkActive="is-active" (click)="close()">{{ 'navServicesPage' | localize }}</a>
 
   @if (isHomeRoute()) {
+    <a routerLink="/" fragment="inicio" (click)="close()">{{ 'navSectionInicio' | localize }}</a>
     <a routerLink="/" fragment="servicios" (click)="close()">{{ 'navServices' | localize }}</a>
     <a routerLink="/" fragment="sobre-amd" (click)="close()">{{ 'navAbout' | localize }}</a>
+    <a routerLink="/" fragment="cifras" (click)="close()">{{ 'navSectionCifras' | localize }}</a>
     <a routerLink="/" fragment="confianza" (click)="close()">{{ 'navTrust' | localize }}</a>
     <a routerLink="/" fragment="contacto" (click)="close()">{{ 'navContact' | localize }}</a>
   }

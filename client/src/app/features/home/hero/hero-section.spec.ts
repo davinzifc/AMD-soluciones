@@ -5,6 +5,29 @@ import { LocaleService } from '../../../core/i18n/locale.service';
 import { MotionService } from '../../../core/motion/motion.service';
 import { HERO_PARALLAX_FACTOR, HeroSection } from './hero-section';
 
+interface NodeProcess {
+  cwd(): string;
+  getBuiltinModule?(name: string): unknown;
+}
+interface NodeFs {
+  readFileSync(path: string, encoding: string): string;
+}
+interface NodePath {
+  resolve(...paths: string[]): string;
+}
+
+const nodeProcess = (globalThis as unknown as { process?: NodeProcess }).process;
+
+function getNodeModule<T>(name: string): T {
+  if (nodeProcess?.getBuiltinModule) {
+    return nodeProcess.getBuiltinModule(name) as T;
+  }
+  throw new Error(`Cannot load built-in Node module '${name}'`);
+}
+
+const fs = getNodeModule<NodeFs>('fs');
+const path = getNodeModule<NodePath>('path');
+
 function setup(reduce = false) {
   TestBed.configureTestingModule({
     providers: [
@@ -130,6 +153,58 @@ describe('HeroSection', () => {
       window.dispatchEvent(new Event('scroll'));
 
       expect(layer.style.transform).toBe('');
+    });
+  });
+
+  describe('hero layout and left alignment (T017 · KZ-007)', () => {
+    const rootDir = nodeProcess ? nodeProcess.cwd() : '';
+    const cssPath = path.resolve(rootDir, 'src/app/features/home/hero/hero-section.css');
+    const rawCss = fs.readFileSync(cssPath, 'utf8');
+    const cleanCss = rawCss.replace(/\/\*[\s\S]*?\*\//g, '');
+
+    it('hero content container does not declare max-width in CSS, leaving alignment to the left of .wrap', () => {
+      const contentMatch = cleanCss.match(/(?<![.\w-])\.hero__content\s*\{([^}]*)\}/);
+      expect(contentMatch).toBeTruthy();
+      expect(contentMatch![1]).not.toMatch(/max-width/);
+    });
+
+    it('hero promise declares max-width: 34rem in CSS to bound copy width without centering container', () => {
+      const promiseMatch = cleanCss.match(/(?<![.\w-])\.hero__promise\s*\{([^}]*)\}/);
+      expect(promiseMatch).toBeTruthy();
+      expect(promiseMatch![1]).toMatch(/max-width\s*:\s*34rem/);
+    });
+
+    it('renders scroll indicator as a navigable accessible link to #servicios (T017 · REQ-013)', () => {
+      const fixture = setup();
+      const scrollLink = fixture.nativeElement.querySelector('a.hero__scroll') as HTMLAnchorElement;
+
+      expect(scrollLink).toBeTruthy();
+      expect(scrollLink.getAttribute('href')).toBe('/#servicios');
+      expect(scrollLink.getAttribute('aria-hidden')).toBeNull();
+      expect(scrollLink.textContent?.trim().length).toBeGreaterThan(0);
+
+      const span = scrollLink.querySelector('span');
+      expect(span).toBeTruthy();
+      expect(span?.textContent).toContain('heroScroll');
+
+      const line = scrollLink.querySelector('i');
+      expect(line).toBeTruthy();
+      expect(line?.getAttribute('aria-hidden')).toBe('true');
+    });
+
+    it('hero scroll rule in CSS is not inert (no pointer-events: none) and declares minimum 44px touch target (REQ-013)', () => {
+      const scrollMatch = cleanCss.match(/(?<![.\w-])\.hero__scroll\s*\{([^}]*)\}/);
+      expect(scrollMatch).toBeTruthy();
+      expect(scrollMatch![1]).not.toMatch(/pointer-events\s*:\s*none/);
+      expect(scrollMatch![1]).toMatch(/min-height\s*:\s*44px/);
+    });
+
+    it('hero scroll includes decorative line styling in CSS (1px width, 34px height, linear-gradient)', () => {
+      const lineMatch = cleanCss.match(/(?<![.\w-])\.hero__scroll\s+i\s*\{([^}]*)\}/);
+      expect(lineMatch).toBeTruthy();
+      expect(lineMatch![1]).toMatch(/width\s*:\s*1px/);
+      expect(lineMatch![1]).toMatch(/height\s*:\s*34px/);
+      expect(lineMatch![1]).toMatch(/linear-gradient/);
     });
   });
 });

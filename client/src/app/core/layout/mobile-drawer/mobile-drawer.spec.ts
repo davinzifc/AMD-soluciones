@@ -2,8 +2,11 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 
+import en from '../../../../assets/i18n/en.json';
+import es from '../../../../assets/i18n/es.json';
 import { LocaleService } from '../../i18n/locale.service';
 import { DrawerStateService } from '../drawer-state.service';
+import { SECTION_NAV_ANCHORS } from '../section-nav/section-nav';
 import { MobileDrawer } from './mobile-drawer';
 
 @Component({ selector: 'app-test-empty', template: '' })
@@ -44,10 +47,16 @@ describe('MobileDrawer', () => {
     expect(pageHrefs.some((h) => h?.includes('services'))).toBe(true);
   });
 
-  it('shows Home section anchors (servicios/sobre-amd/confianza/contacto) while on "/"', () => {
+  it('shows Home section anchors (inicio/servicios/sobre-amd/cifras/confianza/contacto) while on "/"', () => {
     const { fixture } = setup();
     const anchors = Array.from(fixture.nativeElement.querySelectorAll('#drawer a')) as HTMLAnchorElement[];
-    expect(anchors.length).toBe(7);
+    expect(anchors.length).toBe(9);
+
+    const sectionAnchors = anchors.slice(3);
+    const renderedFragments = sectionAnchors.map(
+      (a) => a.getAttribute('ng-reflect-fragment') ?? a.getAttribute('href')?.split('#')[1],
+    );
+    expect(renderedFragments).toEqual(SECTION_NAV_ANCHORS.map((a) => a.id));
   });
 
   it('hides Home section anchors once navigated away from "/"', async () => {
@@ -143,3 +152,30 @@ describe('MobileDrawer', () => {
     });
   });
 });
+
+describe('navigation labels non-repetition & orphan keys (REQ-008 · T004)', () => {
+  const PAGE_NAV_KEYS = ['navHome', 'navAboutPage', 'navServicesPage'] as const;
+
+  const locales = [
+    { code: 'es', dict: es as Record<string, string> },
+    { code: 'en', dict: en as Record<string, string> },
+  ] as const;
+
+  for (const { code, dict } of locales) {
+    it(`page navigation links and Home section anchors have disjoint labels in ${code}`, () => {
+      const pageValues = PAGE_NAV_KEYS.map((key) => dict[key]);
+      const sectionValues = SECTION_NAV_ANCHORS.map((anchor) => dict[anchor.labelKey]);
+      const collision = pageValues.filter((value) => sectionValues.includes(value));
+
+      expect(collision, `Colliding label value in ${code}: ${collision.join(', ')}`).toEqual([]);
+    });
+  }
+
+  it('retired rail keys (sideHome, sideNavAria) do not exist in es.json or en.json', () => {
+    expect('sideHome' in es).toBe(false);
+    expect('sideNavAria' in es).toBe(false);
+    expect('sideHome' in en).toBe(false);
+    expect('sideNavAria' in en).toBe(false);
+  });
+});
+

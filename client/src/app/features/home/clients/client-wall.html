@@ -1,0 +1,32 @@
+<p class="clients__label">{{ 'clientsLabel' | localize }}</p>
+<div class="clients" data-clients [class.is-reduced-motion]="reducedMotion()">
+  <ul
+    class="clients__track"
+    #track
+    [style.animation]="reducedMotion() ? 'none' : null"
+  >
+    @for (client of clients; track client.slug) {
+      <li>
+        <span
+          class="clients__logo"
+          role="img"
+          [attr.aria-label]="client.name"
+          [style.--logo]="client.logoSafe"
+          [style.--w]="client.w"
+          [style.--h]="client.h"
+        ></span>
+      </li>
+    }
+    @for (client of clients; track 'dup-' + client.slug) {
+      <li aria-hidden="true" [style.display]="reducedMotion() ? 'none' : null">
+        <span
+          class="clients__logo"
+          [attr.aria-label]="client.name"
+          [style.--logo]="client.logoSafe"
+          [style.--w]="client.w"
+          [style.--h]="client.h"
+        ></span>
+      </li>
+    }
+  </ul>
+</div>

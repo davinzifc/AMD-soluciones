@@ -1,0 +1,78 @@
+<section id="servicios" class="ledger section--light">
+  <div class="wrap">
+    <header class="ledger__head" #headEl>
+      <div>
+        <p class="eyebrow">{{ 'ledgerEyebrow' | localize }}</p>
+        <h2>{{ 'ledgerTitle' | localize }}</h2>
+      </div>
+      <div class="ledger__aside">
+        <p>{{ 'servicesLead' | localize }}</p>
+        <a class="linkarrow" routerLink="/services">{{ allCtaLabel() }} <i aria-hidden="true">&rarr;</i></a>
+      </div>
+    </header>
+
+    <div class="ledger__body" #bodyEl>
+      <div class="spine" aria-hidden="true"><i data-spine #spineEl></i></div>
+
+      <ol class="lines" data-lines>
+        @for (line of lines; track line.id) {
+          <li
+            class="line"
+            #lineEl
+            [attr.data-line]="line.id"
+            [class.is-open]="isOpen(line.id)"
+            [class.is-hot]="isHot(line.id)"
+          >
+            <div class="line__media" aria-hidden="true">
+              <img [src]="line.image" alt="" loading="lazy" decoding="async" width="900" height="600" />
+              <span class="line__tint"></span>
+            </div>
+            <h3>
+              <button
+                type="button"
+                [id]="buttonId(line.id)"
+                class="line__btn"
+                [attr.aria-expanded]="isOpen(line.id)"
+                [attr.aria-controls]="detailId(line.id)"
+                (focus)="onFocus(line.id)"
+                (blur)="onBlur(line.id)"
+                (mouseenter)="onPointerEnter(line.id)"
+                (mouseleave)="onPointerLeave(line.id)"
+                (click)="onActivateClick($event, line.id)"
+                (keydown)="onActivateKeydown($event, line.id)"
+              >
+                <span class="line__ord">{{ line.ordinal }}</span>
+                <span class="line__text">
+                  <span class="line__title">{{ line.titleKey | localize }}</span>
+                  <span class="line__sum">{{ line.summaryKey | localize }}</span>
+                </span>
+                <span class="line__count"><b>{{ line.count }}</b> {{ 'ledgerCountUnit' | localize }}</span>
+                <span class="line__plus" aria-hidden="true"></span>
+              </button>
+            </h3>
+            <div
+              class="line__detail"
+              [id]="detailId(line.id)"
+              role="region"
+              [attr.aria-labelledby]="buttonId(line.id)"
+              [inert]="!isOpen(line.id)"
+            >
+              <div>
+                <p>{{ line.bodyKey | localize }}</p>
+                <a
+                  class="linkarrow linkarrow--sm"
+                  routerLink="/services"
+                  [fragment]="line.id"
+                >
+                  {{ 'moreInfo' | localize }} <i aria-hidden="true">&rarr;</i>
+                </a>
+              </div>
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+
+    <p class="ledger__hint">{{ 'ledgerHint' | localize }}</p>
+  </div>
+</section>

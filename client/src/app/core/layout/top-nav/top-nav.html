@@ -1,4 +1,4 @@
-<header class="topnav">
+<header class="topnav" [class.on-light]="isOnLight()">
   <div class="wrap topnav__inner">
     <a class="brand" routerLink="/" aria-label="AMD Soluciones Integrales">
       <span class="brand__mark" aria-hidden="true"></span>
@@ -35,7 +35,7 @@
         <button type="button" [attr.aria-pressed]="locale.locale() === 'en'" (click)="setLocale('en')">EN</button>
       </div>
 
-      <a class="btn btn--gold" routerLink="/" fragment="contacto">{{ 'navCta' | localize }}</a>
+      <a class="btn btn--gold topnav__cta" routerLink="/" fragment="contacto">{{ 'navCta' | localize }}</a>
 
       <button
         #menuBtn
