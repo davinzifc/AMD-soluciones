@@ -1264,9 +1264,12 @@ referencia al rail lateral sobrevive en la baseline.
 
 ### Done when
 
-- [ ] §2, §5, §7 y §11 reescritas
-- [ ] Barrido de cierre sin menciones supervivientes al rail
-- [ ] Los dos tokens de tinta documentados, **con la regla de reparto por tamaño**, no sólo sus valores
+- [x] §2, §5, §7 y §11 reescritas — **y además §4, §8, §9 y §12**, que el barrido estrecho de la
+      tarea (`grep sidenav\|1100px`) no habría encontrado
+- [x] Barrido de cierre sin menciones supervivientes al rail: `grep -rn "sidenav\|1100px\|dot sidenav"`
+      → sin resultados. Las tres menciones que quedan son **columnas de alternativa rechazada** y notas
+      de supersesión: describen el rail como retirado, no como existente
+- [x] Los dos tokens de tinta documentados, **con la regla de reparto por tamaño**, no sólo sus valores
 
 ---
 
@@ -1275,11 +1278,17 @@ referencia al rail lateral sobrevive en la baseline.
 ```text
 T001 ─┬─ T005 ── T006 ── T007 ──┐
       ├─ T008 ──────────────────┤
-      ├─ T009 ──────────────────┼── T012
-      └─ T010 ── T011 ──────────┘        │
-T002 ── T003 ── T004                     │
-        └────────────────────────────────┴── T013
+      ├─ T009 ──────────────────┼── T014…T017 ── T018 ── T019 ── T012 ── T020 ──┐
+      └─ T010 ── T011 ──────────┘                                               │
+T002 ── T003 ── T004 ────────────┘                                              │
+                                                                                └── T013
 ```
+
+**T014–T020 se añadieron durante la ejecución** (KZ-007 + revisión HITL); van en serie porque cada
+una nació de mirar el resultado de la anterior en el navegador. **T012 no se movió del final**: mide
+la página ensamblada, y correrlo antes daría números de una página a medias. T020 es la excepción
+deliberada — existe *porque* T012 midió, así que necesariamente va después. T013 cierra: la baseline
+no se puede sincronizar hasta que el producto haya dejado de moverse.
 
 Sin ciclos. **Paralelizables** (dominios disjuntos, techo de 2 workers): `T002/T003/T004` corre en
 paralelo a `T005…T007`; `T008`, `T009` y `T010` son independientes entre sí.
@@ -1309,7 +1318,7 @@ afirmación más débil posible.
 | REQ-004 | Imagen no impone layout | T008 |
 | REQ-005 | Video es fondo | T009 |
 | REQ-005 | Reduced-motion y 3G | T009 |
-| REQ-006 | Testimonio no rota solo | T011 |
+| REQ-006 | El testimonio rota a ritmo de lectura y se detiene al leerlo | T011 (puntos y estructura) → **revertido por HITL: T018** (rotación + pausa) → **T019** (6 s) |
 | REQ-006 | Los puntos dejan de ser decoración | T011 |
 | REQ-006 | Sin fotos de personas | T011 |
 | REQ-007 | Bucle no salta | T010 (estructura) + **T012** (costura) |
@@ -1331,9 +1340,34 @@ afirmación más débil posible.
 | REQ-011 | Ninguna clave huérfana | T004 |
 | REQ-011 | *AND* literales en **código** | T011 (`testimonialLabel`) |
 | REQ-012 | Sin scroll horizontal | T012 |
+| REQ-012 | *AND* el ledger reordena a ordinal + contador + control arriba, título + resumen debajo, < 900 px | T006 (CSS) + **sólo HITL** (ver nota) |
 | REQ-013 | El video no entra en el camino crítico | T001, T009 |
 | REQ-014 | Ningún documento describe lo que ya no existe | T013 |
 
 **Sin huérfanos.** Ninguna laguna se salda citando un requisito distinto del que la tiene. Las
 etiquetas de esta tabla **citan el nombre del escenario** en `requirements.md`, no lo parafrasean,
 para que el cierre se pueda auditar comparando las dos listas y no leyendo con buena voluntad.
+
+> **Una cláusula sin gate automático, declarada (validación 2026-09-06).** El reapilado del ledger
+> bajo 900 px **está implementado** (`ledger-section.css`, `grid-template-areas: 'ord count plus' /
+> 'text text text'`) pero **no lo cubre ningún gate**: jsdom no aplica media queries, y la medición 3
+> del gate de navegador comprueba ausencia de desbordamiento a esos anchos, no el reapilado. Su única
+> verificación es la revisión visual HITL. Se declara aquí en vez de dejar la cláusula sin fila, que
+> es como se pierden en silencio.
+
+### Tareas de corrección HITL (T014–T020)
+
+No estaban en la descomposición original: nacen de **KZ-007** y de cuatro pasadas de revisión en
+navegador. No cubren escenarios nuevos de `requirements.md` — **portan al producto el diseño del
+mockup** que las tareas escritas como delta de comportamiento no habían traído, y añaden el
+instrumento que lo mide.
+
+| Tarea | Qué cierra | REQ tocados |
+|---|---|---|
+| T014 | Manifiesto: cita + tres pilares del mockup | REQ-004 · REQ-009 · REQ-011 |
+| T015 | Confianza: eyebrow, cita centrada, ticker de texto plano; fuera métricas y CTA final | REQ-006 · REQ-011 |
+| T016 | Contacto: portar el mockup y sacar la jerga interna | REQ-011 |
+| T017 | Hero: alineación izquierda y «Scroll» clicable | REQ-010 · REQ-012 |
+| T018 | Etiquetas del nav, aterrizaje del sub-header, **rotación de testimonios (reversión HITL)** | REQ-006 · REQ-008 |
+| T019 | Top-nav a la derecha; pausa de 9 s → **6 s** | REQ-006 · REQ-008 |
+| T020 | El top-nav desbordaba 97 px a 375 px — defecto **preexistente** que destapó T012 | REQ-012 |

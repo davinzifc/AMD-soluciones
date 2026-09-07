@@ -43,8 +43,9 @@ export const TESTIMONIAL_PAUSE_MS = 6000;
 /**
  * Home Trust (T018 · REQ-006 · REQ-011 · design.md §5.5, §6 · DD-034 · mockup index.html#confianza).
  *
- * Centered layout with eyebrow, large centered quote with 4 dots and 9s auto-advance
- * with hover/focus-within pause, ClientWall, and flat-text ticker of 9 localized sectors (18 items).
+ * Centered layout with eyebrow, large centered quote with 4 dots and auto-advance every
+ * `TESTIMONIAL_PAUSE_MS` (6s, T019) with hover/focus-within pause, ClientWall, and flat-text
+ * ticker of 9 localized sectors (18 items).
  */
 @Component({
   selector: 'app-trust-section',

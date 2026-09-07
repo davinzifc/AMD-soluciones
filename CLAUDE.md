@@ -47,7 +47,7 @@ Una sesión AKILI por checkout; adicionales en `git worktree`. No medir (build/L
 
 | Module | Guide | Notes |
 |--------|-------|-------|
-| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). Shared ambient field at `core/ambient/` (archived `changes/hero-floating-orbs`). Add `client/AGENTS.md` only when conventions diverge. |
+| `client/` | *(none — conventions still match root)* | Angular + PrimeNG landing SPA (phase 1 archived as `domain/landing`). **Shared cross-cutting surfaces** — touch with care, each has >1 consumer: `core/ambient/` (ambient field, archived `changes/hero-floating-orbs`); `core/motion/section-theme.ts` (`probeSectionThemeAt`, pure — consumed by `TopNav` **and** `SectionNav`, DD-030); `core/layout/chrome-offset.ts` (single source of chrome height — consumed by `app.config.ts` **and** `SectionNav`, `changes/home-page-redesign` T018). Add `client/AGENTS.md` only when conventions diverge. |
 | `server/` | *(none — not scaffolded)* | NestJS = phase 2 (ADR-003). |
 
 ## Skill Map

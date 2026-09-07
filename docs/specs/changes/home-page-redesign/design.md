@@ -53,7 +53,7 @@ client/
             ├── about-teaser/           ← MOD (→ Manifiesto, claro, con imagen)
             ├── figures/                ← NUEVO   (#cifras, banda de video)
             ├── clients/                ← NUEVO   (muro, hijo de Trust)
-            ├── trust/                  ← MOD (sin auto-rotación, monta el muro)
+            ├── trust/                  ← MOD (rotación a 6 s con pausa, monta el muro)
             └── home-page/              ← MOD (orden de secciones)
 ```
 
@@ -105,9 +105,13 @@ existen con paridad ES/EN. Claves nuevas: encabezado del ledger, banda de Cifras
 tocan `g*Title`** — las comparte `SERVICE_GROUPS` con `/services`, y borrarlas rompe esa página.
 
 **Claves que cambian de valor:** `navServices` y `navAbout` pasan a "Líneas" / "Manifiesto"
-(REQ-008: hoy `navServices` y `navServicesPage` valen ambas `'Servicios'`), y `trustLead` se
-reescribe: su segunda mitad —*"testimonios con pausa larga para leer"*— queda falsa al retirar la
-auto-rotación.
+(REQ-008: hoy `navServices` y `navServicesPage` valen ambas `'Servicios'`).
+
+**Corregido 2026-09-06 (T015).** La versión anterior de este párrafo decía que `trustLead` «se
+reescribe» porque su segunda mitad quedaba falsa «al retirar la auto-rotación». Las dos premisas
+cayeron: la auto-rotación **no se retiró** (DD-034, revertido por HITL), y `trustLead` no se
+reescribió sino que **se borró entera** de ambos diccionarios junto con `trustTitle`, `trustCta`,
+`logosLabel` y `m1…m4`, al portar Confianza del mockup.
 
 ---
 
@@ -190,8 +194,9 @@ hero.
 - Publica `aria-current` sobre la sección activa: el rail lo hacía y nada lo reemplazaba.
 - Decide su tema con `probeSectionThemeAt(y)` midiendo a **su propia** altura (100 px de scroll),
   mientras `TopNav` mide a la suya (40 px). Nunca un punto común.
-- Etiquetas: "Inicio · Líneas · Manifiesto · Cifras · Confianza · Contacto". Ninguna repite las del
-  menú de páginas.
+- Etiquetas: "**Arriba** · Líneas · Manifiesto · Cifras · Confianza · Contacto". Ninguna repite las
+  del menú de páginas — **corregido en T018**: la primera era "Inicio", que colisionaba con el enlace
+  de página `/` en ES y con `"Home"` en EN, donde el drawer las muestra juntas.
 - **KZ-002:** la visibilidad por ancho se resuelve con media query en el CSS del componente, nunca
   con un selector `body`/`html`, que la encapsulación de Angular hace que no case jamás.
 
@@ -199,7 +204,7 @@ hero.
 
 | Componente | Cambio |
 |---|---|
-| `TrustSection` | Se retira `setInterval` y el export `TESTIMONIAL_PAUSE_MS`. **Se conservan los cuatro testimonios.** Los puntos pasan de decoración a control primario: nombre accesible traducido (hoy `testimonialLabel()` devuelve `'Testimonio N'` en español fijo), estado programático, 44×44 px. Monta `ClientWall`. Pasa de mist a blanco |
+| `TrustSection` | **Corregido (T018 · T019):** el `setInterval` y el export `TESTIMONIAL_PAUSE_MS` **se conservan** — la versión anterior de esta fila los daba por retirados, y la reversión HITL de DD-034 la dejó falsa. La constante pasa a **6 000 ms**. **Se conservan los cuatro testimonios.** Los puntos pasan de decoración a control primario: nombre accesible traducido (hoy `testimonialLabel()` devuelve `'Testimonio N'` en español fijo), estado programático, 44×44 px. Monta `ClientWall`. Pasa de mist a blanco |
 | `AboutTeaserSection` | De `--amd-ink` a claro; entra la imagen, cuyo alto deriva del texto; recibe `.section--light` |
 | `MobileDrawer` | Añade `#cifras`; las etiquetas de sección pasan a "Líneas"/"Manifiesto" — hoy muestra **"Servicios" dos veces** |
 | `TopNav` | Empieza a invertirse sobre tramos claros; hoy nunca lo hace |
@@ -224,7 +229,7 @@ hero.
 | **DD-031** | Dorado sobre claro | **Dos** tokens de tinta: `--amd-gold-ink: #8a7a2e` (3.86:1) para relleno y texto grande, `--amd-gold-ink-deep: #6f6224` (5.49:1) para texto normal; `--amd-gold` sólo como relleno | Un solo token de tinta; usar `--amd-gold` como texto; aclarar el fondo | Medido: `#CFBB66` da 1.73:1 sobre mist, reprueba incluso en texto grande. **Corregido en la Pivot T001**: con un solo token a 3.86:1, tres de los cuatro usos del acento incumplen WCAG porque se renderizan a 12–18.4px, por debajo del piso de texto grande. **Ninguno de los dos es un color nuevo**: `#8a7a2e` estaba suelto en `.eyebrow--ink` y `#6f6224` en `home-redesign.css:187` y `:273` |
 | **DD-032** | Logos de clientes | Máscaras monocromas de un canal + `mask-image` + `currentColor` | `<img>` en color; SVG por logo; dos juegos por tema | Los 13 originales traen ratios de 0.82 a 4.18, un JPG con fondo negro y uno rosa invisible sobre papel. El monocromo normaliza los cuatro problemas a la vez y **una pieza sirve en los dos temas** |
 | **DD-033** | Cinta del muro | `margin-inline` por elemento y duración calculada en JS desde el ancho medido | `gap` + duración fija en CSS | Con `gap` el 50 % queda desfasado medio hueco y el bucle salta. Con duración fija la cinta acelera en móvil, justo donde cuesta más leerla |
-| **DD-034** | Testimonios | **Rotación automática a ritmo de lectura (9 s), con pausa en `:hover`/`:focus-within` y sin temporizador bajo reduced-motion**; **cuatro**, no tres; puntos como control explícito | Sin auto-rotación (elección original); rotar sin pausa al interactuar; reducir a tres como el mockup | **Revertido por HITL 2026-09-06:** el cliente pidió que los testimonios pasen solos. La objeción que motivó la elección original —sustituir texto que se está leyendo— se resuelve con la pausa al hover/foco, no renunciando a la rotación. El mockup no rota: esto va por encima del mockup. Reducir a tres seguiría siendo pérdida de contenido que ningún requisito pide |
+| **DD-034** | Testimonios | **Rotación automática a ritmo de lectura (6 s — corregido en T019; el valor original de la reversión fue 9 s), con pausa en `:hover`/`:focus-within` y sin temporizador bajo reduced-motion**; **cuatro**, no tres; puntos como control explícito | Sin auto-rotación (elección original); rotar sin pausa al interactuar; reducir a tres como el mockup | **Revertido por HITL 2026-09-06:** el cliente pidió que los testimonios pasen solos. La objeción que motivó la elección original —sustituir texto que se está leyendo— se resuelve con la pausa al hover/foco, no renunciando a la rotación. El mockup no rota: esto va por encima del mockup. Reducir a tres seguiría siendo pérdida de contenido que ningún requisito pide. **El ritmo sale de medir el copy** (T019): el testimonio más largo son 16 palabras, ~6 s leyendo despacio; 9 s se sentían muertos |
 | **DD-035** | Datos del ledger | Importar `SERVICE_GROUPS` de `features/services/services-page`; contador derivado de `subs.length` | Duplicar el catálogo en la Home; contador literal | Es la dirección de import que ya existe. Hoy ambos dan 31; derivarlo impide que se separen mañana |
 | **DD-036** | Contenido colapsado | Detalle de fila cerrada marcado `inert` | Sólo `hidden` visual; nada | `ServicesRoadSection` ya lo resolvía. Cinco filas cerradas con su enlace dentro es la misma trampa WCAG |
 | **DD-037** | Ocultado del `SectionNav` | Técnica que retira del orden de foco | `opacity` + `transform`, como el mockup | El mockup deja `display: block` y sólo baja la opacidad: enlaces tabulables e invisibles |
@@ -287,11 +292,18 @@ rail no abre un hueco: cierra uno que ya existía.
 
 ## 10. Budget (Step 2.4)
 
-| Señal | Estimación |
-|---|---|
-| **Tareas** | **13** |
-| **LOC neto** | **~1 900** (≈ +2 400 añadidas, ≈ −500 borradas con `services-road/` y `home-side-nav/`) |
-| **Rondas de revisión** | **3** esperadas (el ledger y el `SectionNav` son las candidatas) |
+| Señal | Estimación | **Real (cerrado 2026-09-06)** |
+|---|---|---|
+| **Tareas** | **13** | **20** (T001–T020) |
+| **LOC neto** | **~1 900** (≈ +2 400 añadidas, ≈ −500 borradas con `services-road/` y `home-side-nav/`) | **+3 838** en `client/` (+6 081 / −2 243) |
+| **Rondas de revisión** | **3** esperadas (el ledger y el `SectionNav` son las candidatas) | 1–2 por tarea · 1 Pivot (T001) · 0 HALT |
+
+**El cable trampa saltó, y se escaló como debía.** Las siete tareas de más (T014–T020) no salieron de
+una descomposición mal hecha: salieron de **KZ-007** —una tarea escrita como *delta de comportamiento*
+no porta el diseño, y la revisión no lo detecta— y de **cuatro pasadas de revisión HITL en navegador**,
+cada una aprobada explícitamente. T012 y T020 son el gate de medición y el defecto preexistente que
+destapó. La estimación no estaba mal calibrada para el trabajo que el spec describía; lo que el spec
+no describía era el porte visual del mockup, que es lo que costó las seis tareas de corrección.
 
 > La estimación inicial fue 12; la descomposición de la Fase 3 dio **13**. Se corrige la cifra en
 > vez de forzar la partición: la tarea de más es la sincronización de `docs/ux-ui/design.md`
@@ -308,7 +320,7 @@ y por eso §11 recomienda partir en tres PR.
 
 | Suite | Cubre |
 |---|---|
-| `frontend-unit` (Vitest + jsdom) | Acordeón exclusivo y `aria-expanded`; `inert` en colapsado; contador derivado de `subs.length`; los 5 ids y los 5 deep-links; guard de "Más info"; duplicación y `aria-hidden` del muro; `probeSectionThemeAt` como función pura; ausencia de temporizador en testimonios; paridad de claves i18n; cálculo de contraste sobre los tokens |
+| `frontend-unit` (Vitest + jsdom) | Acordeón exclusivo y `aria-expanded`; `inert` en colapsado; contador derivado de `subs.length`; los 5 ids y los 5 deep-links; guard de "Más info"; duplicación y `aria-hidden` del muro; `probeSectionThemeAt` como función pura; **rotación de testimonios contra `TESTIMONIAL_PAUSE_MS` con timers falsos, pausa por hover/foco y ausencia de temporizador bajo reduced-motion**; paridad de claves i18n; cálculo de contraste sobre los tokens |
 | **`browser-measure` (Playwright, DD-038)** | Proporción de tinta y posición del primer tramo claro; ausencia de scroll horizontal en 6 anchos; costura del carrusel ≤ 0.5 px; velocidad constante ±10 %; un solo índice por ancho; pausa del marquee |
 | `build` | Budgets de `angular.json`; el video fuera del bundle inicial |
 | **Revisión visual HITL** | Encuadre de las fotos; veracidad de los textos alternativos; fidelidad al mockup |
