@@ -1569,3 +1569,77 @@ y no quedó ningún literal `9000` en la suite — comprobado por grep.
 
 jsdom no calcula layout: que no haya `space-between` **no prueba** que el menú quede a la derecha. Y
 si 6 s resulta cómodo de leer sólo lo dice una persona leyéndolo.
+
+---
+
+## T012 — Gate de medición en navegador · **PASS** (1 ronda · 2026-09-06)
+
+**El gate reporta 12 PASS · 1 FAIL · 0 INCONCLUSO.** El FAIL es un defecto real de la app, no del
+instrumento: queda aislado en **T020**. La tarea se cierra porque su entregable era el gate.
+
+### Lo entregado
+
+Playwright como **devDependency** (`main` sigue en 451.35 kB), `playwright.config.ts` con
+`reuseExistingServer`, y `e2e/visual-gate.spec.ts` + un reporter propio que imprime **una tabla con
+nombre, valor medido, umbral y estado** por medición. Salida **1** si alguna no es PASS —verificado
+por el Reviewer ejecutándolo, no leído del reporte—.
+
+### Las trece mediciones, ejecutadas por el Reviewer
+
+| # | Medición | Valor | Umbral | |
+|---|---|---|---|---|
+| 01 | Proporción de tinta a 1440 px | **39.40 %** | 35–45 % | PASS |
+| 02 | Primer tramo claro | **1.00 vh** | ≤ 1.20 vh | PASS |
+| 03 | Sin scroll horizontal (6 anchos) | **+97.00 px a 375** | ≤ 1 px | **FAIL** |
+| 04 | Índices de sección visibles | 1 exacto | exactamente 1 | PASS |
+| 05 | Costura del carrusel | **−0.50 px** | \|≤ 0.50\| px | PASS |
+| 06 | Velocidad del carrusel entre anchos | **±0.74 %** (42.2 px/s) | ±10 % | PASS |
+| 07 | Pausa en hover | paused / running | — | PASS |
+| 08 | Foto del ledger en transición | 0.00 px | ≤ 1 px | PASS |
+| 09 | Contraste dorado sobre claro | **mín 3.86:1** | ≥ 4.5:1, o ≥ 3:1 si texto grande | PASS |
+| 10 | Alineación izquierda del hero | 0.00 px | ± 2 px | PASS |
+| 11 | Enlaces del top-nav a la derecha | 494 vs 24 px | izq ≫ der | PASS |
+| 12 | «Scroll» revela el sub-header | is-on visible | — | PASS |
+| 13 | Sentido de los dos tickers | reverse / normal | opuestos | PASS |
+
+**La 12 responde a un pendiente que quedó abierto en T018:** la tolerancia de 2 px del umbral del
+sub-header **basta** en navegador real. Era la única forma de saberlo.
+
+**La 09 confirma que el umbral se elige por tamaño y no por constante:** el mínimo observado es
+3.86:1, que es `--amd-gold-ink` — reprobaría contra 4.5:1 y pasa porque el elemento **medido** alcanza
+el piso de texto grande. Un gate con umbral fijo habría dado un falso FAIL aquí, o un falso PASS en
+otro sitio.
+
+### Las dos mutaciones del spec, corridas por el Reviewer
+
+| Mutación | Resultado |
+|---|---|
+| `gap` en la cinta en vez de `margin-inline` | Costura **28.00 px** contra 0.50 → **FAIL**, salida 1 |
+| El ledger de vuelta a tinta (`--amd-ink`, sin `.section--light`) | Tinta **62.98 %** y primer tramo claro **2.40 vh** → **dos FAIL** |
+
+> La segunda es notable: **reproduce los números sobre los que se tomó DD-028.** Esa decisión dice que
+> la v1 rechazada medía «68.2 % en tinta y **2.4 pantallas** antes del primer respiro», y la mutación
+> devuelve **2.40 vh**. El gate mide exactamente la magnitud que motivó el rediseño.
+
+La primera es la razón de ser de este gate: la costura del bucle es el defecto que **ningún test en
+jsdom puede ver**, y hasta ahora sólo estaba protegido por un aserto sobre el texto del CSS.
+
+### El FAIL — diagnosticado por el Reviewer, no arreglado
+
+A 375 px, `scrollWidth` 472 contra viewport 375. El culpable es **`.topnav__actions`**, 268.9 px de
+ancho: CTA «Contacto» (110.9) + conmutador ES/EN (~90) + hamburguesa (44). No caben junto a la marca.
+
+**Los orbes del hero también se salen de caja pero no cuentan:** viven dentro de `.hero`, que tiene
+`overflow: hidden`, y no contribuyen al `scrollWidth` del documento. Distinguirlo importaba: sin
+mirarlo se habría "arreglado" el elemento equivocado.
+
+Es el bug preexistente que el `HANDOFF.md` ya nombraba («rama `bugfix/topnav-overflow-mobile` sin
+abrir»). **El mockup lo resuelve** en `home-redesign.css:842` ocultando el CTA por debajo de 900 px.
+Aislado en **T020**; el brief prohibía arreglarlo aquí, y con razón: el entregable era el instrumento.
+
+### ADVISORY (registrado, no bloquea)
+
+1. **La costura sale exactamente en el límite** (−0.50 px contra \|≤ 0.50\|). El mockup medía
+   0.00 / −0.03 / −0.13. Pasa, pero sin margen: conviene mirar si es efecto real o artefacto de
+   redondeo de la medición antes de fiarse de ese número en CI.
+2. `test-results/` añadido a `.gitignore`.

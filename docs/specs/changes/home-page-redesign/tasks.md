@@ -1100,7 +1100,7 @@ hay literales que perseguir. Si alguno compara con `9000` a mano, es un defecto:
 
 ## T012 — Gate de medición en navegador
 
-- **Status:** [ ]
+- **Status:** [x] PASS (1 ronda · 2026-09-06) — **el gate reporta 12 PASS · 1 FAIL**; el FAIL es un defecto real de la app, no del gate (→ **T020**)
 - **Depends on:** T007, T009, T011, **T014, T015, T016, T017, T018, T019**
 - **Directory boundary:** `client/` (devDependency + script)
 - **Recommended skills:** `angular-developer`
@@ -1167,10 +1167,65 @@ este gate debía cubrir. Se añaden como mediciones 10-13, todas lecturas de pos
 
 ### Done when
 
-- [ ] `verify:visual` reporta las **trece** mediciones con su número
-- [ ] Las trece dentro de umbral, o reportadas como INCONCLUSO con su dispersión
-- [ ] El contraste se mide a 375 y 1200 px, y el umbral lo elige el tamaño computado, no una constante
-- [ ] Playwright sólo como devDependency; el bundle no cambia
+- [x] `verify:visual` reporta las **trece** con su número, umbral y estado, y sale con código **1** si alguna no es PASS
+- [x] **12 dentro de umbral, 0 inconclusas.** La 3 sale **FAIL: +97 px de desborde horizontal a 375 px** — defecto preexistente del top-nav, aislado en **T020**
+- [x] Contraste medido a 375 y 1200 px con el umbral elegido por el tamaño computado; mínimo observado **3.86:1**, que es `--amd-gold-ink` sobre texto grande — correcto
+- [x] Playwright sólo como devDependency; `main` sigue en **451.35 kB**
+
+---
+
+
+## T020 — El top-nav desborda 97 px a 375 px
+
+- **Status:** [ ]
+- **Depends on:** T012 (lo detectó su medición 3)
+- **Origen:** **T012, medición 3 — primer defecto que encuentra el gate por sí solo.** Es el bug
+  preexistente que el `HANDOFF.md` ya nombraba («rama `bugfix/topnav-overflow-mobile` sin abrir»),
+  ahora con número.
+- **Directory boundary:** `client/src/app/core/layout/top-nav/`
+- **Recommended skills:** `ui-ux-pro-max`
+- **Requirements:** REQ-012 (sin scroll horizontal), REQ-013
+- **Design refs:** **Mockup: `home-redesign.css:842`**
+
+### Scope
+
+Medido con Playwright a 375 px: `scrollWidth` 472 contra un viewport de 375 → **97 px de desborde**.
+El culpable es `.topnav__actions`, de **268.9 px** de ancho, que arranca en x=203 y termina en 472:
+
+| Pieza | Ancho |
+|---|---|
+| `a.btn.btn--gold` («Contacto») | 110.9 px |
+| Conmutador ES/EN | ~90 px |
+| `button.menu-btn` (hamburguesa) | 44 px |
+
+No caben junto a la marca en 375 px. **Los orbes del hero también se salen de caja, pero no cuentan**:
+viven dentro de `.hero`, que tiene `overflow: hidden`, y no contribuyen al `scrollWidth` del documento.
+
+**El mockup ya lo resuelve** (`home-redesign.css:842`):
+
+```css
+@media (max-width: 899px) { .topnav__cta { display: none; } }
+```
+
+Oculta el CTA por debajo de 900 px. El contacto no se pierde: quedan la hamburguesa —que lleva el
+enlace a `#contacto`— y el FAB flotante de WhatsApp, presente en toda la página.
+
+### Tests
+
+- El CTA del top-nav no se renderiza por debajo de 900 px
+- **La verificación real es el gate**: `npm run verify:visual` debe pasar la medición 3 en los seis
+  anchos, y las otras doce deben seguir en PASS
+
+- **Verification:** `cd client && npm run verify:visual && npm run test:agent`
+- **Falsable con:** devolver el CTA a < 900 px → la medición 3 debe volver a FALLAR con ~97 px.
+- **Evidence disqualifier:** un test en jsdom que compruebe `display: none` **no** prueba que no haya
+  desborde. Lo prueba la medición 3 y sólo ella.
+
+### Done when
+
+- [ ] Medición 3 en PASS a 375 · 768 · 900 · 1200 · 1600 · 1920
+- [ ] Las otras doce mediciones siguen en PASS
+- [ ] El acceso a contacto sigue disponible en móvil por la hamburguesa y el FAB
 
 ---
 
